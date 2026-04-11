@@ -437,10 +437,40 @@ document.getElementById('appTitle').textContent = '📋 JNV Tarikhet';
 // ════════════════════════════════════════════════════════════
 async function api(params) {
   if (!params.pin) params.pin = PIN;
+
+  // Validate API_URL before attempting fetch
+  if (!API_URL || API_URL === 'https://script.google.com/macros/s/AKfycby9XJtadC1lZo6vmp7TWRnO_nq-LoVZnpsqWB_drSTLPXYfM5zTkCjQn8PxTVuZvdaO1Q/exec') {
+    throw new Error('API URL not set. Open index.html and replace YOUR_GAS_WEB_APP_URL_HERE with your GAS Web App URL.');
+  }
+
   const qs = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v||'')).join('&');
-  const res = await fetch(API_URL + '?' + qs);
-  const json = await res.json();
-  // If PIN was wrong, lock back to PIN screen with error message
+  let res, text;
+  try {
+    res  = await fetch(API_URL + '?' + qs);
+    text = await res.text();
+  } catch(e) {
+    throw new Error('Network error — check your internet connection.');
+  }
+
+  // GAS sometimes returns an HTML error page instead of JSON
+  // (expired deployment, wrong URL, authorization needed)
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch(e) {
+    // Show helpful message with the actual URL that was called
+    console.error('Non-JSON response from GAS:', text.substring(0, 300));
+    throw new Error(
+      'GAS returned HTML instead of JSON.\n\n' +
+      'Most likely causes:\n' +
+      '1. Wrong API URL in index.html\n' +
+      '2. Deployment expired — redeploy in Apps Script\n' +
+      '3. "Execute as" not set to "Me" in deployment settings\n\n' +
+      'Current URL: ' + API_URL.substring(0, 60) + '...'
+    );
+  }
+
+  // If PIN was wrong, lock back to PIN screen
   if (json.code === 401) {
     PIN = '';
     document.getElementById('app').style.display = 'none';
@@ -450,10 +480,11 @@ async function api(params) {
     inp.value = ''; inp.style.border = '2px solid #c0392b'; inp.focus();
     err.textContent = '❌ Wrong PIN. Please try again.';
     err.style.display = 'block';
-    const btn = document.getElementById('pinBtn');
-    btn.textContent = 'Open Dashboard →'; btn.disabled = false;
+    document.getElementById('pinBtn').textContent = 'Open Dashboard →';
+    document.getElementById('pinBtn').disabled = false;
     throw new Error('Invalid PIN');
   }
+
   if (json.error) throw new Error(json.error);
   return json;
 }
@@ -602,7 +633,14 @@ async function loadDaily() {
     renderErrorTable(d.errors);
     document.getElementById('lastSync').textContent = 'Synced '+d.time;
   } catch(e) {
-    alert('Load failed: '+e.message);
+    const msg = e.message || String(e);
+    ['todayBody','teacherBody','classBody','heatmapBody','errorBody'].forEach(id => {
+      document.getElementById(id).innerHTML =
+        '<div class="empty"><div class="empty-icon">❌</div>' +
+        '<div style="font-size:12px;color:#c0392b;max-width:320px;margin:0 auto;text-align:left;white-space:pre-wrap">' +
+        msg + '</div></div>';
+    });
+    document.getElementById('lastSync').textContent = 'Failed';
   }
   btn.disabled = false;
   icon.textContent = '↻';
