@@ -413,11 +413,24 @@ let LINKS = { sheetUrl:'', formFillUrl:'', formEditUrl:'' };
 //  API FETCH — simple wrapper
 // ════════════════════════════════════════════════════════════
 async function api(params) {
-  // Only set PIN from global state if not already explicitly provided in params
   if (!params.pin) params.pin = PIN;
   const qs = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v||'')).join('&');
   const res = await fetch(API_URL + '?' + qs);
   const json = await res.json();
+  // If PIN was wrong, lock back to PIN screen with error message
+  if (json.code === 401) {
+    PIN = '';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('pinScreen').style.display = 'flex';
+    const inp = document.getElementById('pinInput');
+    const err = document.getElementById('pinErr');
+    inp.value = ''; inp.style.border = '2px solid #c0392b'; inp.focus();
+    err.textContent = '❌ Wrong PIN. Please try again.';
+    err.style.display = 'block';
+    const btn = document.getElementById('pinBtn');
+    btn.textContent = 'Open Dashboard →'; btn.disabled = false;
+    throw new Error('Invalid PIN');
+  }
   if (json.error) throw new Error(json.error);
   return json;
 }
@@ -446,22 +459,15 @@ async function tryPin() {
   const err = document.getElementById('pinErr');
   const pin = inp.value.trim();
   if (!pin) return;
-  btn.textContent = 'Verifying...'; btn.disabled = true;
   err.style.display = 'none';
-  try {
-    const r = await api({ action:'verifyPin', pin });
-    if (r.ok) {
-      PIN = pin;
-      await initApp();
-    } else {
-      err.style.display = 'block';
-      inp.value = ''; inp.focus();
-      inp.style.border = '2px solid #c0392b';
-    }
-  } catch(e) {
-    err.textContent = '❌ Error: ' + e.message;
-    err.style.display = 'block';
-  }
+
+  // ── Fast path: store PIN and open dashboard immediately ──────
+  // The first real API call (ping/daily) will fail with 401 if
+  // the PIN is wrong, and we lock back to the PIN screen then.
+  // This makes login feel instant — no waiting for GAS round-trip.
+  PIN = pin;
+  btn.textContent = 'Opening...'; btn.disabled = true;
+  await initApp();
   btn.textContent = 'Open Dashboard →'; btn.disabled = false;
 }
 
