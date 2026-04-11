@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -72,6 +72,15 @@
 
       <div style="font-size:0.68rem;color:var(--t3);margin-top:24px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">
         Secured by <span style="color:var(--indigo-lt);">Supabase</span>
+      </div>
+
+      <div style="text-align:center; margin-top:16px;">
+        <a href="index.html"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;color:var(--t3);text-decoration:none;padding:8px 16px;border-radius:var(--r-full);border:1px solid var(--bd2);background:var(--bg-raised);transition:all 0.2s var(--ease);"
+           onmouseover="this.style.color='var(--indigo-lt)';this.style.borderColor='var(--indigo-border)';this.style.background='var(--indigo-sub)';"
+           onmouseout="this.style.color='var(--t3)';this.style.borderColor='var(--bd2)';this.style.background='var(--bg-raised)';">
+          ⬅ Back to User Login / Signup
+        </a>
       </div>
 
     </div>
@@ -363,7 +372,7 @@
   <!-- Theme bootstrap -->
   <script>
     (function(){
-      const t = localStorage.getItem('nova-theme') || 'dark';
+      const t = localStorage.getItem('nova-theme') || 'light';
       document.documentElement.setAttribute('data-theme', t);
       const pinBtn = document.getElementById('pinThemeBtn');
       const appBtn = document.getElementById('appThemeBtn');

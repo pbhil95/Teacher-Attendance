@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -245,7 +245,7 @@
     function toggleTheme() {
       applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
-    applyTheme(localStorage.getItem('nova-theme') || 'dark');
+    applyTheme(localStorage.getItem('nova-theme') || 'light');
 
     // ── HTML escape ──
     function esc(s) {
