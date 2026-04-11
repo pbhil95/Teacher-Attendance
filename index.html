@@ -1010,6 +1010,49 @@
         grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
       }
     }
+
+    /* ── INLINE SUCCESS SCREEN ── */
+    #successScreen { display:none; }
+    .success-page { max-width:560px; margin:0 auto; padding:26px 14px 40px; }
+    .suc-card { background:var(--card); border-radius:var(--r); box-shadow:var(--sh);
+      padding:28px 24px; text-align:center; margin-bottom:14px; border:1px solid var(--border); }
+    .suc-tick { width:76px; height:76px; background:var(--green-light,#eafaf1); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+      font-size:2.2rem; animation:sucPop .5s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes sucPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+    .suc-title { font-family:var(--fh); font-size:1.5rem; color:var(--green,#1e8449); font-weight:700; margin-bottom:5px; }
+    .suc-sub { color:var(--muted); font-size:14px; line-height:1.6; }
+    .suc-detail { background:var(--card); border-radius:var(--r); box-shadow:var(--sh);
+      overflow:hidden; margin-bottom:14px; border:1px solid var(--border); }
+    .suc-detail-head { background:var(--card2,#fafbfd); border-bottom:1px solid var(--border);
+      padding:11px 18px; font-family:var(--fh); font-size:.95rem; color:var(--blue); font-weight:700; }
+    .suc-row { display:flex; border-bottom:1px solid var(--border); padding:10px 18px; }
+    .suc-row:last-child { border-bottom:none; }
+    .suc-lbl { width:120px; font-size:11px; font-weight:600; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.7px; flex-shrink:0; padding-top:1px; }
+    .suc-val { font-size:14px; font-weight:500; }
+    .suc-counts { display:grid; grid-template-columns:repeat(4,1fr); padding:12px 18px 14px; }
+    .suc-cnt { text-align:center; padding:6px 4px; }
+    .suc-cnt .v { font-family:var(--fh); font-size:1.3rem; font-weight:700; }
+    .suc-cnt .l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+    .pill-ok { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px;
+      font-weight:600; background:var(--green-light,#eafaf1); color:var(--green,#1e8449); }
+    .pill-no { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px;
+      font-weight:600; background:#fde8e6; color:var(--red); }
+    .suc-btns { display:flex; flex-direction:column; gap:10px; }
+    .suc-btn { display:block; width:100%; padding:14px; border:none; border-radius:12px;
+      font-family:var(--fh); font-size:1.05rem; font-weight:700; letter-spacing:.5px;
+      cursor:pointer; text-align:center; transition:opacity .2s; }
+    .suc-btn:active { opacity:.85; }
+    .suc-btn-primary { background:linear-gradient(135deg,var(--hdr2,#1a5276),var(--hdr3,#117a65));
+      color:#fff; box-shadow:0 4px 18px rgba(26,82,118,.3); }
+    .suc-btn-outline { background:var(--card); color:var(--blue); border:1.5px solid var(--border);
+      box-shadow:0 2px 8px rgba(28,36,52,.07); }
+    .suc-ts { text-align:center; font-size:11px; color:var(--muted); margin-top:10px; }
+    @media(max-width:420px) {
+      .suc-counts { grid-template-columns:repeat(2,1fr); }
+      .suc-lbl { width:100px; }
+    }
   </style>
 </head>
 
@@ -1325,6 +1368,27 @@
     </div>
   </div>
 
+  <!-- ── INLINE SUCCESS SCREEN ── -->
+  <div id="successScreen">
+    <div class="success-page">
+      <div class="suc-card">
+        <div class="suc-tick">✅</div>
+        <div class="suc-title">Submitted Successfully!</div>
+        <div class="suc-sub">Your attendance record has been saved.<br>Thank you for submitting on time.</div>
+      </div>
+      <div class="suc-detail" id="sucDetail" style="display:none">
+        <div class="suc-detail-head">📝 Submission Details</div>
+        <div id="sucBody"></div>
+      </div>
+      <div class="suc-btns">
+        <button class="suc-btn suc-btn-primary" onclick="submitAnother()">➕ Submit Another Entry</button>
+        <a href="dashboard.html" class="suc-btn suc-btn-outline">📊 Open Admin Dashboard</a>
+        <button class="suc-btn suc-btn-outline" onclick="doLogout()" style="font-size:.95rem;">🚪 Sign Out</button>
+      </div>
+      <div class="suc-ts" id="sucTs"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- Supabase JS (CDN) -->
@@ -1569,15 +1633,82 @@
     function showScreen(name) {
       const loading = document.getElementById('loadingScreen');
       if (loading) loading.classList.add('hidden');
-      
+
       document.getElementById('authScreen').classList.toggle('hidden', name !== 'auth');
       document.getElementById('waitScreen').classList.toggle('hidden', name !== 'wait');
       document.getElementById('mainContent').classList.toggle('hidden', name !== 'form');
-      // Always reset login button when returning to auth screen
+      document.getElementById('successScreen').style.display = name === 'success' ? 'block' : 'none';
+
       if (name === 'auth') {
         const btn = document.getElementById('loginBtn');
         if (btn) { btn.disabled = false; btn.textContent = '🔐 Sign In'; }
       }
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function showSuccessScreen(payload) {
+      const d = payload;
+      const detail = document.getElementById('sucDetail');
+      const body   = document.getElementById('sucBody');
+
+      const rows = [
+        ['Teacher', esc(d.teacher)],
+        ['Period',  'Period ' + esc(d.period)],
+        ['Class',   esc(d.class)],
+        ['Subject', esc(d.subject)],
+        ['Class Taken', d.taken === 'Yes'
+          ? '<span class="pill-ok">✅ Yes</span>'
+          : '<span class="pill-no">❌ No</span>']
+      ];
+      if (d.reason) rows.push(['Reason', esc(d.reason)]);
+
+      let html = rows.map(([l, v]) =>
+        `<div class="suc-row"><div class="suc-lbl">${l}</div><div class="suc-val">${v}</div></div>`
+      ).join('');
+
+      if (d.taken === 'Yes' && d.total) {
+        html += `<div class="suc-counts">
+          <div class="suc-cnt"><div class="v">${esc(d.total)}</div><div class="l">Total</div></div>
+          <div class="suc-cnt"><div class="v" style="color:var(--green)">${esc(d.present)}</div><div class="l">Present</div></div>
+          <div class="suc-cnt"><div class="v" style="color:var(--red)">${esc(d.absent)}</div><div class="l">Absent</div></div>
+          <div class="suc-cnt"><div class="v">${esc(d.leave_count)}</div><div class="l">Leave</div></div>
+          <div class="suc-cnt"><div class="v">${esc(d.od)}</div><div class="l">OD</div></div>
+          <div class="suc-cnt"><div class="v">${esc(d.tca)}</div><div class="l">TCA</div></div>
+          <div class="suc-cnt"><div class="v">${esc(d.nr)}</div><div class="l">NR</div></div>
+          <div class="suc-cnt"><div class="v">${esc(d.sick)}</div><div class="l">Sick</div></div>
+        </div>`;
+      }
+      if (d.remarks) html += `<div class="suc-row"><div class="suc-lbl">Remarks</div><div class="suc-val">${esc(d.remarks)}</div></div>`;
+
+      body.innerHTML = html;
+      detail.style.display = '';
+
+      const now = new Date();
+      document.getElementById('sucTs').textContent = 'Submitted at ' +
+        now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' on ' +
+        now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      showScreen('success');
+      window.scrollTo(0, 0);
+    }
+
+    function submitAnother() {
+      // Reset form completely, keep profile — no page reload, no DB call
+      const form = document.getElementById('attForm');
+      if (form) form.reset();
+      document.querySelectorAll('input[name="period"]').forEach(r => r.checked = false);
+      document.getElementById('countsSection').classList.add('hidden');
+      document.getElementById('reasonField').classList.remove('hidden');
+      setMath('neu', '⊞ Fill counts above when class is taken');
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = false;
+      btn.textContent = 'Submit Attendance →';
+      showScreen('form');
+      window.scrollTo(0, 0);
     }
 
     function showForm(profile) {
@@ -1916,10 +2047,7 @@
       try {
         const { error } = await db.from('attendance').insert([payload]);
         if (error) throw error;
-        sessionStorage.setItem('lastSubmission', JSON.stringify({
-          ...payload, leave: payload.leave_count
-        }));
-        window.location.href = 'form-success.html';
+        showSuccessScreen(payload);
       } catch (err) {
         const msg = err.message || String(err);
         const isAuthErr = /jwt|expired|not authenticated|unauthorized|401|403/i.test(msg);
