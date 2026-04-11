@@ -400,7 +400,7 @@ tbody tr:hover{background:#f7f9fc;}
 //  STEP 1: Paste your GAS Web App URL here
 //  Get it from: Apps Script → Deploy → Manage Deployments
 // ════════════════════════════════════════════════════════════
-const API_URL = 'YOUR_GAS_WEB_APP_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycby9XJtadC1lZo6vmp7TWRnO_nq-LoVZnpsqWB_drSTLPXYfM5zTkCjQn8PxTVuZvdaO1Q/exec';
 
 // ════════════════════════════════════════════════════════════
 //  STATE
@@ -439,7 +439,7 @@ async function api(params) {
   if (!params.pin) params.pin = PIN;
 
   // Validate API_URL before attempting fetch
-  if (!API_URL || API_URL === 'https://script.google.com/macros/s/AKfycby9XJtadC1lZo6vmp7TWRnO_nq-LoVZnpsqWB_drSTLPXYfM5zTkCjQn8PxTVuZvdaO1Q/exec') {
+  if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
     throw new Error('API URL not set. Open index.html and replace YOUR_GAS_WEB_APP_URL_HERE with your GAS Web App URL.');
   }
 
