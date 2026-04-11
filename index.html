@@ -153,7 +153,7 @@
       padding: 32px 26px 28px;
       max-width: 440px;
       width: 100%;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255,255,255,.06);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06);
       border: 1px solid var(--border);
       position: relative;
       z-index: 1;
@@ -164,7 +164,7 @@
       font-size: 2.6rem;
       text-align: center;
       margin-bottom: 6px;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .2));
     }
 
     .auth-title {
@@ -433,8 +433,15 @@
     }
 
     @keyframes pulse-wait {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
     }
 
     .wait-name-badge {
@@ -1076,8 +1083,8 @@
         <div id="registerError" class="auth-error"></div>
         <div id="registerSuccess" class="auth-success-msg hidden"></div>
         <button class="auth-btn" id="registerBtn" onclick="doRegister()">📝 Create Account</button>
-        <p class="auth-foot">Already have an account? <a href="#"
-            onclick="switchAuthTab('login');return false;">Sign in →</a></p>
+        <p class="auth-foot">Already have an account? <a href="#" onclick="switchAuthTab('login');return false;">Sign in
+            →</a></p>
         <p class="auth-foot" style="font-size:11px;margin-top:6px;color:var(--muted)">
           ⚠️ After registration, the admin must approve your account before you can submit.
         </p>
@@ -1085,14 +1092,13 @@
 
       <!-- Dashboard link for admin -->
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);text-align:center">
-        <a href="dashboard.html"
-           style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
+        <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
                   background:var(--card2);border:1.5px solid var(--border);
                   border-radius:30px;text-decoration:none;color:var(--muted);
                   font-size:12px;font-weight:600;font-family:var(--fb);
                   transition:all .2s;letter-spacing:.3px"
-           onmouseover="this.style.borderColor='var(--blue2)';this.style.color='var(--blue)'"
-           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+          onmouseover="this.style.borderColor='var(--blue2)';this.style.color='var(--blue)'"
+          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
           📊 Admin Dashboard →
         </a>
         <p style="margin-top:8px;font-size:10px;color:var(--muted);opacity:.7">Admin access required (PIN)</p>
@@ -1378,48 +1384,56 @@
     });
 
     async function loadProfile(user) {
-      let { data: profile, error } = await db
-        .from('teacher_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      // If no profile but we have metadata (email confirmation flow — profile created at next login)
-      if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
-        const { data: newProfile, error: insertErr } = await db
+      try {
+        let { data: profile, error } = await db
           .from('teacher_profiles')
-          .insert([{
-            id: user.id,
-            name: user.user_metadata.name,
-            email: user.email,
-            classes: user.user_metadata.classes || [],
-            subjects: user.user_metadata.subjects || []
-          }])
-          .select()
+          .select('*')
+          .eq('id', user.id)
           .single();
 
-        if (!insertErr && newProfile) {
-          profile = newProfile;
-          error = null;
+        // If no profile but we have metadata (email confirmation flow — profile created at next login)
+        if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
+          const { data: newProfile, error: insertErr } = await db
+            .from('teacher_profiles')
+            .insert([{
+              id: user.id,
+              name: user.user_metadata.name,
+              email: user.email,
+              classes: user.user_metadata.classes || [],
+              subjects: user.user_metadata.subjects || []
+            }])
+            .select()
+            .single();
+
+          if (!insertErr && newProfile) {
+            profile = newProfile;
+            error = null;
+          }
         }
-      }
 
-      if (error || !profile) {
-        // Profile truly missing — sign out
-        await db.auth.signOut();
-        showScreen('auth');
-        return;
-      }
+        if (error || !profile) {
+          // Profile truly missing — sign out
+          await db.auth.signOut();
+          showScreen('auth');
+          return;
+        }
 
-      if (!profile.approved) {
-        document.getElementById('waitNameDisplay').textContent = profile.name;
+        if (!profile.approved) {
+          document.getElementById('waitNameDisplay').textContent = profile.name;
+          currentProfile = profile;
+          showScreen('wait');
+          return;
+        }
+
         currentProfile = profile;
-        showScreen('wait');
-        return;
+        showForm(profile);
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        showToast('❌ Profile load error: ' + (err.message || String(err)), 6000);
+        document.getElementById('loginBtn').disabled = false;
+        document.getElementById('loginBtn').textContent = '🔐 Sign In';
+        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
       }
-
-      currentProfile = profile;
-      showForm(profile);
     }
 
     function showScreen(name) {
@@ -1435,7 +1449,11 @@
       // Populate ONLY the teacher's assigned classes
       const clsSel = document.getElementById('cls');
       clsSel.innerHTML = '<option value="">— Select class —</option>';
-      (profile.classes || []).sort().forEach(v => {
+      let pClasses = profile.classes || [];
+      if (typeof pClasses === 'string') {
+        pClasses = pClasses.replace(/^\{|\}$/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+      }
+      pClasses.sort().forEach(v => {
         const o = document.createElement('option');
         o.value = v; o.textContent = v;
         clsSel.appendChild(o);
@@ -1444,7 +1462,11 @@
       // Populate ONLY the teacher's assigned subjects
       const subSel = document.getElementById('subject');
       subSel.innerHTML = '<option value="">— Select subject —</option>';
-      (profile.subjects || []).sort().forEach(v => {
+      let pSubjects = profile.subjects || [];
+      if (typeof pSubjects === 'string') {
+        pSubjects = pSubjects.replace(/^\{|\}$/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+      }
+      pSubjects.sort().forEach(v => {
         const o = document.createElement('option');
         o.value = v; o.textContent = v;
         subSel.appendChild(o);
@@ -1481,16 +1503,26 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Signing in...';
 
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      try {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
 
-      btn.disabled = false;
-      btn.textContent = '🔐 Sign In';
+        if (error) {
+          btn.disabled = false;
+          btn.textContent = '🔐 Sign In';
+          errEl.textContent = '❌ ' + (error.message === 'Invalid login credentials'
+            ? 'Incorrect email or password. Please try again.'
+            : error.message);
+          return;
+        }
 
-      if (error) {
-        errEl.textContent = '❌ ' + (error.message === 'Invalid login credentials'
-          ? 'Incorrect email or password. Please try again.'
-          : error.message);
-        return;
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = '🔐 Sign In';
+        }, 2000);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '🔐 Sign In';
+        errEl.textContent = '❌ An unexpected error occurred: ' + (err.message || String(err));
       }
       // onAuthStateChange will handle the rest
     }
