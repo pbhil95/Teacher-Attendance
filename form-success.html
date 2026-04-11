@@ -150,6 +150,11 @@ function applyTheme(t){
 function toggleTheme(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');}
 applyTheme(localStorage.getItem('theme')||'light');
 
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // Show submission details from sessionStorage
 const raw = sessionStorage.getItem('lastSubmission');
 if (raw) {
@@ -158,29 +163,29 @@ if (raw) {
     document.getElementById('detailCard').style.display='';
     const body = document.getElementById('detailBody');
     const rows=[
-      ['Teacher', d.teacher],
-      ['Period', 'Period '+d.period],
-      ['Class', d.class||d.cls],
-      ['Subject', d.subject],
+      ['Teacher', esc(d.teacher)],
+      ['Period', 'Period '+esc(d.period)],
+      ['Class', esc(d.class||d.cls)],
+      ['Subject', esc(d.subject)],
       ['Class Taken', d.taken==='Yes'?'<span class="pill-ok">✅ Yes</span>':'<span class="pill-no">❌ No</span>']
     ];
-    if(d.reason) rows.push(['Reason', d.reason]);
+    if(d.reason) rows.push(['Reason', esc(d.reason)]);
     let html=rows.map(([l,v])=>
       `<div class="detail-row-item"><div class="detail-label">${l}</div><div class="detail-val">${v}</div></div>`
     ).join('');
     if(d.taken==='Yes'&&d.total){
       html+=`<div class="count-grid">
-        <div class="count-item"><div class="val">${d.total}</div><div class="lbl">Total</div></div>
-        <div class="count-item"><div class="val" style="color:var(--green)">${d.present}</div><div class="lbl">Present</div></div>
-        <div class="count-item"><div class="val" style="color:var(--red)">${d.absent}</div><div class="lbl">Absent</div></div>
-        <div class="count-item"><div class="val">${d.leave||d.leave_count||0}</div><div class="lbl">Leave</div></div>
-        <div class="count-item"><div class="val">${d.od||0}</div><div class="lbl">OD</div></div>
-        <div class="count-item"><div class="val">${d.tca||0}</div><div class="lbl">TCA</div></div>
-        <div class="count-item"><div class="val">${d.nr||0}</div><div class="lbl">NR</div></div>
-        <div class="count-item"><div class="val">${d.sick||0}</div><div class="lbl">Sick</div></div>
+        <div class="count-item"><div class="val">${esc(d.total)}</div><div class="lbl">Total</div></div>
+        <div class="count-item"><div class="val" style="color:var(--green)">${esc(d.present)}</div><div class="lbl">Present</div></div>
+        <div class="count-item"><div class="val" style="color:var(--red)">${esc(d.absent)}</div><div class="lbl">Absent</div></div>
+        <div class="count-item"><div class="val">${esc(d.leave||d.leave_count||0)}</div><div class="lbl">Leave</div></div>
+        <div class="count-item"><div class="val">${esc(d.od||0)}</div><div class="lbl">OD</div></div>
+        <div class="count-item"><div class="val">${esc(d.tca||0)}</div><div class="lbl">TCA</div></div>
+        <div class="count-item"><div class="val">${esc(d.nr||0)}</div><div class="lbl">NR</div></div>
+        <div class="count-item"><div class="val">${esc(d.sick||0)}</div><div class="lbl">Sick</div></div>
       </div>`;
     }
-    if(d.remarks) html+=`<div class="detail-row-item"><div class="detail-label">Remarks</div><div class="detail-val">${d.remarks}</div></div>`;
+    if(d.remarks) html+=`<div class="detail-row-item"><div class="detail-label">Remarks</div><div class="detail-val">${esc(d.remarks)}</div></div>`;
     body.innerHTML=html;
     sessionStorage.removeItem('lastSubmission');
   } catch(e){}

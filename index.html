@@ -1352,6 +1352,7 @@
 
     // ── CURRENT PROFILE ──────────────────────────────────────────
     let currentProfile = null;
+    let profileLoading = false; // guard against concurrent loadProfile calls
 
     // ═══════════════════════════════════════════════════════════════
     //  THEME
@@ -1375,17 +1376,34 @@
     //  AUTH STATE MANAGEMENT
     // ═══════════════════════════════════════════════════════════════
     db.auth.onAuthStateChange(async (event, session) => {
+      // INITIAL_SESSION is handled by getSession() below — skip it here to avoid
+      // showing the login screen before a token auto-refresh has a chance to complete.
+      if (event === 'INITIAL_SESSION') return;
+
       if (session && session.user) {
-        // Skip reload on token refresh if already logged in — avoids spurious sign-out loops
+        // Token silently refreshed while user is already on the form — no reload needed.
         if (event === 'TOKEN_REFRESHED' && currentProfile) return;
-        await loadProfile(session.user);
-      } else if (event === 'SIGNED_OUT' || (!session && event === 'INITIAL_SESSION')) {
+        if (!profileLoading) await loadProfile(session.user);
+      } else if (event === 'SIGNED_OUT') {
         currentProfile = null;
+        profileLoading = false;
+        showScreen('auth');
+      }
+    });
+
+    // Startup session check — getSession() waits for token auto-refresh to complete,
+    // so it is the reliable source of truth on page load (including "Submit Another Entry" returns).
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session && session.user) {
+        if (!currentProfile && !profileLoading) loadProfile(session.user);
+      } else {
         showScreen('auth');
       }
     });
 
     async function loadProfile(user) {
+      if (profileLoading) return;
+      profileLoading = true;
       try {
         let { data: profile, error } = await db
           .from('teacher_profiles')
@@ -1442,6 +1460,8 @@
         document.getElementById('loginBtn').disabled = false;
         document.getElementById('loginBtn').textContent = '🔐 Sign In';
         document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
+      } finally {
+        profileLoading = false;
       }
     }
 
@@ -1791,7 +1811,14 @@
         }));
         window.location.href = 'form-success.html';
       } catch (err) {
-        showToast('❌ Error: ' + (err.message || String(err)), 5000);
+        const msg = err.message || String(err);
+        const isAuthErr = /jwt|expired|not authenticated|unauthorized|401|403/i.test(msg);
+        if (isAuthErr) {
+          showToast('⚠️ Session expired. Redirecting to sign in...', 3000);
+          setTimeout(() => { currentProfile = null; showScreen('auth'); }, 1500);
+        } else {
+          showToast('❌ Error: ' + msg, 5000);
+        }
         btn.disabled = false;
         btn.textContent = 'Submit Attendance →';
       }
