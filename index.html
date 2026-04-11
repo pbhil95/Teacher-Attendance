@@ -88,6 +88,373 @@
       transition: background .3s, color .3s;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    /* ══════════════════════════════════════════════
+       AUTH SCREENS
+    ══════════════════════════════════════════════ */
+    .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 45%, #0d4a38 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px 14px 40px;
+    }
+
+    .auth-screen::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(36, 113, 163, 0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(17, 122, 101, 0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .auth-theme-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 1010;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+      color: #fff;
+    }
+
+    .auth-theme-btn:hover {
+      background: rgba(255, 255, 255, .25);
+    }
+
+    .auth-card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 32px 26px 28px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+      margin-top: 20px;
+    }
+
+    .auth-logo {
+      font-size: 2.6rem;
+      text-align: center;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+    }
+
+    .auth-title {
+      font-family: var(--fh);
+      font-size: 1.6rem;
+      color: var(--blue);
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+    }
+
+    .auth-sub {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    /* ── AUTH TABS ── */
+    .auth-tabs {
+      display: flex;
+      background: var(--card2);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 22px;
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      background: none;
+      border-radius: 9px;
+      font-family: var(--fh);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      letter-spacing: .5px;
+    }
+
+    .auth-tab.active {
+      background: var(--card);
+      color: var(--blue);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+    }
+
+    /* ── AUTH FIELDS ── */
+    .auth-field {
+      margin-bottom: 14px;
+    }
+
+    .auth-lbl {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 6px;
+    }
+
+    .auth-lbl .req {
+      color: var(--red);
+      margin-left: 2px;
+    }
+
+    .auth-field input[type=email],
+    .auth-field input[type=password],
+    .auth-field input[type=text],
+    .auth-field select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--fb);
+      font-size: 15px;
+      color: var(--ink);
+      background: var(--card);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .3s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .auth-field input:focus,
+    .auth-field select:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(36, 113, 163, .15);
+    }
+
+    .auth-select-wrap {
+      position: relative;
+    }
+
+    .auth-select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* ── CHECKBOX GRID ── */
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+      gap: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 4px 2px;
+      scrollbar-width: thin;
+    }
+
+    .check-grid::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .check-grid::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--card2);
+      transition: all .15s;
+      user-select: none;
+      line-height: 1.2;
+    }
+
+    .check-item:hover {
+      border-color: var(--blue2);
+      color: var(--blue);
+    }
+
+    .check-item.checked {
+      border-color: var(--blue2);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .check-item-dot {
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 9px;
+      transition: background .15s;
+    }
+
+    .check-item.checked .check-item-dot {
+      background: var(--blue2);
+      border-color: var(--blue2);
+      color: #fff;
+    }
+
+    .check-item.checked .check-item-dot::after {
+      content: '✓';
+    }
+
+    /* ── AUTH BUTTON ── */
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--hdr2), var(--hdr3));
+      color: #fff;
+      border: none;
+      border-radius: 11px;
+      font-family: var(--fh);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 18px rgba(26, 82, 118, .35);
+      transition: opacity .2s, transform .1s;
+      margin-top: 6px;
+    }
+
+    .auth-btn:hover {
+      opacity: .93;
+    }
+
+    .auth-btn:active {
+      transform: scale(.98);
+    }
+
+    .auth-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .auth-btn-outline {
+      background: var(--card2);
+      color: var(--muted);
+      box-shadow: none;
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── AUTH ERROR / FOOT ── */
+    .auth-error {
+      color: var(--red);
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      min-height: 18px;
+      line-height: 1.4;
+    }
+
+    .auth-success-msg {
+      color: var(--green);
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      padding: 10px 14px;
+      background: var(--green-light);
+      border-radius: 8px;
+      border: 1px solid rgba(30, 132, 73, .3);
+    }
+
+    .auth-foot {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    .auth-foot a {
+      color: var(--blue2);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .auth-foot a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── WAIT SCREEN ── */
+    .wait-icon {
+      font-size: 3.5rem;
+      text-align: center;
+      margin-bottom: 14px;
+      animation: pulse-wait 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-wait {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .wait-name-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue2);
+      border-radius: 30px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      margin: 0 auto 20px;
+    }
+
+    /* ══════════════════════════════════════════════
+       MAIN APP STYLES
+    ══════════════════════════════════════════════ */
+
     /* ── HEADER ── */
     .header {
       background: linear-gradient(135deg, var(--hdr1) 0%, var(--hdr2) 55%, var(--hdr3) 100%);
@@ -141,6 +508,14 @@
       letter-spacing: .5px;
     }
 
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      min-width: 80px;
+    }
+
     .theme-btn {
       background: rgba(255, 255, 255, .15);
       border: 1px solid rgba(255, 255, 255, .3);
@@ -158,6 +533,59 @@
 
     .theme-btn:hover {
       background: rgba(255, 255, 255, .25);
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 20px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 5px 11px;
+      white-space: nowrap;
+      transition: background .2s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, .25);
+    }
+
+    /* ── TEACHER DISPLAY ── */
+    .teacher-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue2);
+      border-radius: 10px;
+      transition: background .3s, border-color .3s;
+    }
+
+    .teacher-display-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--blue2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .teacher-display-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--blue);
+    }
+
+    .teacher-display-tag {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
     }
 
     /* ── LAYOUT ── */
@@ -430,10 +858,6 @@
       border: 1px solid var(--border);
     }
 
-    .hidden {
-      display: none !important;
-    }
-
     /* ── SUBMIT ── */
     .submit-btn {
       width: 100%;
@@ -475,6 +899,11 @@
       animation: spin 1s linear infinite;
       vertical-align: middle;
       margin-right: 6px;
+    }
+
+    .spinner-dark {
+      border-color: rgba(36, 113, 163, .3);
+      border-top-color: var(--blue2);
     }
 
     @keyframes spin {
@@ -565,171 +994,298 @@
         height: 42px;
         font-size: .95rem;
       }
+
+      .auth-card {
+        padding: 24px 18px 22px;
+      }
+
+      .check-grid {
+        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="header">
-    <div class="header-inner">
-      <div style="width:40px"></div>
-      <div class="header-center">
-        <div class="header-logo">📋</div>
-        <h1>JNV Tarikhet</h1>
-        <p>Jawahar Navodaya Vidyalaya, Tarikhet • Almora</p>
-        <div class="header-badge">Staff Class Attendance Form</div>
+  <!-- ══════════════════════════════════════════
+       AUTH SCREEN — Login / Register
+  ══════════════════════════════════════════ -->
+  <div id="authScreen" class="auth-screen">
+    <button class="auth-theme-btn" id="authThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+
+    <div class="auth-card">
+      <div class="auth-logo">📋</div>
+      <h1 class="auth-title">JNV Tarikhet</h1>
+      <p class="auth-sub">Staff Attendance System<br>Sign in to submit attendance</p>
+
+      <!-- Tab switcher -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">🔐 Sign In</button>
+        <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">📝 Register</button>
       </div>
-      <button class="theme-btn" id="themeToggle" title="Toggle dark mode" onclick="toggleTheme()">🌙</button>
+
+      <!-- ── LOGIN PANEL ── -->
+      <div id="loginPanel">
+        <div class="auth-field">
+          <label class="auth-lbl">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"
+            onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div id="loginError" class="auth-error"></div>
+        <button class="auth-btn" id="loginBtn" onclick="doLogin()">🔐 Sign In</button>
+        <p class="auth-foot">No account yet? <a href="#" onclick="switchAuthTab('register');return false;">Register
+            here →</a></p>
+      </div>
+
+      <!-- ── REGISTER PANEL ── -->
+      <div id="registerPanel" class="hidden">
+        <div class="auth-field">
+          <label class="auth-lbl">Your Designation / Name <span class="req">*</span></label>
+          <div class="auth-select-wrap">
+            <select id="regName">
+              <option value="">— Select your designation —</option>
+            </select>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Email Address <span class="req">*</span></label>
+          <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Password <span class="req">*</span></label>
+          <input type="password" id="regPassword" placeholder="Minimum 6 characters" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Confirm Password <span class="req">*</span></label>
+          <input type="password" id="regConfirm" placeholder="Re-enter password" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Classes I Teach <span class="req">*</span></label>
+          <div class="check-grid" id="regClasses"><!-- populated by JS --></div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-lbl">Subjects I Teach <span class="req">*</span></label>
+          <div class="check-grid" id="regSubjects"><!-- populated by JS --></div>
+        </div>
+        <div id="registerError" class="auth-error"></div>
+        <div id="registerSuccess" class="auth-success-msg hidden"></div>
+        <button class="auth-btn" id="registerBtn" onclick="doRegister()">📝 Create Account</button>
+        <p class="auth-foot">Already have an account? <a href="#"
+            onclick="switchAuthTab('login');return false;">Sign in →</a></p>
+        <p class="auth-foot" style="font-size:11px;margin-top:6px;color:var(--muted)">
+          ⚠️ After registration, the admin must approve your account before you can submit.
+        </p>
+      </div>
     </div>
   </div>
 
-  <div class="page">
-    <form id="attForm" novalidate>
+  <!-- ══════════════════════════════════════════
+       WAIT SCREEN — Pending Approval
+  ══════════════════════════════════════════ -->
+  <div id="waitScreen" class="auth-screen hidden">
+    <button class="auth-theme-btn" id="waitThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
 
-      <!-- TEACHER -->
-      <div class="section">
-        <div class="section-head">
-          <span class="section-icon">👤</span>
-          <h2>Teacher Information</h2>
+    <div class="auth-card" style="text-align:center;margin-top:40px">
+      <div class="wait-icon">⏳</div>
+      <h2
+        style="font-family:var(--fh);font-size:1.5rem;color:var(--blue);font-weight:700;letter-spacing:.5px;margin-bottom:10px">
+        Pending Approval
+      </h2>
+      <p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:6px">
+        Your account has been created and is <strong>awaiting admin approval</strong>.
+      </p>
+      <p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:20px">
+        Please contact the school admin (Principal / Vice Principal) to activate your account.
+      </p>
+      <div class="wait-name-badge">
+        <span>👤</span>
+        <span id="waitNameDisplay">—</span>
+      </div>
+      <button class="auth-btn auth-btn-outline" onclick="doLogout()" style="margin-top:0">
+        🚪 Sign Out
+      </button>
+      <p class="auth-foot" style="margin-top:14px">
+        Once approved, <a href="#" onclick="checkApprovalStatus();return false;">click here to check again</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN CONTENT — Attendance Form
+  ══════════════════════════════════════════ -->
+  <div id="mainContent" class="hidden">
+
+    <div class="header">
+      <div class="header-inner">
+        <div style="width:36px"></div>
+        <div class="header-center">
+          <div class="header-logo">📋</div>
+          <h1>JNV Tarikhet</h1>
+          <p>Jawahar Navodaya Vidyalaya, Tarikhet • Almora</p>
+          <div class="header-badge">Staff Class Attendance Form</div>
         </div>
-        <div class="section-body">
-          <div class="field">
-            <label for="teacher">Your Name / Designation <span class="req">*</span></label>
-            <div class="select-wrap">
-              <select id="teacher" required>
-                <option value="">— Select your name —</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label>Period Number <span class="req">*</span></label>
-            <div class="period-group" id="periodGroup"></div>
-          </div>
+        <div class="header-right">
+          <button class="theme-btn" id="themeToggle" title="Toggle dark mode" onclick="toggleTheme()">🌙</button>
+          <button class="logout-btn" id="logoutBtn" onclick="doLogout()" title="Sign out">🚪 Logout</button>
         </div>
       </div>
+    </div>
 
-      <!-- CLASS DETAILS -->
-      <div class="section">
-        <div class="section-head">
-          <span class="section-icon">🏫</span>
-          <h2>Class Details</h2>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <label for="cls">Class <span class="req">*</span></label>
-            <div class="select-wrap">
-              <select id="cls" required>
-                <option value="">— Select class —</option>
-              </select>
-            </div>
+    <div class="page">
+      <form id="attForm" novalidate>
+
+        <!-- TEACHER INFO (read-only after login) -->
+        <div class="section">
+          <div class="section-head">
+            <span class="section-icon">👤</span>
+            <h2>Teacher Information</h2>
           </div>
-          <div class="field">
-            <label for="subject">Subject Taught <span class="req">*</span></label>
-            <div class="select-wrap">
-              <select id="subject" required>
-                <option value="">— Select subject —</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label>Was the Class Taken? <span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-opt yes">
-                <input type="radio" name="taken" id="takenYes" value="Yes" required>
-                <label for="takenYes">✅ Yes, class was taken</label>
+          <div class="section-body">
+            <div class="field">
+              <label>Logged In As</label>
+              <div class="teacher-display" id="teacherDisplay">
+                <div class="teacher-display-avatar">👤</div>
+                <div>
+                  <div class="teacher-display-name" id="teacherNameDisplay">—</div>
+                  <div class="teacher-display-tag">Verified Account ✓</div>
+                </div>
               </div>
-              <div class="radio-opt no">
-                <input type="radio" name="taken" id="takenNo" value="No">
-                <label for="takenNo">❌ No, class not taken</label>
+            </div>
+            <div class="field">
+              <label>Period Number <span class="req">*</span></label>
+              <div class="period-group" id="periodGroup"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLASS DETAILS -->
+        <div class="section">
+          <div class="section-head">
+            <span class="section-icon">🏫</span>
+            <h2>Class Details</h2>
+          </div>
+          <div class="section-body">
+            <div class="field">
+              <label for="cls">Class <span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="cls" required>
+                  <option value="">— Select class —</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="subject">Subject Taught <span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="subject" required>
+                  <option value="">— Select subject —</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Was the Class Taken? <span class="req">*</span></label>
+              <div class="radio-group">
+                <div class="radio-opt yes">
+                  <input type="radio" name="taken" id="takenYes" value="Yes" required>
+                  <label for="takenYes">✅ Yes, class was taken</label>
+                </div>
+                <div class="radio-opt no">
+                  <input type="radio" name="taken" id="takenNo" value="No">
+                  <label for="takenNo">❌ No, class not taken</label>
+                </div>
+              </div>
+            </div>
+            <div class="field hidden" id="reasonField">
+              <label for="reason">Reason for Not Taking Class</label>
+              <div class="select-wrap">
+                <select id="reason">
+                  <option value="">— Select reason —</option>
+                  <option>Leave</option>
+                  <option>Medical Leave</option>
+                  <option>Assembly / Prayer</option>
+                  <option>Official Duty</option>
+                  <option>School Event</option>
+                  <option>Other</option>
+                </select>
               </div>
             </div>
           </div>
-          <div class="field hidden" id="reasonField">
-            <label for="reason">Reason for Not Taking Class</label>
-            <div class="select-wrap">
-              <select id="reason">
-                <option value="">— Select reason —</option>
-                <option>Leave</option>
-                <option>Medical Leave</option>
-                <option>Assembly / Prayer</option>
-                <option>Official Duty</option>
-                <option>School Event</option>
-                <option>Other</option>
-              </select>
+        </div>
+
+        <!-- ATTENDANCE COUNTS -->
+        <div class="section hidden" id="countsSection">
+          <div class="section-head">
+            <span class="section-icon">🔢</span>
+            <h2>Attendance Count</h2>
+          </div>
+          <div class="section-body">
+            <div class="num-grid">
+              <div class="num-card">
+                <label for="total">Total Students</label>
+                <input type="number" id="total" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+              <div class="num-card">
+                <label for="present" style="color:var(--green)">Present</label>
+                <input type="number" id="present" min="0" max="60" placeholder="0" oninput="updateMath()"
+                  style="color:var(--green)">
+              </div>
+              <div class="num-card">
+                <label for="absent" style="color:var(--red)">Absent</label>
+                <input type="number" id="absent" min="0" max="60" placeholder="0" oninput="updateMath()"
+                  style="color:var(--red)">
+              </div>
+              <div class="num-card">
+                <label for="leave">On Leave</label>
+                <input type="number" id="leave" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+              <div class="num-card">
+                <label for="od">On OD</label>
+                <input type="number" id="od" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+              <div class="num-card">
+                <label for="tca">TCA</label>
+                <input type="number" id="tca" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+              <div class="num-card">
+                <label for="nr">NR</label>
+                <input type="number" id="nr" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+              <div class="num-card">
+                <label for="sick">Sick</label>
+                <input type="number" id="sick" min="0" max="60" placeholder="0" oninput="updateMath()">
+              </div>
+            </div>
+            <div id="mathCheck" class="math-check math-neu">
+              ⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick
             </div>
           </div>
         </div>
+
+        <!-- REMARKS -->
+        <div class="section">
+          <div class="section-head">
+            <span class="section-icon">💬</span>
+            <h2>Additional Remarks</h2>
+          </div>
+          <div class="section-body">
+            <div class="field">
+              <label for="remarks">Remarks (optional)</label>
+              <textarea id="remarks" placeholder="Any additional notes..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Attendance →</button>
+      </form>
+
+      <div class="dash-link">
+        <a href="dashboard.html">📊 Open Admin Dashboard</a>
       </div>
-
-      <!-- ATTENDANCE COUNTS -->
-      <div class="section hidden" id="countsSection">
-        <div class="section-head">
-          <span class="section-icon">🔢</span>
-          <h2>Attendance Count</h2>
-        </div>
-        <div class="section-body">
-          <div class="num-grid">
-            <div class="num-card">
-              <label for="total">Total Students</label>
-              <input type="number" id="total" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-            <div class="num-card">
-              <label for="present" style="color:var(--green)">Present</label>
-              <input type="number" id="present" min="0" max="60" placeholder="0" oninput="updateMath()"
-                style="color:var(--green)">
-            </div>
-            <div class="num-card">
-              <label for="absent" style="color:var(--red)">Absent</label>
-              <input type="number" id="absent" min="0" max="60" placeholder="0" oninput="updateMath()"
-                style="color:var(--red)">
-            </div>
-            <div class="num-card">
-              <label for="leave">On Leave</label>
-              <input type="number" id="leave" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-            <div class="num-card">
-              <label for="od">On OD</label>
-              <input type="number" id="od" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-            <div class="num-card">
-              <label for="tca">TCA</label>
-              <input type="number" id="tca" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-            <div class="num-card">
-              <label for="nr">NR</label>
-              <input type="number" id="nr" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-            <div class="num-card">
-              <label for="sick">Sick</label>
-              <input type="number" id="sick" min="0" max="60" placeholder="0" oninput="updateMath()">
-            </div>
-          </div>
-          <div id="mathCheck" class="math-check math-neu">
-            ⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick
-          </div>
-        </div>
-      </div>
-
-      <!-- REMARKS -->
-      <div class="section">
-        <div class="section-head">
-          <span class="section-icon">💬</span>
-          <h2>Additional Remarks</h2>
-        </div>
-        <div class="section-body">
-          <div class="field">
-            <label for="remarks">Remarks (optional)</label>
-            <textarea id="remarks" placeholder="Any additional notes..."></textarea>
-          </div>
-        </div>
-      </div>
-
-      <button type="submit" class="submit-btn" id="submitBtn">Submit Attendance →</button>
-    </form>
-
-    <div class="dash-link">
-      <a href="dashboard.html">📊 Open Admin Dashboard</a>
     </div>
   </div>
 
@@ -739,8 +1295,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
     // ═══════════════════════════════════════════════════════════════
-    //  STEP 1: Set your Supabase project details here
-    //  Get them from: supabase.com → your project → Settings → API
+    //  STEP 1: Your Supabase credentials
     // ═══════════════════════════════════════════════════════════════
     const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
@@ -774,51 +1329,316 @@
     ];
     const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
-    // ── DARK MODE ─────────────────────────────────────────────────
+    // ── CURRENT PROFILE ──────────────────────────────────────────
+    let currentProfile = null;
+
+    // ═══════════════════════════════════════════════════════════════
+    //  THEME
+    // ═══════════════════════════════════════════════════════════════
     function applyTheme(t) {
       document.documentElement.setAttribute('data-theme', t);
-      document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+      const icon = t === 'dark' ? '☀️' : '🌙';
+      ['themeToggle', 'authThemeBtn', 'waitThemeBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = icon;
+      });
       document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
       localStorage.setItem('theme', t);
     }
     function toggleTheme() {
-      const cur = document.documentElement.getAttribute('data-theme');
-      applyTheme(cur === 'dark' ? 'light' : 'dark');
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
     applyTheme(localStorage.getItem('theme') || 'light');
 
-    // ── POPULATE DROPDOWNS ────────────────────────────────────────
-    function populateSelect(id, items) {
-      const sel = document.getElementById(id);
-      items.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
-    }
-    populateSelect('teacher', TEACHERS);
-    populateSelect('cls', CLASSES);
-    populateSelect('subject', SUBJECTS);
+    // ═══════════════════════════════════════════════════════════════
+    //  AUTH STATE MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════
+    db.auth.onAuthStateChange(async (event, session) => {
+      if (session && session.user) {
+        await loadProfile(session.user);
+      } else if (event === 'SIGNED_OUT' || (!session && event === 'INITIAL_SESSION')) {
+        currentProfile = null;
+        showScreen('auth');
+      }
+    });
 
+    async function loadProfile(user) {
+      let { data: profile, error } = await db
+        .from('teacher_profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // If no profile but we have metadata (email confirmation flow — profile created at next login)
+      if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
+        const { data: newProfile, error: insertErr } = await db
+          .from('teacher_profiles')
+          .insert([{
+            id: user.id,
+            name: user.user_metadata.name,
+            email: user.email,
+            classes: user.user_metadata.classes || [],
+            subjects: user.user_metadata.subjects || []
+          }])
+          .select()
+          .single();
+
+        if (!insertErr && newProfile) {
+          profile = newProfile;
+          error = null;
+        }
+      }
+
+      if (error || !profile) {
+        // Profile truly missing — sign out
+        await db.auth.signOut();
+        showScreen('auth');
+        return;
+      }
+
+      if (!profile.approved) {
+        document.getElementById('waitNameDisplay').textContent = profile.name;
+        currentProfile = profile;
+        showScreen('wait');
+        return;
+      }
+
+      currentProfile = profile;
+      showForm(profile);
+    }
+
+    function showScreen(name) {
+      document.getElementById('authScreen').classList.toggle('hidden', name !== 'auth');
+      document.getElementById('waitScreen').classList.toggle('hidden', name !== 'wait');
+      document.getElementById('mainContent').classList.toggle('hidden', name !== 'form');
+    }
+
+    function showForm(profile) {
+      // Fill teacher name
+      document.getElementById('teacherNameDisplay').textContent = profile.name;
+
+      // Populate ONLY the teacher's assigned classes
+      const clsSel = document.getElementById('cls');
+      clsSel.innerHTML = '<option value="">— Select class —</option>';
+      (profile.classes || []).sort().forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        clsSel.appendChild(o);
+      });
+
+      // Populate ONLY the teacher's assigned subjects
+      const subSel = document.getElementById('subject');
+      subSel.innerHTML = '<option value="">— Select subject —</option>';
+      (profile.subjects || []).sort().forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        subSel.appendChild(o);
+      });
+
+      // Reset form to clean state
+      document.getElementById('attForm').reset();
+      document.getElementById('countsSection').classList.add('hidden');
+      document.getElementById('reasonField').classList.add('hidden');
+      setMath('neu', '⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick');
+
+      showScreen('form');
+    }
+
+    // Re-check approval status (for the "check again" link on wait screen)
+    async function checkApprovalStatus() {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) await loadProfile(session.user);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  LOGIN
+    // ═══════════════════════════════════════════════════════════════
+    async function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
+
+      errEl.textContent = '';
+      if (!email) { errEl.textContent = '⚠️ Please enter your email address'; return; }
+      if (!password) { errEl.textContent = '⚠️ Please enter your password'; return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in...';
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+      btn.disabled = false;
+      btn.textContent = '🔐 Sign In';
+
+      if (error) {
+        errEl.textContent = '❌ ' + (error.message === 'Invalid login credentials'
+          ? 'Incorrect email or password. Please try again.'
+          : error.message);
+        return;
+      }
+      // onAuthStateChange will handle the rest
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  REGISTER
+    // ═══════════════════════════════════════════════════════════════
+    async function doRegister() {
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm = document.getElementById('regConfirm').value;
+      const errEl = document.getElementById('registerError');
+      const successEl = document.getElementById('registerSuccess');
+      const btn = document.getElementById('registerBtn');
+
+      const classes = [...document.querySelectorAll('#regClasses .check-item.checked')]
+        .map(el => el.dataset.value);
+      const subjects = [...document.querySelectorAll('#regSubjects .check-item.checked')]
+        .map(el => el.dataset.value);
+
+      errEl.textContent = '';
+      successEl.classList.add('hidden');
+
+      if (!name) { errEl.textContent = '⚠️ Please select your designation'; return; }
+      if (!email) { errEl.textContent = '⚠️ Please enter your email address'; return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = '⚠️ Please enter a valid email address'; return; }
+      if (password.length < 6) { errEl.textContent = '⚠️ Password must be at least 6 characters'; return; }
+      if (password !== confirm) { errEl.textContent = '⚠️ Passwords do not match'; return; }
+      if (classes.length === 0) { errEl.textContent = '⚠️ Please select at least one class you teach'; return; }
+      if (subjects.length === 0) { errEl.textContent = '⚠️ Please select at least one subject you teach'; return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating account...';
+
+      // Sign up — pass profile data in user_metadata for the email-confirmation flow
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name, classes, subjects }  // stored in user_metadata
+        }
+      });
+
+      if (error) {
+        errEl.textContent = '❌ ' + error.message;
+        btn.disabled = false;
+        btn.textContent = '📝 Create Account';
+        return;
+      }
+
+      // If session returned immediately (email confirmation disabled) → create profile now
+      if (data.session && data.user) {
+        const { error: profileErr } = await db.from('teacher_profiles').insert([{
+          id: data.user.id,
+          name,
+          email,
+          classes,
+          subjects
+        }]);
+
+        btn.disabled = false;
+        btn.textContent = '📝 Create Account';
+
+        if (profileErr) {
+          errEl.textContent = '❌ Account created but profile error: ' + profileErr.message + '. Please contact admin.';
+          return;
+        }
+        // onAuthStateChange will trigger and show wait screen
+        return;
+      }
+
+      // Email confirmation required — show message
+      btn.disabled = false;
+      btn.textContent = '📝 Create Account';
+      successEl.textContent = '✅ Account created! Please check your email (' + email + ') to verify, then sign in. Your profile information has been saved.';
+      successEl.classList.remove('hidden');
+      // Switch to login tab after a delay
+      setTimeout(() => switchAuthTab('login'), 4000);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  LOGOUT
+    // ═══════════════════════════════════════════════════════════════
+    async function doLogout() {
+      await db.auth.signOut();
+      currentProfile = null;
+      // Reset form fields on logout
+      document.getElementById('cls').innerHTML = '<option value="">— Select class —</option>';
+      document.getElementById('subject').innerHTML = '<option value="">— Select subject —</option>';
+      showScreen('auth');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  AUTH TAB SWITCHER
+    // ═══════════════════════════════════════════════════════════════
+    function switchAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('loginTab').classList.toggle('active', isLogin);
+      document.getElementById('registerTab').classList.toggle('active', !isLogin);
+      document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
+      document.getElementById('registerPanel').classList.toggle('hidden', isLogin);
+      // Clear errors on tab switch
+      document.getElementById('loginError').textContent = '';
+      document.getElementById('registerError').textContent = '';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  POPULATE REGISTRATION CHECKBOXES
+    // ═══════════════════════════════════════════════════════════════
+    function buildCheckGrid(containerId, items) {
+      const container = document.getElementById(containerId);
+      items.forEach(val => {
+        const div = document.createElement('div');
+        div.className = 'check-item';
+        div.dataset.value = val;
+        div.innerHTML = `<span class="check-item-dot"></span><span>${val}</span>`;
+        div.addEventListener('click', () => div.classList.toggle('checked'));
+        container.appendChild(div);
+      });
+    }
+
+    // Populate name dropdown for registration
+    TEACHERS.forEach(name => {
+      const o = document.createElement('option');
+      o.value = name; o.textContent = name;
+      document.getElementById('regName').appendChild(o);
+    });
+
+    buildCheckGrid('regClasses', CLASSES);
+    buildCheckGrid('regSubjects', SUBJECTS);
+
+    // ═══════════════════════════════════════════════════════════════
+    //  PERIOD PILLS (always present in the form)
+    // ═══════════════════════════════════════════════════════════════
     const pg = document.getElementById('periodGroup');
     PERIODS.forEach(p => {
       const div = document.createElement('div');
       div.className = 'period-opt';
       div.innerHTML = `<input type="radio" name="period" id="p${p}" value="${p}" required>
-    <label for="p${p}">P${p}</label>`;
+      <label for="p${p}">P${p}</label>`;
       pg.appendChild(div);
     });
 
-    // ── TAKEN TOGGLE ──────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  TAKEN TOGGLE
+    // ═══════════════════════════════════════════════════════════════
     document.querySelectorAll('input[name="taken"]').forEach(r => {
       r.addEventListener('change', () => {
         const taken = document.querySelector('input[name="taken"]:checked')?.value === 'Yes';
         document.getElementById('countsSection').classList.toggle('hidden', !taken);
         document.getElementById('reasonField').classList.toggle('hidden', taken);
         if (!taken) {
-          ['total', 'present', 'absent', 'leave', 'od', 'tca', 'nr', 'sick'].forEach(id => document.getElementById(id).value = '');
+          ['total', 'present', 'absent', 'leave', 'od', 'tca', 'nr', 'sick']
+            .forEach(id => document.getElementById(id).value = '');
           setMath('neu', '⊞ Fill counts above when class is taken');
         }
       });
     });
 
-    // ── MATH CHECK ────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  MATH CHECK
+    // ═══════════════════════════════════════════════════════════════
     const getN = id => parseInt(document.getElementById(id).value) || 0;
     function setMath(cls, msg) {
       const el = document.getElementById('mathCheck');
@@ -836,24 +1656,33 @@
       }
     }
 
-    // ── TOAST ─────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  TOAST
+    // ═══════════════════════════════════════════════════════════════
     function showToast(msg, dur = 3500) {
       const t = document.getElementById('toast');
-      t.textContent = msg; t.classList.add('show');
+      t.textContent = msg;
+      t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), dur);
     }
 
-    // ── SUBMIT ────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  FORM SUBMIT
+    // ═══════════════════════════════════════════════════════════════
     document.getElementById('attForm').addEventListener('submit', async e => {
       e.preventDefault();
 
-      const teacher = document.getElementById('teacher').value;
+      if (!currentProfile) {
+        showToast('⚠️ You are not logged in. Please refresh.');
+        return;
+      }
+
+      const teacher = currentProfile.name;  // always from authenticated profile
       const period = document.querySelector('input[name="period"]:checked')?.value;
       const cls = document.getElementById('cls').value;
       const subject = document.getElementById('subject').value;
       const taken = document.querySelector('input[name="taken"]:checked')?.value;
 
-      if (!teacher) { showToast('⚠️ Please select your name'); return; }
       if (!period) { showToast('⚠️ Please select a period'); return; }
       if (!cls) { showToast('⚠️ Please select a class'); return; }
       if (!subject) { showToast('⚠️ Please select a subject'); return; }
@@ -887,7 +1716,6 @@
       try {
         const { error } = await db.from('attendance').insert([payload]);
         if (error) throw error;
-        // Save for success page display
         sessionStorage.setItem('lastSubmission', JSON.stringify({
           ...payload, leave: payload.leave_count
         }));

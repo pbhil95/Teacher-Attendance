@@ -37,9 +37,13 @@ body{font-family:var(--fb);background:var(--bg);color:var(--ink);
   box-shadow:0 4px 20px rgba(0,0,0,.25);}
 .header h1{font-family:var(--fh);font-size:1.35rem;font-weight:700;letter-spacing:1px;}
 .header p{opacity:.7;font-size:11px;margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:8px;}
 .theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
   border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:1rem;
   display:flex;align-items:center;justify-content:center;}
+.logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;
+  padding:5px 11px;white-space:nowrap;}
 
 .page{max-width:560px;margin:0 auto;padding:26px 14px 40px;}
 
@@ -96,7 +100,10 @@ body{font-family:var(--fb);background:var(--bg);color:var(--ink);
     <h1>📋 JNV Tarikhet</h1>
     <p>Staff Class Attendance</p>
   </div>
-  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+  <div class="header-right">
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+    <button class="logout-btn" onclick="doLogout()" title="Sign out">🚪 Logout</button>
+  </div>
 </div>
 
 <div class="page">
@@ -115,12 +122,24 @@ body{font-family:var(--fb);background:var(--bg);color:var(--ink);
   <div class="btn-group">
     <a href="index.html" class="btn btn-primary">➕ Submit Another Entry</a>
     <a href="dashboard.html" class="btn btn-outline">📊 Open Admin Dashboard</a>
+    <button class="btn btn-outline" onclick="doLogout()" style="font-size:1rem;">🚪 Sign Out</button>
   </div>
 
   <div class="timestamp" id="tsLine"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+async function doLogout(){
+  await db.auth.signOut();
+  window.location.href='index.html';
+}
+
 // Dark mode
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
