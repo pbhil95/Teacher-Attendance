@@ -97,7 +97,7 @@
       ['pinThemeBtn', 'appThemeBtn'].forEach(id => {
         const el = document.getElementById(id); if (el) el.textContent = icon;
       });
-      document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
+      const tc = document.getElementById('themeColor'); if (tc) tc.setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
       localStorage.setItem('theme', t);
     }
     function toggleTheme() {
