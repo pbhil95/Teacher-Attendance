@@ -1517,8 +1517,16 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Signing in...';
 
+      // Safety net: if nothing resolves within 20s, unblock the button
+      const safetyTimer = setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '🔐 Sign In';
+        errEl.textContent = '⚠️ Sign in timed out. Please check your connection and try again.';
+      }, 20000);
+
       try {
         const { data, error } = await db.auth.signInWithPassword({ email, password });
+        clearTimeout(safetyTimer);
 
         if (error) {
           btn.disabled = false;
@@ -1528,17 +1536,14 @@
             : error.message);
           return;
         }
-
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.textContent = '🔐 Sign In';
-        }, 2000);
+        // Login succeeded — onAuthStateChange → loadProfile → showScreen will handle navigation.
+        // showScreen('auth') also resets this button if profile load fails.
       } catch (err) {
+        clearTimeout(safetyTimer);
         btn.disabled = false;
         btn.textContent = '🔐 Sign In';
         errEl.textContent = '❌ An unexpected error occurred: ' + (err.message || String(err));
       }
-      // onAuthStateChange will handle the rest
     }
 
     // ═══════════════════════════════════════════════════════════════
