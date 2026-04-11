@@ -1531,6 +1531,12 @@
     // The actual PIN is never stored anywhere — only its SHA-256 hash.
     let cachedPinHash = null;  // populated on first login attempt
 
+    // Brute-force protection state
+    let pinFailCount = 0;
+    const PIN_MAX_FAILS = 5;
+    const PIN_LOCKOUT_MS = 30_000; // 30 seconds
+    let pinLockedUntil = 0;
+
     // ── CONFIG ────────────────────────────────────────────────────
     const TEACHERS = [
       "TGT Computer Science", "Librarian", "PET F", "PET M",
@@ -1578,6 +1584,30 @@
     // ── APP STATE ─────────────────────────────────────────────────
     let countdownSec = AUTO_REFRESH_SEC;
     let refreshTimer = null;
+
+    // ── INACTIVITY AUTO-LOCK ──────────────────────────────────────
+    const INACTIVITY_MS = 30 * 60 * 1000; // 30 minutes
+    let inactivityTimer = null;
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(lockDashboard, INACTIVITY_MS);
+    }
+
+    function startInactivityWatch() {
+      ['mousemove', 'keydown', 'click', 'touchstart'].forEach(ev =>
+        document.addEventListener(ev, resetInactivityTimer, { passive: true, capture: true })
+      );
+      resetInactivityTimer();
+    }
+
+    function stopInactivityWatch() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+      ['mousemove', 'keydown', 'click', 'touchstart'].forEach(ev =>
+        document.removeEventListener(ev, resetInactivityTimer, { capture: true })
+      );
+    }
 
 
     // ── DARK MODE ─────────────────────────────────────────────────
@@ -1818,6 +1848,16 @@
       const val = inp.value.trim();
       if (!val) return;
 
+      // Brute-force lockout check
+      const now = Date.now();
+      if (now < pinLockedUntil) {
+        const secsLeft = Math.ceil((pinLockedUntil - now) / 1000);
+        err.textContent = `🔒 Too many failed attempts. Try again in ${secsLeft}s.`;
+        err.style.display = 'block';
+        inp.value = '';
+        return;
+      }
+
       err.style.display = 'none';
       btn.textContent = 'Verifying…'; btn.disabled = true;
 
@@ -1825,12 +1865,24 @@
         const entered = await hashPin(val);
         const stored  = await getPinHash();
         if (entered !== stored) {
+          pinFailCount++;
           inp.value = ''; inp.style.border = '2px solid var(--red)';
-          err.textContent = '❌ Wrong PIN. Please try again.'; err.style.display = 'block';
+          if (pinFailCount >= PIN_MAX_FAILS) {
+            pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
+            pinFailCount = 0;
+            err.textContent = `🔒 Too many failed attempts. Locked for ${PIN_LOCKOUT_MS / 1000}s.`;
+          } else {
+            const remaining = PIN_MAX_FAILS - pinFailCount;
+            err.textContent = `❌ Wrong PIN. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`;
+          }
+          err.style.display = 'block';
           btn.textContent = 'Open Dashboard →'; btn.disabled = false;
           setTimeout(() => inp.focus(), 50);
           return;
         }
+        // Successful login — reset fail counter
+        pinFailCount = 0;
+        pinLockedUntil = 0;
         inp.style.border = '';
         btn.textContent = 'Opening…';
         await initApp();
@@ -1842,6 +1894,8 @@
 
     function lockDashboard() {
       stopAutoRefresh();
+      stopInactivityWatch();
+      cachedPinHash = null; // force fresh fetch from DB on next login
       document.getElementById('app').style.display = 'none';
       document.getElementById('pinScreen').style.display = 'flex';
       const inp = document.getElementById('pinInput');
@@ -1966,6 +2020,7 @@
       document.getElementById('app').style.display = 'block';
       await loadDaily(true);
       startAutoRefresh();
+      startInactivityWatch();
       checkPendingBadge(); // show pending badge on Approvals tab if any
     }
 

@@ -1425,12 +1425,26 @@
     async function loadProfile(user) {
       if (profileLoading) return;
       profileLoading = true;
+      let timedOut = false;
+
+      // Hard timeout: if Supabase hangs, don't leave the user stuck on the spinner.
+      const timeoutId = setTimeout(() => {
+        if (!profileLoading) return; // already finished
+        timedOut = true;
+        profileLoading = false;
+        showScreen('auth');
+        document.getElementById('loginError').textContent =
+          '⚠️ Connection timed out. Please check your network and sign in again.';
+      }, 10000); // 10 seconds
+
       try {
         let { data: profile, error } = await db
           .from('teacher_profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+
+        if (timedOut) return; // timeout already showed auth screen
 
         // If no profile but we have metadata (email confirmation flow — profile created at next login)
         if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
@@ -1476,6 +1490,7 @@
         currentProfile = profile;
         showForm(profile);
       } catch (err) {
+        if (timedOut) return; // timeout already handled the UI
         console.error('Error loading profile:', err);
         showToast('❌ Profile load error: ' + (err.message || String(err)), 6000);
         showScreen('auth');
@@ -1483,7 +1498,8 @@
         document.getElementById('loginBtn').textContent = '🔐 Sign In';
         document.getElementById('loginError').textContent = '❌ Failed to load profile. Please sign in again.';
       } finally {
-        profileLoading = false;
+        clearTimeout(timeoutId);
+        if (!timedOut) profileLoading = false;
       }
     }
 
@@ -1676,12 +1692,18 @@
     //  LOGOUT
     // ═══════════════════════════════════════════════════════════════
     async function doLogout() {
-      await db.auth.signOut();
-      currentProfile = null;
-      // Reset form fields on logout
+      // Clear any sensitive submission data left in sessionStorage
+      try { sessionStorage.removeItem('lastSubmission'); } catch(e) {}
+
+      // Reset all form fields so data isn't visible if another user logs in
+      const form = document.getElementById('attForm');
+      if (form) form.reset();
       document.getElementById('cls').innerHTML = '<option value="">— Select class —</option>';
       document.getElementById('subject').innerHTML = '<option value="">— Select subject —</option>';
-      showScreen('auth');
+
+      // Sign out — onAuthStateChange SIGNED_OUT will call showScreen('auth')
+      currentProfile = null;
+      await db.auth.signOut();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -1839,8 +1861,8 @@
         const msg = err.message || String(err);
         const isAuthErr = /jwt|expired|not authenticated|unauthorized|401|403/i.test(msg);
         if (isAuthErr) {
-          showToast('⚠️ Session expired. Redirecting to sign in...', 3000);
-          setTimeout(() => { currentProfile = null; showScreen('auth'); }, 1500);
+          showToast('⚠️ Session expired. Signing out...', 3000);
+          setTimeout(() => doLogout(), 1500);
         } else {
           showToast('❌ Error: ' + msg, 5000);
         }
