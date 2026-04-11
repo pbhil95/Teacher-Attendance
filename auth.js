@@ -1,6 +1,6 @@
 // Initialize Supabase Client
-const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
+const SUPABASE_URL = 'https://cuvleeayglhpuhouvzts.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_2dIPFyaQ6DOI_f3Tlt47dg_yJEsu5B7';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
