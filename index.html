@@ -1456,179 +1456,157 @@
     // ═══════════════════════════════════════════════════════════════
     //  AUTH STATE MANAGEMENT
     // ═══════════════════════════════════════════════════════════════
-    db.auth.onAuthStateChange(async (event, session) => {
-      // INITIAL_SESSION is handled by getSession() below — skip it here to avoid
-      // showing the login screen before a token auto-refresh has a chance to complete.
-      if (event === 'INITIAL_SESSION') return;
+    // ═══════════════════════════════════════════════════════════════
+    //  PROFILE CACHE  (localStorage, 8-hour TTL)
+    //  Profile is saved after every successful DB fetch so subsequent
+    //  page loads are instant — no spinner, no network wait.
+    // ═══════════════════════════════════════════════════════════════
+    const CACHE_KEY = 'jnv_profile_v1';
+    const CACHE_TTL = 8 * 60 * 60 * 1000; // 8 hours
 
-      if (session && session.user) {
-        // Token silently refreshed while user is already on the form — no reload needed.
-        if (event === 'TOKEN_REFRESHED' && currentProfile) return;
-        if (!profileLoading) await loadProfile(session.user);
-      } else if (event === 'SIGNED_OUT') {
-        currentProfile = null;
-        profileLoading = false;
-        showScreen('auth');
-      }
-    });
+    function getCachedProfile(userId) {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const { uid, profile, ts } = JSON.parse(raw);
+        if (uid !== userId) return null;
+        if (Date.now() - ts > CACHE_TTL) return null;
+        return profile;
+      } catch(e) { return null; }
+    }
 
-    // Startup session check — getSession() waits for token auto-refresh to complete,
-    // so it is the reliable source of truth on page load (including "Submit Another Entry" returns).
-    db.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error('Session error:', error);
-        showScreen('auth');
-        return;
-      }
-      if (session && session.user) {
-        if (!currentProfile && !profileLoading) loadProfile(session.user);
+    function setCachedProfile(userId, profile) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ uid: userId, profile, ts: Date.now() })); }
+      catch(e) {}
+    }
+
+    function clearCachedProfile() {
+      try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
+    }
+
+    // ─── Apply a profile to the UI immediately (no network needed) ──
+    function applyProfile(profile) {
+      currentProfile = profile;
+      if (!profile.approved) {
+        document.getElementById('waitNameDisplay').textContent = profile.name;
+        showScreen('wait');
       } else {
-        showScreen('auth');
+        showForm(profile);
       }
-    }).catch(err => {
-      console.error('Failed to get session:', err);
-      showScreen('auth');
-    });
-
-    // ── LOADING SCREEN HELPERS ───────────────────────────────────
-    let lastProfileUser = null;
-
-    // Progressive loading messages — shown at intervals so the user
-    // knows the app is alive, not frozen.
-    let _loadingMsgTimers = [];
-    function startLoadingMessages() {
-      clearLoadingMessages();
-      const msgs = [
-        [8000,  'Still connecting…'],
-        [18000, 'Waking up the server, please wait…'],
-        [35000, null] // show retry UI after 35s
-      ];
-      msgs.forEach(([ms, txt]) => {
-        _loadingMsgTimers.push(setTimeout(() => {
-          // Only update if we're still on the loading screen
-          const ls = document.getElementById('loadingScreen');
-          if (!ls || ls.classList.contains('hidden')) return;
-          if (txt) {
-            document.getElementById('loadingMsg').textContent = txt;
-          } else {
-            // Show retry buttons
-            document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('loadingMsg').textContent = 'Taking longer than expected.';
-            document.getElementById('loadingRetry').style.display = 'block';
-            profileLoading = false; // allow retry to re-enter
-          }
-        }, ms));
-      });
     }
-    function clearLoadingMessages() {
-      _loadingMsgTimers.forEach(t => clearTimeout(t));
-      _loadingMsgTimers = [];
+
+    // ─── Silent background refresh after serving from cache ─────────
+    async function refreshProfileInBackground(user) {
+      try {
+        const { data: profile, error } = await db
+          .from('teacher_profiles').select('*').eq('id', user.id).single();
+        if (error || !profile) return;
+        setCachedProfile(user.id, profile);
+        // Only update UI if approval status changed
+        if (!!profile.approved !== !!currentProfile?.approved) applyProfile(profile);
+        else currentProfile = profile; // keep in-memory fresh, no UI flicker
+      } catch(e) { /* silent — cached version still valid */ }
     }
-    function resetLoadingScreen() {
+
+    // ─── First-time DB load (no cache) with retry UI on timeout ─────
+    let profileLoading = false;
+    let _retryUser = null;
+    let _retryTimer = null;
+
+    function retryProfileLoad() {
+      if (!_retryUser) { db.auth.signOut(); return; }
       document.getElementById('loadingSpinner').style.display = '';
       document.getElementById('loadingMsg').textContent = 'Loading your profile...';
       document.getElementById('loadingRetry').style.display = 'none';
-    }
-
-    function retryProfileLoad() {
-      if (!lastProfileUser) { signOutAndGoLogin(); return; }
-      resetLoadingScreen();
-      startLoadingMessages();
-      loadProfile(lastProfileUser);
+      loadProfileFromDB(_retryUser);
     }
 
     async function signOutAndGoLogin() {
-      clearLoadingMessages();
+      clearCachedProfile();
       await db.auth.signOut();
       showScreen('auth');
     }
 
-    // Start the progressive messages immediately on page load
-    // (covers both getSession() hangs and loadProfile() hangs).
-    startLoadingMessages();
-
-    async function loadProfile(user) {
+    async function loadProfileFromDB(user) {
       if (profileLoading) return;
-      lastProfileUser = user;
+      _retryUser = user;
       profileLoading = true;
-      let timedOut = false;
 
-      // Secondary hard-stop: if still running after 40s something is truly broken.
-      const timeoutId = setTimeout(() => {
+      // Show retry UI after 25 s if DB still hasn't responded
+      _retryTimer = setTimeout(() => {
         if (!profileLoading) return;
-        timedOut = true;
         profileLoading = false;
         document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('loadingMsg').textContent = 'Taking longer than expected.';
+        document.getElementById('loadingMsg').textContent = 'Server is slow to respond.';
         document.getElementById('loadingRetry').style.display = 'block';
-      }, 40000);
+      }, 25000);
 
       try {
         let { data: profile, error } = await db
-          .from('teacher_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+          .from('teacher_profiles').select('*').eq('id', user.id).single();
 
-        if (timedOut) return; // timeout already showed retry UI
-
-        // If no profile but we have metadata (email confirmation flow — profile created at next login)
-        if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
-          const { data: newProfile, error: insertErr } = await db
+        // New user: create profile row from registration metadata
+        if ((error || !profile) && user.user_metadata?.name) {
+          const { data: np, error: ie } = await db
             .from('teacher_profiles')
-            .insert([{
-              id: user.id,
-              name: user.user_metadata.name,
-              email: user.email,
-              classes: user.user_metadata.classes || [],
-              subjects: user.user_metadata.subjects || []
-            }])
-            .select()
-            .single();
-
-          if (!insertErr && newProfile) {
-            profile = newProfile;
-            error = null;
-          }
+            .insert([{ id: user.id, name: user.user_metadata.name, email: user.email,
+                       classes: user.user_metadata.classes || [],
+                       subjects: user.user_metadata.subjects || [] }])
+            .select().single();
+          if (!ie && np) { profile = np; error = null; }
         }
 
         if (error || !profile) {
-          // Distinguish transient network/RLS error vs truly missing profile
-          if (error && error.code !== 'PGRST116') {
-            // Transient error — don't sign out, just show auth screen so user can retry
+          if (error?.code !== 'PGRST116') {
             showScreen('auth');
-            document.getElementById('loginError').textContent = '⚠️ Could not load your profile. Please sign in again.';
-            return;
+            document.getElementById('loginError').textContent = '⚠️ Could not load profile. Please sign in again.';
+          } else {
+            await db.auth.signOut(); showScreen('auth');
           }
-          // Profile truly missing — sign out
-          await db.auth.signOut();
-          showScreen('auth');
           return;
         }
 
-        if (!profile.approved) {
-          document.getElementById('waitNameDisplay').textContent = profile.name;
-          currentProfile = profile;
-          showScreen('wait');
-          return;
-        }
-
-        currentProfile = profile;
-        showForm(profile);
-      } catch (err) {
-        if (timedOut) return; // timeout already handled the UI
-        console.error('Error loading profile:', err);
-        showToast('❌ Profile load error: ' + (err.message || String(err)), 6000);
+        setCachedProfile(user.id, profile); // save so next visit is instant
+        applyProfile(profile);
+      } catch(err) {
         showScreen('auth');
-        document.getElementById('loginBtn').disabled = false;
-        document.getElementById('loginBtn').textContent = '🔐 Sign In';
-        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please sign in again.';
+        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
       } finally {
-        clearTimeout(timeoutId);
-        clearLoadingMessages(); // stop progressive messages — load finished (success or error)
-        if (!timedOut) profileLoading = false;
+        clearTimeout(_retryTimer);
+        profileLoading = false;
       }
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  STARTUP — cache-first, DB-second
+    // ═══════════════════════════════════════════════════════════════
+    db.auth.getSession().then(({ data: { session }, error }) => {
+      if (error || !session?.user) { showScreen('auth'); return; }
+
+      const cached = getCachedProfile(session.user.id);
+      if (cached) {
+        applyProfile(cached);                         // instant — no spinner
+        refreshProfileInBackground(session.user);     // quietly sync in background
+      } else {
+        loadProfileFromDB(session.user);              // first time — show spinner
+      }
+    }).catch(() => showScreen('auth'));
+
+    // Handle auth events AFTER startup (login, sign-out, token refresh)
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user && !currentProfile && !profileLoading) {
+        // Fired after doLogin() succeeds — load from DB (no cache yet for this login)
+        const cached = getCachedProfile(session.user.id);
+        if (cached) applyProfile(cached);
+        else loadProfileFromDB(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        currentProfile = null;
+        profileLoading = false;
+        clearCachedProfile();
+        showScreen('auth');
+      }
+      // TOKEN_REFRESHED: session stays valid, no action needed
+    });
 
     function showScreen(name) {
       const loading = document.getElementById('loadingScreen');
@@ -1753,7 +1731,7 @@
     // Re-check approval status (for the "check again" link on wait screen)
     async function checkApprovalStatus() {
       const { data: { session } } = await db.auth.getSession();
-      if (session) await loadProfile(session.user);
+      if (session) await loadProfileFromDB(session.user);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -1886,18 +1864,14 @@
     //  LOGOUT
     // ═══════════════════════════════════════════════════════════════
     async function doLogout() {
-      // Clear any sensitive submission data left in sessionStorage
       try { sessionStorage.removeItem('lastSubmission'); } catch(e) {}
-
-      // Reset all form fields so data isn't visible if another user logs in
+      clearCachedProfile();
+      currentProfile = null;
       const form = document.getElementById('attForm');
       if (form) form.reset();
       document.getElementById('cls').innerHTML = '<option value="">— Select class —</option>';
       document.getElementById('subject').innerHTML = '<option value="">— Select subject —</option>';
-
-      // Sign out — onAuthStateChange SIGNED_OUT will call showScreen('auth')
-      currentProfile = null;
-      await db.auth.signOut();
+      await db.auth.signOut(); // onAuthStateChange SIGNED_OUT handles showScreen('auth')
     }
 
     // ═══════════════════════════════════════════════════════════════
