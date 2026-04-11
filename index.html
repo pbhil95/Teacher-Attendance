@@ -1,2082 +1,255 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#1a3a5c" id="themeColor">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="JNV Tarikhet Staff Class Attendance Submission Form">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Attendance Form — JNV Tarikhet</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet">
-  <style>
-    /* ── LIGHT THEME ── */
-    :root,
-    [data-theme="light"] {
-      --blue: #1a5276;
-      --blue2: #2471a3;
-      --blue-light: #eaf2f8;
-      --teal: #117a65;
-      --teal-light: #e8f8f5;
-      --green: #1e8449;
-      --green-light: #eafaf1;
-      --amber: #b7770d;
-      --red: #922b21;
-      --red-light: #fdedec;
-      --ink: #1c2434;
-      --muted: #6c7a8a;
-      --border: #d5dde8;
-      --bg: #f0f3f8;
-      --card: #ffffff;
-      --card2: #fafbfd;
-      --fh: 'Rajdhani', sans-serif;
-      --fb: 'Inter', sans-serif;
-      --r: 14px;
-      --sh: 0 4px 24px rgba(28, 36, 52, .10);
-      --hdr1: #1a3a5c;
-      --hdr2: #1a5276;
-      --hdr3: #117a65;
-    }
-
-    /* ── DARK THEME ── */
-    [data-theme="dark"] {
-      --blue: #60a5fa;
-      --blue2: #93c5fd;
-      --blue-light: #1e3a5f;
-      --teal: #34d399;
-      --teal-light: #064e3b;
-      --green: #4ade80;
-      --green-light: #14532d;
-      --amber: #fbbf24;
-      --red: #f87171;
-      --red-light: #450a0a;
-      --ink: #e2e8f0;
-      --muted: #8892a4;
-      --border: #2d3148;
-      --bg: #0f1117;
-      --card: #1a1d27;
-      --card2: #1f2235;
-      --sh: 0 4px 24px rgba(0, 0, 0, .4);
-      --hdr1: #0d1b2e;
-      --hdr2: #0f2744;
-      --hdr3: #065f46;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      transition: background .3s, color .3s;
-    }
-
-    body {
-      font-family: var(--fb);
-      background: var(--bg);
-      color: var(--ink);
-      font-size: 15px;
-      min-height: 100vh;
-      overscroll-behavior: none;
-      -webkit-text-size-adjust: 100%;
-      transition: background .3s, color .3s;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* ══════════════════════════════════════════════
-       AUTH SCREENS
-    ══════════════════════════════════════════════ */
-    .auth-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      background: linear-gradient(135deg, #0a1628 0%, #1a3a5c 45%, #0d4a38 100%);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1000;
-      overflow-y: auto;
-      padding: 20px 14px 40px;
-    }
-
-    .auth-screen::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(ellipse at 20% 20%, rgba(36, 113, 163, 0.25) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 80%, rgba(17, 122, 101, 0.2) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .auth-theme-btn {
-      position: fixed;
-      top: 14px;
-      right: 14px;
-      z-index: 1010;
-      background: rgba(255, 255, 255, .15);
-      border: 1px solid rgba(255, 255, 255, .3);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      font-size: 1.05rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .2s;
-      color: #fff;
-    }
-
-    .auth-theme-btn:hover {
-      background: rgba(255, 255, 255, .25);
-    }
-
-    .auth-card {
-      background: var(--card);
-      border-radius: 22px;
-      padding: 32px 26px 28px;
-      max-width: 440px;
-      width: 100%;
-      box-shadow: 0 24px 64px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06);
-      border: 1px solid var(--border);
-      position: relative;
-      z-index: 1;
-      margin-top: 20px;
-    }
-
-    .auth-logo {
-      font-size: 2.6rem;
-      text-align: center;
-      margin-bottom: 6px;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .2));
-    }
-
-    .auth-title {
-      font-family: var(--fh);
-      font-size: 1.6rem;
-      color: var(--blue);
-      text-align: center;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 3px;
-    }
-
-    .auth-sub {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: 22px;
-      line-height: 1.5;
-    }
-
-    /* ── AUTH TABS ── */
-    .auth-tabs {
-      display: flex;
-      background: var(--card2);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 22px;
-      border: 1px solid var(--border);
-      gap: 4px;
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 10px 8px;
-      border: none;
-      background: none;
-      border-radius: 9px;
-      font-family: var(--fh);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all .2s;
-      letter-spacing: .5px;
-    }
-
-    .auth-tab.active {
-      background: var(--card);
-      color: var(--blue);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
-    }
-
-    /* ── AUTH FIELDS ── */
-    .auth-field {
-      margin-bottom: 14px;
-    }
-
-    .auth-lbl {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .7px;
-      margin-bottom: 6px;
-    }
-
-    .auth-lbl .req {
-      color: var(--red);
-      margin-left: 2px;
-    }
-
-    .auth-field input[type=email],
-    .auth-field input[type=password],
-    .auth-field input[type=text],
-    .auth-field select {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--fb);
-      font-size: 15px;
-      color: var(--ink);
-      background: var(--card);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s, background .3s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .auth-field input:focus,
-    .auth-field select:focus {
-      border-color: var(--blue2);
-      box-shadow: 0 0 0 3px rgba(36, 113, 163, .15);
-    }
-
-    .auth-select-wrap {
-      position: relative;
-    }
-
-    .auth-select-wrap::after {
-      content: '▾';
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    /* ── CHECKBOX GRID ── */
-    .check-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
-      gap: 6px;
-      max-height: 180px;
-      overflow-y: auto;
-      padding: 4px 2px;
-      scrollbar-width: thin;
-    }
-
-    .check-grid::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .check-grid::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 2px;
-    }
-
-    .check-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      background: var(--card2);
-      transition: all .15s;
-      user-select: none;
-      line-height: 1.2;
-    }
-
-    .check-item:hover {
-      border-color: var(--blue2);
-      color: var(--blue);
-    }
-
-    .check-item.checked {
-      border-color: var(--blue2);
-      background: var(--blue-light);
-      color: var(--blue);
-    }
-
-    .check-item-dot {
-      width: 14px;
-      height: 14px;
-      border: 2px solid currentColor;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 9px;
-      transition: background .15s;
-    }
-
-    .check-item.checked .check-item-dot {
-      background: var(--blue2);
-      border-color: var(--blue2);
-      color: #fff;
-    }
-
-    .check-item.checked .check-item-dot::after {
-      content: '✓';
-    }
-
-    /* ── AUTH BUTTON ── */
-    .auth-btn {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--hdr2), var(--hdr3));
-      color: #fff;
-      border: none;
-      border-radius: 11px;
-      font-family: var(--fh);
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 18px rgba(26, 82, 118, .35);
-      transition: opacity .2s, transform .1s;
-      margin-top: 6px;
-    }
-
-    .auth-btn:hover {
-      opacity: .93;
-    }
-
-    .auth-btn:active {
-      transform: scale(.98);
-    }
-
-    .auth-btn:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .auth-btn-outline {
-      background: var(--card2);
-      color: var(--muted);
-      box-shadow: none;
-      border: 1.5px solid var(--border);
-    }
-
-    /* ── AUTH ERROR / FOOT ── */
-    .auth-error {
-      color: var(--red);
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      min-height: 18px;
-      line-height: 1.4;
-    }
-
-    .auth-success-msg {
-      color: var(--green);
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      padding: 10px 14px;
-      background: var(--green-light);
-      border-radius: 8px;
-      border: 1px solid rgba(30, 132, 73, .3);
-    }
-
-    .auth-foot {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-
-    .auth-foot a {
-      color: var(--blue2);
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .auth-foot a:hover {
-      text-decoration: underline;
-    }
-
-    /* ── WAIT SCREEN ── */
-    .wait-icon {
-      font-size: 3.5rem;
-      text-align: center;
-      margin-bottom: 14px;
-      animation: pulse-wait 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-wait {
-
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.05);
-      }
-    }
-
-    .wait-name-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--blue-light);
-      border: 1.5px solid var(--blue2);
-      border-radius: 30px;
-      padding: 8px 18px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--blue);
-      margin: 0 auto 20px;
-    }
-
-    /* ══════════════════════════════════════════════
-       MAIN APP STYLES
-    ══════════════════════════════════════════════ */
-
-    /* ── HEADER ── */
-    .header {
-      background: linear-gradient(135deg, var(--hdr1) 0%, var(--hdr2) 55%, var(--hdr3) 100%);
-      color: #fff;
-      padding: 16px 20px 14px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, .25);
-      position: relative;
-    }
-
-    .header-inner {
-      max-width: 640px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .header-center {
-      text-align: center;
-      flex: 1;
-    }
-
-    .header-logo {
-      font-size: 2rem;
-      margin-bottom: 2px;
-    }
-
-    .header h1 {
-      font-family: var(--fh);
-      font-size: 1.45rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 1px;
-    }
-
-    .header p {
-      opacity: .72;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .header-badge {
-      display: inline-block;
-      margin-top: 7px;
-      background: rgba(255, 255, 255, .15);
-      border: 1px solid rgba(255, 255, 255, .28);
-      border-radius: 20px;
-      padding: 3px 13px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .5px;
-    }
-
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      min-width: 80px;
-    }
-
-    .theme-btn {
-      background: rgba(255, 255, 255, .15);
-      border: 1px solid rgba(255, 255, 255, .3);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .2s;
-      flex-shrink: 0;
-    }
-
-    .theme-btn:hover {
-      background: rgba(255, 255, 255, .25);
-    }
-
-    .logout-btn {
-      background: rgba(255, 255, 255, .15);
-      border: 1px solid rgba(255, 255, 255, .3);
-      border-radius: 20px;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 5px 11px;
-      white-space: nowrap;
-      transition: background .2s;
-    }
-
-    .logout-btn:hover {
-      background: rgba(255, 255, 255, .25);
-    }
-
-    /* ── TEACHER DISPLAY ── */
-    .teacher-display {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 16px;
-      background: var(--blue-light);
-      border: 1.5px solid var(--blue2);
-      border-radius: 10px;
-      transition: background .3s, border-color .3s;
-    }
-
-    .teacher-display-avatar {
-      width: 36px;
-      height: 36px;
-      background: var(--blue2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .teacher-display-name {
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--blue);
-    }
-
-    .teacher-display-tag {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 1px;
-    }
-
-    /* ── LAYOUT ── */
-    .page {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 20px 14px 40px;
-    }
-
-    /* ── SECTION ── */
-    .section {
-      background: var(--card);
-      border-radius: var(--r);
-      box-shadow: var(--sh);
-      margin-bottom: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      transition: background .3s, border-color .3s;
-    }
-
-    .section-head {
-      padding: 13px 18px 11px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--card2);
-      transition: background .3s, border-color .3s;
-    }
-
-    .section-icon {
-      font-size: 1.25rem;
-    }
-
-    .section-head h2 {
-      font-family: var(--fh);
-      font-size: 1.05rem;
-      color: var(--blue);
-      font-weight: 700;
-      letter-spacing: .5px;
-    }
-
-    .section-body {
-      padding: 16px 18px;
-    }
-
-    /* ── FORM FIELDS ── */
-    .field {
-      margin-bottom: 15px;
-    }
-
-    .field:last-child {
-      margin-bottom: 0;
-    }
-
-    label {
-      display: block;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .7px;
-      margin-bottom: 6px;
-    }
-
-    label .req {
-      color: var(--red);
-      margin-left: 2px;
-    }
-
-    select,
-    input[type=text],
-    input[type=number],
-    textarea {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: var(--fb);
-      font-size: 15px;
-      color: var(--ink);
-      background: var(--card);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s, background .3s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    select:focus,
-    input:focus,
-    textarea:focus {
-      border-color: var(--blue2);
-      box-shadow: 0 0 0 3px rgba(36, 113, 163, .15);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 70px;
-      line-height: 1.5;
-    }
-
-    .select-wrap {
-      position: relative;
-    }
-
-    .select-wrap::after {
-      content: '▾';
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    /* ── RADIO TOGGLE ── */
-    .radio-group {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-    }
-
-    .radio-opt {
-      flex: 1;
-      min-width: 120px;
-    }
-
-    .radio-opt input[type=radio] {
-      display: none;
-    }
-
-    .radio-opt label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 11px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: none;
-      letter-spacing: 0;
-      color: var(--muted);
-      transition: all .2s;
-      background: var(--card2);
-    }
-
-    .radio-opt input[type=radio]:checked+label {
-      border-color: var(--blue);
-      background: var(--blue-light);
-      color: var(--blue);
-    }
-
-    .radio-opt.yes input[type=radio]:checked+label {
-      border-color: var(--green);
-      background: var(--green-light);
-      color: var(--green);
-    }
-
-    .radio-opt.no input[type=radio]:checked+label {
-      border-color: var(--red);
-      background: var(--red-light);
-      color: var(--red);
-    }
-
-    /* ── PERIOD PILLS ── */
-    .period-group {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-
-    .period-opt input[type=radio] {
-      display: none;
-    }
-
-    .period-opt label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 52px;
-      height: 46px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: var(--fh);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--muted);
-      background: var(--card2);
-      transition: all .2s;
-    }
-
-    .period-opt input[type=radio]:checked+label {
-      border-color: var(--blue);
-      background: var(--blue-light);
-      color: var(--blue);
-    }
-
-    /* ── NUMBER GRID ── */
-    .num-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-      gap: 9px;
-    }
-
-    .num-card {
-      background: var(--card2);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      transition: background .3s, border-color .3s;
-    }
-
-    .num-card label {
-      font-size: 10.5px;
-      margin-bottom: 4px;
-    }
-
-    .num-card input {
-      border: none;
-      background: transparent;
-      padding: 4px 0;
-      font-size: 1.45rem;
-      font-family: var(--fh);
-      font-weight: 700;
-      color: var(--ink);
-      width: 100%;
-      outline: none;
-      transition: color .3s;
-    }
-
-    .num-card input::-webkit-outer-spin-button,
-    .num-card input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    /* ── MATH CHECK ── */
-    .math-check {
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all .3s;
-      margin-top: 13px;
-    }
-
-    .math-ok {
-      background: var(--green-light);
-      color: var(--green);
-      border: 1px solid var(--teal-light);
-    }
-
-    .math-err {
-      background: var(--red-light);
-      color: var(--red);
-      border: 1px solid #fca5a5;
-    }
-
-    .math-neu {
-      background: var(--card2);
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-
-    /* ── SUBMIT ── */
-    .submit-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--hdr2), var(--hdr3));
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-family: var(--fh);
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
-      box-shadow: 0 4px 18px rgba(26, 82, 118, .3);
-      margin-top: 4px;
-    }
-
-    .submit-btn:hover {
-      opacity: .93;
-    }
-
-    .submit-btn:active {
-      transform: scale(.98);
-    }
-
-    .submit-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 15px;
-      height: 15px;
-      border: 2px solid rgba(255, 255, 255, .4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-
-    .spinner-dark {
-      border-color: rgba(36, 113, 163, .3);
-      border-top-color: var(--blue2);
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* ── DASHBOARD LINK ── */
-    .dash-link {
-      text-align: center;
-      margin-top: 16px;
-    }
-
-    .dash-link a {
-      color: var(--blue2);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 18px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      background: var(--card);
-      box-shadow: 0 2px 8px rgba(28, 36, 52, .07);
-      transition: background .2s;
-    }
-
-    .dash-link a:hover {
-      background: var(--blue-light);
-    }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #1c2434;
-      color: #fff;
-      padding: 12px 22px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 600;
-      opacity: 0;
-      transition: all .3s;
-      z-index: 999;
-      white-space: nowrap;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
-    }
-
-    [data-theme="dark"] .toast {
-      background: #e2e8f0;
-      color: #1c2434;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* ── RESPONSIVE ── */
-    @media(max-width:480px) {
-      .page {
-        padding: 14px 10px 32px;
-      }
-
-      .section-body {
-        padding: 14px;
-      }
-
-      .header h1 {
-        font-size: 1.25rem;
-      }
-
-      .num-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .period-group {
-        gap: 5px;
-      }
-
-      .period-opt label {
-        width: 44px;
-        height: 42px;
-        font-size: .95rem;
-      }
-
-      .auth-card {
-        padding: 24px 18px 22px;
-      }
-
-      .check-grid {
-        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-      }
-    }
-
-    /* ── INLINE SUCCESS SCREEN ── */
-    #successScreen { display:none; }
-    .success-page { max-width:560px; margin:0 auto; padding:26px 14px 40px; }
-    .suc-card { background:var(--card); border-radius:var(--r); box-shadow:var(--sh);
-      padding:28px 24px; text-align:center; margin-bottom:14px; border:1px solid var(--border); }
-    .suc-tick { width:76px; height:76px; background:var(--green-light,#eafaf1); border-radius:50%;
-      display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
-      font-size:2.2rem; animation:sucPop .5s cubic-bezier(.34,1.56,.64,1) both; }
-    @keyframes sucPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
-    .suc-title { font-family:var(--fh); font-size:1.5rem; color:var(--green,#1e8449); font-weight:700; margin-bottom:5px; }
-    .suc-sub { color:var(--muted); font-size:14px; line-height:1.6; }
-    .suc-detail { background:var(--card); border-radius:var(--r); box-shadow:var(--sh);
-      overflow:hidden; margin-bottom:14px; border:1px solid var(--border); }
-    .suc-detail-head { background:var(--card2,#fafbfd); border-bottom:1px solid var(--border);
-      padding:11px 18px; font-family:var(--fh); font-size:.95rem; color:var(--blue); font-weight:700; }
-    .suc-row { display:flex; border-bottom:1px solid var(--border); padding:10px 18px; }
-    .suc-row:last-child { border-bottom:none; }
-    .suc-lbl { width:120px; font-size:11px; font-weight:600; color:var(--muted);
-      text-transform:uppercase; letter-spacing:.7px; flex-shrink:0; padding-top:1px; }
-    .suc-val { font-size:14px; font-weight:500; }
-    .suc-counts { display:grid; grid-template-columns:repeat(4,1fr); padding:12px 18px 14px; }
-    .suc-cnt { text-align:center; padding:6px 4px; }
-    .suc-cnt .v { font-family:var(--fh); font-size:1.3rem; font-weight:700; }
-    .suc-cnt .l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
-    .pill-ok { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px;
-      font-weight:600; background:var(--green-light,#eafaf1); color:var(--green,#1e8449); }
-    .pill-no { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px;
-      font-weight:600; background:#fde8e6; color:var(--red); }
-    .suc-btns { display:flex; flex-direction:column; gap:10px; }
-    .suc-btn { display:block; width:100%; padding:14px; border:none; border-radius:12px;
-      font-family:var(--fh); font-size:1.05rem; font-weight:700; letter-spacing:.5px;
-      cursor:pointer; text-align:center; transition:opacity .2s; }
-    .suc-btn:active { opacity:.85; }
-    .suc-btn-primary { background:linear-gradient(135deg,var(--hdr2,#1a5276),var(--hdr3,#117a65));
-      color:#fff; box-shadow:0 4px 18px rgba(26,82,118,.3); }
-    .suc-btn-outline { background:var(--card); color:var(--blue); border:1.5px solid var(--border);
-      box-shadow:0 2px 8px rgba(28,36,52,.07); }
-    .suc-ts { text-align:center; font-size:11px; color:var(--muted); margin-top:10px; }
-    @media(max-width:420px) {
-      .suc-counts { grid-template-columns:repeat(2,1fr); }
-      .suc-lbl { width:100px; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
-
 <body>
 
-  <!-- ══════════════════════════════════════════
-       LOADING SCREEN — Initial App Load
-  ══════════════════════════════════════════ -->
-  <div id="loadingScreen" class="auth-screen" style="flex-direction:column;align-items:center;justify-content:center;">
-    <div id="loadingSpinner" class="spinner" style="width:34px;height:34px;border-width:3px;margin-bottom:16px;"></div>
-    <div style="color:#fff;font-family:var(--fh);font-size:1.3rem;font-weight:700;letter-spacing:1px;text-align:center;">
-      JNV Tarikhet<br>
-      <span id="loadingMsg" style="font-size:14px;font-family:var(--fb);font-weight:500;opacity:0.8;letter-spacing:normal;">Loading your profile...</span>
-    </div>
-    <div id="loadingRetry" style="display:none;margin-top:20px;text-align:center;">
-      <button onclick="retryProfileLoad()" style="padding:10px 28px;background:#fff;color:#1a3a5c;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;margin-right:10px;">↺ Retry</button>
-      <button onclick="signOutAndGoLogin()" style="padding:10px 20px;background:transparent;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:13px;cursor:pointer;">Sign Out</button>
-    </div>
+  <!-- ===============================
+       LOADING SCREEN
+       =============================== -->
+  <div id="screen-loading" class="fullscreen-overlay">
+    <div class="spinner"></div>
+    <div style="font-weight: 600; color: var(--text-primary);">Loading your profile...</div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       AUTH SCREEN — Login / Register
-  ══════════════════════════════════════════ -->
-  <div id="authScreen" class="auth-screen hidden">
-    <button class="auth-theme-btn" id="authThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
-
-    <div class="auth-card">
-      <div class="auth-logo">📋</div>
-      <h1 class="auth-title">JNV Tarikhet</h1>
-      <p class="auth-sub">Staff Attendance System<br>Sign in to submit attendance</p>
-
-      <!-- Tab switcher -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">🔐 Sign In</button>
-        <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">📝 Register</button>
+  <!-- ===============================
+       AUTH SCREEN (Login / Register)
+       =============================== -->
+  <div id="screen-auth" class="fullscreen-overlay hidden">
+    <div class="glass-card auth-card" style="margin-top:20px; max-height: 90vh; overflow-y: auto;">
+      <div class="text-center mb-4">
+        <h1 class="header-title" style="justify-content:center;">📋 JNV Tarikhet</h1>
+        <div class="header-subtitle" style="color:var(--text-secondary);">Staff Portal</div>
       </div>
 
-      <!-- ── LOGIN PANEL ── -->
-      <div id="loginPanel">
-        <div class="auth-field">
-          <label class="auth-lbl">Email Address</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"
-            onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Password</label>
-          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
-            onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div id="loginError" class="auth-error"></div>
-        <button class="auth-btn" id="loginBtn" onclick="doLogin()">🔐 Sign In</button>
-        <p class="auth-foot">No account yet? <a href="#" onclick="switchAuthTab('register');return false;">Register
-            here →</a></p>
+      <!-- Tabs -->
+      <div style="display:flex; border-bottom:2px solid var(--input-border); margin-bottom:20px;">
+        <button id="tab-login" class="btn" style="flex:1; background:transparent; border-radius:0; color:var(--primary); border-bottom:3px solid var(--primary); font-size:1rem; padding:10px;" onclick="switchAuthTab('login')">Login</button>
+        <button id="tab-register" class="btn" style="flex:1; background:transparent; border-radius:0; color:var(--text-secondary); border-bottom:3px solid transparent; font-size:1rem; padding:10px;" onclick="switchAuthTab('register')">Register</button>
       </div>
 
-      <!-- ── REGISTER PANEL ── -->
-      <div id="registerPanel" class="hidden">
-        <div class="auth-field">
-          <label class="auth-lbl">Your Designation / Name <span class="req">*</span></label>
-          <div class="auth-select-wrap">
-            <select id="regName">
-              <option value="">— Select your designation —</option>
-            </select>
-          </div>
+      <!-- Login Form -->
+      <form id="form-login">
+        <div id="err-login" class="alert alert-danger hidden"></div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="log-email" class="form-input" required>
         </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Email Address <span class="req">*</span></label>
-          <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email">
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="log-pwd" class="form-input" required>
         </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Password <span class="req">*</span></label>
-          <input type="password" id="regPassword" placeholder="Minimum 6 characters" autocomplete="new-password">
-        </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Confirm Password <span class="req">*</span></label>
-          <input type="password" id="regConfirm" placeholder="Re-enter password" autocomplete="new-password">
-        </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Classes I Teach <span class="req">*</span></label>
-          <div class="check-grid" id="regClasses"><!-- populated by JS --></div>
-        </div>
-        <div class="auth-field">
-          <label class="auth-lbl">Subjects I Teach <span class="req">*</span></label>
-          <div class="check-grid" id="regSubjects"><!-- populated by JS --></div>
-        </div>
-        <div id="registerError" class="auth-error"></div>
-        <div id="registerSuccess" class="auth-success-msg hidden"></div>
-        <button class="auth-btn" id="registerBtn" onclick="doRegister()">📝 Create Account</button>
-        <p class="auth-foot">Already have an account? <a href="#" onclick="switchAuthTab('login');return false;">Sign in
-            →</a></p>
-        <p class="auth-foot" style="font-size:11px;margin-top:6px;color:var(--muted)">
-          ⚠️ After registration, the admin must approve your account before you can submit.
-        </p>
-      </div>
-
-      <!-- Dashboard link for admin -->
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);text-align:center">
-        <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
-                  background:var(--card2);border:1.5px solid var(--border);
-                  border-radius:30px;text-decoration:none;color:var(--muted);
-                  font-size:12px;font-weight:600;font-family:var(--fb);
-                  transition:all .2s;letter-spacing:.3px"
-          onmouseover="this.style.borderColor='var(--blue2)';this.style.color='var(--blue)'"
-          onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-          📊 Admin Dashboard →
-        </a>
-        <p style="margin-top:8px;font-size:10px;color:var(--muted);opacity:.7">Admin access required (PIN)</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       WAIT SCREEN — Pending Approval
-  ══════════════════════════════════════════ -->
-  <div id="waitScreen" class="auth-screen hidden">
-    <button class="auth-theme-btn" id="waitThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
-
-    <div class="auth-card" style="text-align:center;margin-top:40px">
-      <div class="wait-icon">⏳</div>
-      <h2
-        style="font-family:var(--fh);font-size:1.5rem;color:var(--blue);font-weight:700;letter-spacing:.5px;margin-bottom:10px">
-        Pending Approval
-      </h2>
-      <p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:6px">
-        Your account has been created and is <strong>awaiting admin approval</strong>.
-      </p>
-      <p style="color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:20px">
-        Please contact the school admin (Principal / Vice Principal) to activate your account.
-      </p>
-      <div class="wait-name-badge">
-        <span>👤</span>
-        <span id="waitNameDisplay">—</span>
-      </div>
-      <button class="auth-btn auth-btn-outline" onclick="doLogout()" style="margin-top:0">
-        🚪 Sign Out
-      </button>
-      <p class="auth-foot" style="margin-top:14px">
-        Once approved, <a href="#" onclick="checkApprovalStatus();return false;">click here to check again</a>
-      </p>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       MAIN CONTENT — Attendance Form
-  ══════════════════════════════════════════ -->
-  <div id="mainContent" class="hidden">
-
-    <div class="header">
-      <div class="header-inner">
-        <div style="width:36px"></div>
-        <div class="header-center">
-          <div class="header-logo">📋</div>
-          <h1>JNV Tarikhet</h1>
-          <p>Jawahar Navodaya Vidyalaya, Tarikhet • Almora</p>
-          <div class="header-badge">Staff Class Attendance Form</div>
-        </div>
-        <div class="header-right">
-          <button class="theme-btn" id="themeToggle" title="Toggle dark mode" onclick="toggleTheme()">🌙</button>
-          <button class="logout-btn" id="logoutBtn" onclick="doLogout()" title="Sign out">🚪 Logout</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="page">
-      <form id="attForm" novalidate>
-
-        <!-- TEACHER INFO (read-only after login) -->
-        <div class="section">
-          <div class="section-head">
-            <span class="section-icon">👤</span>
-            <h2>Teacher Information</h2>
-          </div>
-          <div class="section-body">
-            <div class="field">
-              <label>Logged In As</label>
-              <div class="teacher-display" id="teacherDisplay">
-                <div class="teacher-display-avatar">👤</div>
-                <div>
-                  <div class="teacher-display-name" id="teacherNameDisplay">—</div>
-                  <div class="teacher-display-tag">Verified Account ✓</div>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label>Period Number <span class="req">*</span></label>
-              <div class="period-group" id="periodGroup"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CLASS DETAILS -->
-        <div class="section">
-          <div class="section-head">
-            <span class="section-icon">🏫</span>
-            <h2>Class Details</h2>
-          </div>
-          <div class="section-body">
-            <div class="field">
-              <label for="cls">Class <span class="req">*</span></label>
-              <div class="select-wrap">
-                <select id="cls" required>
-                  <option value="">— Select class —</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label for="subject">Subject Taught <span class="req">*</span></label>
-              <div class="select-wrap">
-                <select id="subject" required>
-                  <option value="">— Select subject —</option>
-                </select>
-              </div>
-            </div>
-            <div class="field">
-              <label>Was the Class Taken? <span class="req">*</span></label>
-              <div class="radio-group">
-                <div class="radio-opt yes">
-                  <input type="radio" name="taken" id="takenYes" value="Yes" required>
-                  <label for="takenYes">✅ Yes, class was taken</label>
-                </div>
-                <div class="radio-opt no">
-                  <input type="radio" name="taken" id="takenNo" value="No">
-                  <label for="takenNo">❌ No, class not taken</label>
-                </div>
-              </div>
-            </div>
-            <div class="field hidden" id="reasonField">
-              <label for="reason">Reason for Not Taking Class</label>
-              <div class="select-wrap">
-                <select id="reason">
-                  <option value="">— Select reason —</option>
-                  <option>Leave</option>
-                  <option>Medical Leave</option>
-                  <option>Assembly / Prayer</option>
-                  <option>Official Duty</option>
-                  <option>School Event</option>
-                  <option>Other</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ATTENDANCE COUNTS -->
-        <div class="section hidden" id="countsSection">
-          <div class="section-head">
-            <span class="section-icon">🔢</span>
-            <h2>Attendance Count</h2>
-          </div>
-          <div class="section-body">
-            <div class="num-grid">
-              <div class="num-card">
-                <label for="total">Total Students</label>
-                <input type="number" id="total" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-              <div class="num-card">
-                <label for="present" style="color:var(--green)">Present</label>
-                <input type="number" id="present" min="0" max="60" placeholder="0" oninput="updateMath()"
-                  style="color:var(--green)">
-              </div>
-              <div class="num-card">
-                <label for="absent" style="color:var(--red)">Absent</label>
-                <input type="number" id="absent" min="0" max="60" placeholder="0" oninput="updateMath()"
-                  style="color:var(--red)">
-              </div>
-              <div class="num-card">
-                <label for="leave">On Leave</label>
-                <input type="number" id="leave" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-              <div class="num-card">
-                <label for="od">On OD</label>
-                <input type="number" id="od" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-              <div class="num-card">
-                <label for="tca">TCA</label>
-                <input type="number" id="tca" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-              <div class="num-card">
-                <label for="nr">NR</label>
-                <input type="number" id="nr" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-              <div class="num-card">
-                <label for="sick">Sick</label>
-                <input type="number" id="sick" min="0" max="60" placeholder="0" oninput="updateMath()">
-              </div>
-            </div>
-            <div id="mathCheck" class="math-check math-neu">
-              ⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick
-            </div>
-          </div>
-        </div>
-
-        <!-- REMARKS -->
-        <div class="section">
-          <div class="section-head">
-            <span class="section-icon">💬</span>
-            <h2>Additional Remarks</h2>
-          </div>
-          <div class="section-body">
-            <div class="field">
-              <label for="remarks">Remarks (optional)</label>
-              <textarea id="remarks" placeholder="Any additional notes..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <button type="submit" class="submit-btn" id="submitBtn">Submit Attendance →</button>
+        <button type="submit" id="btn-login" class="btn btn-primary mt-4">Sign In</button>
       </form>
 
-      <div class="dash-link">
-        <a href="dashboard.html">📊 Open Admin Dashboard</a>
+      <!-- Register Form -->
+      <form id="form-register" class="hidden">
+        <div id="err-register" class="alert alert-danger hidden"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Designation <span class="req">*</span></label>
+          <select id="reg-name" class="form-select" required>
+            <option value="">— Select Designation —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span class="req">*</span></label>
+          <input type="email" id="reg-email" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="req">*</span></label>
+          <input type="password" id="reg-pwd" class="form-input" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span class="req">*</span></label>
+          <input type="password" id="reg-pwd-confirm" class="form-input" required minlength="6">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Classes Handled <span class="req">*</span></label>
+          <div id="reg-classes" class="chip-group"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subjects Handled <span class="req">*</span></label>
+          <div id="reg-subjects" class="chip-group"></div>
+        </div>
+        
+        <button type="submit" id="btn-register" class="btn btn-primary mt-4">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===============================
+       WAIT SCREEN (Pending Approval)
+       =============================== -->
+  <div id="screen-wait" class="fullscreen-overlay hidden">
+    <div class="glass-card" style="padding: 40px; text-align:center; max-width: 400px; width:90%;">
+      <h1 style="font-size:3rem; margin-bottom:10px;">⏳</h1>
+      <h2 style="color:var(--primary); margin-bottom:5px;">Pending Approval</h2>
+      <div style="background:var(--success-bg); color:var(--success); border-radius:30px; padding:6px 12px; display:inline-block; font-weight:700; margin-bottom:20px;" id="wait-name"></div>
+      <p style="color:var(--text-secondary); font-size:.9rem; margin-bottom:24px;">Your account has been created. Please wait for an administrator to approve your profile before submitting attendance.</p>
+      
+      <button class="btn btn-outline" id="btn-refresh-status" style="width:auto; padding:10px 20px; border-radius:30px; margin-right:10px; font-size:.9rem;">🔄 Check Status</button>
+      <button class="btn btn-outline btn-logout" style="width:auto; padding:10px 20px; border-radius:30px; font-size:.9rem;">🚪 Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ===============================
+       MAIN FORM SCREEN
+       =============================== -->
+  <div id="screen-main" class="hidden">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <h1 class="header-title">📋 JNV Tarikhet</h1>
+        <div class="header-subtitle">Staff Class Attendance Form</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle">☀</button>
+        <button class="icon-btn btn-logout">🚪</button>
+      </div>
+    </header>
+
+    <div class="glass-container">
+      
+      <!-- Teacher Info Badge -->
+      <div class="glass-card" style="background:var(--primary); color:white; border:none;">
+        <div style="padding:16px 20px; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:2rem;">👤</div>
+          <div>
+            <div style="font-size:.8rem; opacity:0.8; font-weight:600; text-transform:uppercase;">Logged In As</div>
+            <div style="font-size:1.2rem; font-weight:700;" id="teacher-name-display">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Form -->
+      <form id="attendance-form">
+        
+        <div class="glass-card form-group">
+          <div class="card-header">
+            <span class="card-icon">🏫</span>
+            <h2 class="card-title">Class Details</h2>
+          </div>
+          <div class="card-body">
+            
+            <div class="form-group">
+              <label class="form-label">Period <span class="req">*</span></label>
+              <div id="period-chips" class="chip-group"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Class <span class="req">*</span></label>
+              <select id="form-class" class="form-select" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Subject Taught <span class="req">*</span></label>
+              <select id="form-subject" class="form-select" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Was the class taken? <span class="req">*</span></label>
+              <div class="chip-group">
+                <div class="chip success">
+                  <input type="radio" name="taken" id="taken-yes" value="Yes" required checked>
+                  <label for="taken-yes">✅ Yes, class taken</label>
+                </div>
+                <div class="chip danger">
+                  <input type="radio" name="taken" id="taken-no" value="No" required>
+                  <label for="taken-no">❌ No, not taken</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reason (conditionally visible) -->
+            <div class="form-group hidden" id="reason-section">
+              <label class="form-label">Reason for not taking class</label>
+              <select id="form-reason" class="form-select">
+                <option value="">— Select reason —</option>
+                <option>Leave</option><option>Medical Leave</option>
+                <option>Assembly / Prayer</option><option>Official Duty</option>
+                <option>School Event</option><option>Other</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Counts Section -->
+        <div class="glass-card form-group" id="counts-section">
+          <div class="card-header">
+            <span class="card-icon">🔢</span>
+            <h2 class="card-title">Attendance Counts</h2>
+          </div>
+          <div class="card-body">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-bottom:16px;">
+              <div><label class="form-label">Total</label><input type="number" id="count-tot" class="form-input" min="0" max="60"></div>
+              <div><label class="form-label" style="color:var(--success)">Present</label><input type="number" id="count-pre" class="form-input" min="0" max="60" style="color:var(--success)"></div>
+              <div><label class="form-label" style="color:var(--danger)">Absent</label><input type="number" id="count-abs" class="form-input" min="0" max="60" style="color:var(--danger)"></div>
+              <div><label class="form-label">On Leave</label><input type="number" id="count-lea" class="form-input" min="0" max="60"></div>
+              <div><label class="form-label">On OD</label><input type="number" id="count-od" class="form-input" min="0" max="60"></div>
+              <div><label class="form-label">TCA</label><input type="number" id="count-tca" class="form-input" min="0" max="60"></div>
+              <div><label class="form-label">NR</label><input type="number" id="count-nr" class="form-input" min="0" max="60"></div>
+              <div><label class="form-label">Sick</label><input type="number" id="count-sick" class="form-input" min="0" max="60"></div>
+            </div>
+            <div id="math-checker" class="alert" style="background:rgba(0,0,0,0.05); color:var(--text-secondary); margin:0;">
+              ⊞ Fill counts above when class is taken
+            </div>
+          </div>
+        </div>
+
+        <!-- Remarks -->
+        <div class="glass-card form-group">
+          <div class="card-header">
+            <span class="card-icon">💬</span>
+            <h2 class="card-title">Remarks</h2>
+          </div>
+          <div class="card-body">
+            <textarea id="form-remarks" class="form-textarea" placeholder="Any additional notes..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn btn-primary" style="margin-top: 10px;">Submit Attendance &rarr;</button>
+        <div class="text-center mt-4">
+          <a href="dashboard.html" style="color:var(--primary); font-weight:600; text-decoration:none;">📊 Open Admin Dashboard</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===============================
+       SUCCESS SCREEN
+       =============================== -->
+  <div id="screen-success" class="fullscreen-overlay hidden" style="justify-content: flex-start; padding-top: 10vh;">
+    <div class="glass-card" style="padding:40px 24px; text-align:center; max-width:440px; width:100%;">
+      <div style="font-size:4rem; margin-bottom:10px;">✅</div>
+      <h2 style="color:var(--success); font-family:var(--font-heading); font-size:2rem; margin-bottom:10px;">Success!</h2>
+      <p style="color:var(--text-secondary); margin-bottom:20px;">Your attendance record has been securely saved.</p>
+      
+      <div style="background:var(--input-bg); border:1px solid var(--input-border); border-radius:var(--radius-md); padding:16px; margin-bottom:24px; text-align:left; font-size:.9rem; color:var(--text-primary);" id="suc-details">
+        <!-- Details injected via JS -->
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <button class="btn btn-primary" onclick="submitAnother()">Submit Another Entry</button>
+        <a href="dashboard.html" class="btn btn-outline" style="text-decoration:none;">Open Admin Dashboard</a>
       </div>
     </div>
   </div>
 
-  <!-- ── INLINE SUCCESS SCREEN ── -->
-  <div id="successScreen">
-    <div class="success-page">
-      <div class="suc-card">
-        <div class="suc-tick">✅</div>
-        <div class="suc-title">Submitted Successfully!</div>
-        <div class="suc-sub">Your attendance record has been saved.<br>Thank you for submitting on time.</div>
-      </div>
-      <div class="suc-detail" id="sucDetail" style="display:none">
-        <div class="suc-detail-head">📝 Submission Details</div>
-        <div id="sucBody"></div>
-      </div>
-      <div class="suc-btns">
-        <button class="suc-btn suc-btn-primary" onclick="submitAnother()">➕ Submit Another Entry</button>
-        <a href="dashboard.html" class="suc-btn suc-btn-outline">📊 Open Admin Dashboard</a>
-        <button class="suc-btn suc-btn-outline" onclick="doLogout()" style="font-size:.95rem;">🚪 Sign Out</button>
-      </div>
-      <div class="suc-ts" id="sucTs"></div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <!-- Supabase JS (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script>
-    // ═══════════════════════════════════════════════════════════════
-    //  STEP 1: Your Supabase credentials
-    // ═══════════════════════════════════════════════════════════════
-    const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
-
-    // ── SUPABASE CLIENT ──────────────────────────────────────────
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    // ── CONFIG ───────────────────────────────────────────────────
-    const TEACHERS = [
-      "TGT Computer Science", "Librarian", "PET F", "PET M",
-      "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
-      "PGT Geography", "PGT Hindi", "PGT History", "PGT Computer Sc.",
-      "PGT Mathematics", "PGT Physics", "TGT Art", "TGT Eng-1",
-      "TGT Eng-2", "TGT Hindi-1", "TGT Hindi-2", "TGT Punjabi-1",
-      "TGT Punjabi-2", "TGT Math-1", "TGT Math-2", "TGT Music",
-      "TGT Science", "TGT Social Science", "Automotive Teacher"
-    ];
-    const SUBJECTS = [
-      "Art", "Biology", "Chemistry", "Computer", "Economics", "English",
-      "Geography", "Hindi", "History", "Library", "Hindi/Punjabi",
-      "Mathematics", "Music", "Physical Education", "Physics", "Science",
-      "Social Science", "SUPW", "3rd Language", "G.S. / G.F.C",
-      "SEWA / WE", "ICT (Comp. Lab)", "Vocational Education", "Hindi/CS",
-      "IT/Automotive", "Computer Science", "Math/Biology",
-      "Art Education (Music)", "Art Education (Drawing)", "Automotive"
-    ];
-    const CLASSES = [
-      "VI-A", "VI-B", "VII-A", "VII-B", "VIII-A", "VIII-B",
-      "IX-A", "IX-B", "X-A", "X-B", "XI-Sci", "XI-Hum", "XII-Sci", "XII-Hum"
-    ];
-    const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
-
-    // ── CURRENT PROFILE ──────────────────────────────────────────
-    let currentProfile = null;
-    let profileLoading = false; // guard against concurrent loadProfile calls
-
-    // ═══════════════════════════════════════════════════════════════
-    //  THEME
-    // ═══════════════════════════════════════════════════════════════
-    function applyTheme(t) {
-      document.documentElement.setAttribute('data-theme', t);
-      const icon = t === 'dark' ? '☀️' : '🌙';
-      ['themeToggle', 'authThemeBtn', 'waitThemeBtn'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = icon;
-      });
-      document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
-      try { localStorage.setItem('theme', t); } catch(e) {}
-    }
-    function toggleTheme() {
-      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-    let savedTheme = 'light';
-    try { savedTheme = localStorage.getItem('theme') || 'light'; } catch(e) {}
-    applyTheme(savedTheme);
-
-    // ═══════════════════════════════════════════════════════════════
-    //  AUTH STATE MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════
-    // ═══════════════════════════════════════════════════════════════
-    //  PROFILE CACHE  (localStorage, 8-hour TTL)
-    //  Profile is saved after every successful DB fetch so subsequent
-    //  page loads are instant — no spinner, no network wait.
-    // ═══════════════════════════════════════════════════════════════
-    const CACHE_KEY = 'jnv_profile_v1';
-    const CACHE_TTL = 8 * 60 * 60 * 1000; // 8 hours
-
-    function getCachedProfile(userId) {
-      try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        if (!raw) return null;
-        const { uid, profile, ts } = JSON.parse(raw);
-        if (uid !== userId) return null;
-        if (Date.now() - ts > CACHE_TTL) return null;
-        return profile;
-      } catch(e) { return null; }
-    }
-
-    function setCachedProfile(userId, profile) {
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ uid: userId, profile, ts: Date.now() })); }
-      catch(e) {}
-    }
-
-    function clearCachedProfile() {
-      try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
-    }
-
-    // ─── Apply a profile to the UI immediately (no network needed) ──
-    function applyProfile(profile) {
-      currentProfile = profile;
-      if (!profile.approved) {
-        document.getElementById('waitNameDisplay').textContent = profile.name;
-        showScreen('wait');
-      } else {
-        showForm(profile);
-      }
-    }
-
-    // ─── Silent background refresh after serving from cache ─────────
-    async function refreshProfileInBackground(user) {
-      try {
-        const { data: profile, error } = await db
-          .from('teacher_profiles').select('*').eq('id', user.id).single();
-        if (error || !profile) return;
-        setCachedProfile(user.id, profile);
-        // Only update UI if approval status changed
-        if (!!profile.approved !== !!currentProfile?.approved) applyProfile(profile);
-        else currentProfile = profile; // keep in-memory fresh, no UI flicker
-      } catch(e) { /* silent — cached version still valid */ }
-    }
-
-    // ─── First-time DB load (no cache) with retry UI on timeout ─────
-    let profileLoading = false;
-    let _retryUser = null;
-    let _retryTimer = null;
-
-    function retryProfileLoad() {
-      if (!_retryUser) { db.auth.signOut(); return; }
-      document.getElementById('loadingSpinner').style.display = '';
-      document.getElementById('loadingMsg').textContent = 'Loading your profile...';
-      document.getElementById('loadingRetry').style.display = 'none';
-      loadProfileFromDB(_retryUser);
-    }
-
-    async function signOutAndGoLogin() {
-      clearCachedProfile();
-      await db.auth.signOut();
-      showScreen('auth');
-    }
-
-    async function loadProfileFromDB(user) {
-      if (profileLoading) return;
-      _retryUser = user;
-      profileLoading = true;
-
-      // Show retry UI after 25 s if DB still hasn't responded
-      _retryTimer = setTimeout(() => {
-        if (!profileLoading) return;
-        profileLoading = false;
-        document.getElementById('loadingSpinner').style.display = 'none';
-        document.getElementById('loadingMsg').textContent = 'Server is slow to respond.';
-        document.getElementById('loadingRetry').style.display = 'block';
-      }, 25000);
-
-      try {
-        let { data: profile, error } = await db
-          .from('teacher_profiles').select('*').eq('id', user.id).single();
-
-        // New user: create profile row from registration metadata
-        if ((error || !profile) && user.user_metadata?.name) {
-          const { data: np, error: ie } = await db
-            .from('teacher_profiles')
-            .insert([{ id: user.id, name: user.user_metadata.name, email: user.email,
-                       classes: user.user_metadata.classes || [],
-                       subjects: user.user_metadata.subjects || [] }])
-            .select().single();
-          if (!ie && np) { profile = np; error = null; }
-        }
-
-        if (error || !profile) {
-          if (error?.code !== 'PGRST116') {
-            showScreen('auth');
-            document.getElementById('loginError').textContent = '⚠️ Could not load profile. Please sign in again.';
-          } else {
-            await db.auth.signOut(); showScreen('auth');
-          }
-          return;
-        }
-
-        setCachedProfile(user.id, profile); // save so next visit is instant
-        applyProfile(profile);
-      } catch(err) {
-        showScreen('auth');
-        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
-      } finally {
-        clearTimeout(_retryTimer);
-        profileLoading = false;
-      }
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  STARTUP — 100% synchronous, zero network wait
-    //
-    //  Supabase stores the session in localStorage under a known key.
-    //  We read the user ID synchronously — no getSession() call needed —
-    //  then serve the profile from cache INSTANTLY before any network.
-    //  Validation and DB sync happen silently in the background.
-    // ═══════════════════════════════════════════════════════════════
-    const SB_SESS_KEY = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token';
-
-    function readStoredUserId() {
-      try {
-        const raw = localStorage.getItem(SB_SESS_KEY);
-        return raw ? (JSON.parse(raw)?.user?.id || null) : null;
-      } catch(e) { return null; }
-    }
-
-    // Background: validate session and refresh profile (never blocks UI)
-    async function bgValidateAndSync(expectedUserId) {
-      try {
-        const { data: { session } } = await db.auth.getSession();
-        if (!session?.user || session.user.id !== expectedUserId) {
-          // Session is gone or switched — force logout
-          currentProfile = null; clearCachedProfile();
-          await db.auth.signOut(); showScreen('auth'); return;
-        }
-        refreshProfileInBackground(session.user); // silent DB refresh
-      } catch(e) { /* network down — cached UI still shown, no action */ }
-    }
-
-    // Startup (runs synchronously on page load — zero network calls)
-    const _storedUid = readStoredUserId();
-    if (!_storedUid) {
-      // No stored session at all → show login immediately
-      showScreen('auth');
-    } else {
-      const _cached = getCachedProfile(_storedUid);
-      if (_cached) {
-        // INSTANT path: cached profile → show form right now, validate in background
-        applyProfile(_cached);
-        bgValidateAndSync(_storedUid);
-      } else {
-        // Session exists but cache is empty (first login or expired).
-        // NEVER show the spinner — show login screen immediately instead.
-        // Try to auto-reconnect in the background; form shows automatically when ready.
-        showScreen('auth');
-        const reconnectMsg = document.getElementById('loginError');
-        reconnectMsg.style.color = 'var(--blue,#1a5276)';
-        reconnectMsg.textContent = '🔄 Reconnecting your session…';
-        db.auth.getSession().then(({ data: { session } }) => {
-          reconnectMsg.textContent = '';
-          reconnectMsg.style.color = '';
-          if (session?.user && !currentProfile) loadProfileFromDB(session.user);
-        }).catch(() => {
-          reconnectMsg.textContent = '';
-          reconnectMsg.style.color = '';
-        });
-      }
-    }
-
-    // Handle auth events after startup (login success, sign-out)
-    db.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && !currentProfile && !profileLoading) {
-        const cached = getCachedProfile(session.user.id);
-        if (cached) applyProfile(cached);
-        else loadProfileFromDB(session.user);
-      } else if (event === 'SIGNED_OUT') {
-        currentProfile = null; profileLoading = false;
-        clearCachedProfile(); showScreen('auth');
-      }
-    });
-
-    function showScreen(name) {
-      const loading = document.getElementById('loadingScreen');
-      if (loading) loading.classList.add('hidden');
-
-      document.getElementById('authScreen').classList.toggle('hidden', name !== 'auth');
-      document.getElementById('waitScreen').classList.toggle('hidden', name !== 'wait');
-      document.getElementById('mainContent').classList.toggle('hidden', name !== 'form');
-      document.getElementById('successScreen').style.display = name === 'success' ? 'block' : 'none';
-
-      if (name === 'auth') {
-        const btn = document.getElementById('loginBtn');
-        if (btn) { btn.disabled = false; btn.textContent = '🔐 Sign In'; }
-      }
-    }
-
-    function esc(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function showSuccessScreen(payload) {
-      const d = payload;
-      const detail = document.getElementById('sucDetail');
-      const body   = document.getElementById('sucBody');
-
-      const rows = [
-        ['Teacher', esc(d.teacher)],
-        ['Period',  'Period ' + esc(d.period)],
-        ['Class',   esc(d.class)],
-        ['Subject', esc(d.subject)],
-        ['Class Taken', d.taken === 'Yes'
-          ? '<span class="pill-ok">✅ Yes</span>'
-          : '<span class="pill-no">❌ No</span>']
-      ];
-      if (d.reason) rows.push(['Reason', esc(d.reason)]);
-
-      let html = rows.map(([l, v]) =>
-        `<div class="suc-row"><div class="suc-lbl">${l}</div><div class="suc-val">${v}</div></div>`
-      ).join('');
-
-      if (d.taken === 'Yes' && d.total) {
-        html += `<div class="suc-counts">
-          <div class="suc-cnt"><div class="v">${esc(d.total)}</div><div class="l">Total</div></div>
-          <div class="suc-cnt"><div class="v" style="color:var(--green)">${esc(d.present)}</div><div class="l">Present</div></div>
-          <div class="suc-cnt"><div class="v" style="color:var(--red)">${esc(d.absent)}</div><div class="l">Absent</div></div>
-          <div class="suc-cnt"><div class="v">${esc(d.leave_count)}</div><div class="l">Leave</div></div>
-          <div class="suc-cnt"><div class="v">${esc(d.od)}</div><div class="l">OD</div></div>
-          <div class="suc-cnt"><div class="v">${esc(d.tca)}</div><div class="l">TCA</div></div>
-          <div class="suc-cnt"><div class="v">${esc(d.nr)}</div><div class="l">NR</div></div>
-          <div class="suc-cnt"><div class="v">${esc(d.sick)}</div><div class="l">Sick</div></div>
-        </div>`;
-      }
-      if (d.remarks) html += `<div class="suc-row"><div class="suc-lbl">Remarks</div><div class="suc-val">${esc(d.remarks)}</div></div>`;
-
-      body.innerHTML = html;
-      detail.style.display = '';
-
-      const now = new Date();
-      document.getElementById('sucTs').textContent = 'Submitted at ' +
-        now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + ' on ' +
-        now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-
-      showScreen('success');
-      window.scrollTo(0, 0);
-    }
-
-    function submitAnother() {
-      // Reset form completely, keep profile — no page reload, no DB call
-      const form = document.getElementById('attForm');
-      if (form) form.reset();
-      document.querySelectorAll('input[name="period"]').forEach(r => r.checked = false);
-      document.getElementById('countsSection').classList.add('hidden');
-      document.getElementById('reasonField').classList.remove('hidden');
-      setMath('neu', '⊞ Fill counts above when class is taken');
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = false;
-      btn.textContent = 'Submit Attendance →';
-      showScreen('form');
-      window.scrollTo(0, 0);
-    }
-
-    function showForm(profile) {
-      // Fill teacher name
-      document.getElementById('teacherNameDisplay').textContent = profile.name;
-
-      // Populate ONLY the teacher's assigned classes
-      const clsSel = document.getElementById('cls');
-      clsSel.innerHTML = '<option value="">— Select class —</option>';
-      let pClasses = profile.classes || [];
-      if (typeof pClasses === 'string') {
-        pClasses = pClasses.replace(/^\{|\}$/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
-      }
-      pClasses.sort().forEach(v => {
-        const o = document.createElement('option');
-        o.value = v; o.textContent = v;
-        clsSel.appendChild(o);
-      });
-
-      // Populate ONLY the teacher's assigned subjects
-      const subSel = document.getElementById('subject');
-      subSel.innerHTML = '<option value="">— Select subject —</option>';
-      let pSubjects = profile.subjects || [];
-      if (typeof pSubjects === 'string') {
-        pSubjects = pSubjects.replace(/^\{|\}$/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
-      }
-      pSubjects.sort().forEach(v => {
-        const o = document.createElement('option');
-        o.value = v; o.textContent = v;
-        subSel.appendChild(o);
-      });
-
-      // Reset form to clean state
-      document.getElementById('attForm').reset();
-      document.getElementById('countsSection').classList.add('hidden');
-      document.getElementById('reasonField').classList.add('hidden');
-      setMath('neu', '⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick');
-
-      showScreen('form');
-    }
-
-    // Re-check approval status (for the "check again" link on wait screen)
-    async function checkApprovalStatus() {
-      const { data: { session } } = await db.auth.getSession();
-      if (session) await loadProfileFromDB(session.user);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  LOGIN
-    // ═══════════════════════════════════════════════════════════════
-    async function doLogin() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const errEl = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
-
-      errEl.textContent = '';
-      if (!email) { errEl.textContent = '⚠️ Please enter your email address'; return; }
-      if (!password) { errEl.textContent = '⚠️ Please enter your password'; return; }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Signing in...';
-
-      // Safety net: if nothing resolves within 20s, unblock the button
-      const safetyTimer = setTimeout(() => {
-        btn.disabled = false;
-        btn.textContent = '🔐 Sign In';
-        errEl.textContent = '⚠️ Sign in timed out. Please check your connection and try again.';
-      }, 20000);
-
-      try {
-        const { data, error } = await db.auth.signInWithPassword({ email, password });
-        clearTimeout(safetyTimer);
-
-        if (error) {
-          btn.disabled = false;
-          btn.textContent = '🔐 Sign In';
-          errEl.textContent = '❌ ' + (error.message === 'Invalid login credentials'
-            ? 'Incorrect email or password. Please try again.'
-            : error.message);
-          return;
-        }
-        // Login succeeded — onAuthStateChange → loadProfile → showScreen will handle navigation.
-        // showScreen('auth') also resets this button if profile load fails.
-      } catch (err) {
-        clearTimeout(safetyTimer);
-        btn.disabled = false;
-        btn.textContent = '🔐 Sign In';
-        errEl.textContent = '❌ An unexpected error occurred: ' + (err.message || String(err));
-      }
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  REGISTER
-    // ═══════════════════════════════════════════════════════════════
-    async function doRegister() {
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const confirm = document.getElementById('regConfirm').value;
-      const errEl = document.getElementById('registerError');
-      const successEl = document.getElementById('registerSuccess');
-      const btn = document.getElementById('registerBtn');
-
-      const classes = [...document.querySelectorAll('#regClasses .check-item.checked')]
-        .map(el => el.dataset.value);
-      const subjects = [...document.querySelectorAll('#regSubjects .check-item.checked')]
-        .map(el => el.dataset.value);
-
-      errEl.textContent = '';
-      successEl.classList.add('hidden');
-
-      if (!name) { errEl.textContent = '⚠️ Please select your designation'; return; }
-      if (!email) { errEl.textContent = '⚠️ Please enter your email address'; return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = '⚠️ Please enter a valid email address'; return; }
-      if (password.length < 6) { errEl.textContent = '⚠️ Password must be at least 6 characters'; return; }
-      if (password !== confirm) { errEl.textContent = '⚠️ Passwords do not match'; return; }
-      if (classes.length === 0) { errEl.textContent = '⚠️ Please select at least one class you teach'; return; }
-      if (subjects.length === 0) { errEl.textContent = '⚠️ Please select at least one subject you teach'; return; }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Creating account...';
-
-      // Sign up — pass profile data in user_metadata for the email-confirmation flow
-      const { data, error } = await db.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { name, classes, subjects }  // stored in user_metadata
-        }
-      });
-
-      if (error) {
-        errEl.textContent = '❌ ' + error.message;
-        btn.disabled = false;
-        btn.textContent = '📝 Create Account';
-        return;
-      }
-
-      // data.user is always returned even when email confirmation is pending.
-      // Save the profile row immediately — admin can see it straight away.
-      if (data.user) {
-        const { error: profileErr } = await db.from('teacher_profiles').insert([{
-          id: data.user.id,
-          name,
-          email,
-          classes,
-          subjects,
-          approved: false
-        }]);
-
-        btn.disabled = false;
-        btn.textContent = '📝 Create Account';
-
-        if (profileErr && profileErr.code !== '23505') {
-          // 23505 = unique_violation (profile already exists — safe to ignore)
-          errEl.textContent = '❌ Profile save error: ' + profileErr.message;
-          return;
-        }
-      } else {
-        btn.disabled = false;
-        btn.textContent = '📝 Create Account';
-      }
-
-      // If session exists (email confirmation disabled) → onAuthStateChange handles navigation
-      if (data.session) return;
-
-      // Email confirmation required → show message and switch to login
-      successEl.textContent = '✅ Account created! Your profile has been saved and is pending admin approval. You can sign in after the admin approves your account.';
-      successEl.classList.remove('hidden');
-      setTimeout(() => switchAuthTab('login'), 5000);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  LOGOUT
-    // ═══════════════════════════════════════════════════════════════
-    async function doLogout() {
-      try { sessionStorage.removeItem('lastSubmission'); } catch(e) {}
-      clearCachedProfile();
-      currentProfile = null;
-      const form = document.getElementById('attForm');
-      if (form) form.reset();
-      document.getElementById('cls').innerHTML = '<option value="">— Select class —</option>';
-      document.getElementById('subject').innerHTML = '<option value="">— Select subject —</option>';
-      await db.auth.signOut(); // onAuthStateChange SIGNED_OUT handles showScreen('auth')
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  AUTH TAB SWITCHER
-    // ═══════════════════════════════════════════════════════════════
-    function switchAuthTab(tab) {
-      const isLogin = tab === 'login';
-      document.getElementById('loginTab').classList.toggle('active', isLogin);
-      document.getElementById('registerTab').classList.toggle('active', !isLogin);
-      document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
-      document.getElementById('registerPanel').classList.toggle('hidden', isLogin);
-      // Clear errors on tab switch
-      document.getElementById('loginError').textContent = '';
-      document.getElementById('registerError').textContent = '';
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  POPULATE REGISTRATION CHECKBOXES
-    // ═══════════════════════════════════════════════════════════════
-    function buildCheckGrid(containerId, items) {
-      const container = document.getElementById(containerId);
-      items.forEach(val => {
-        const div = document.createElement('div');
-        div.className = 'check-item';
-        div.dataset.value = val;
-        div.innerHTML = `<span class="check-item-dot"></span><span>${val}</span>`;
-        div.addEventListener('click', () => div.classList.toggle('checked'));
-        container.appendChild(div);
-      });
-    }
-
-    // Populate name dropdown for registration
-    TEACHERS.forEach(name => {
-      const o = document.createElement('option');
-      o.value = name; o.textContent = name;
-      document.getElementById('regName').appendChild(o);
-    });
-
-    buildCheckGrid('regClasses', CLASSES);
-    buildCheckGrid('regSubjects', SUBJECTS);
-
-    // ═══════════════════════════════════════════════════════════════
-    //  PERIOD PILLS (always present in the form)
-    // ═══════════════════════════════════════════════════════════════
-    const pg = document.getElementById('periodGroup');
-    PERIODS.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'period-opt';
-      div.innerHTML = `<input type="radio" name="period" id="p${p}" value="${p}" required>
-      <label for="p${p}">P${p}</label>`;
-      pg.appendChild(div);
-    });
-
-    // ═══════════════════════════════════════════════════════════════
-    //  TAKEN TOGGLE
-    // ═══════════════════════════════════════════════════════════════
-    document.querySelectorAll('input[name="taken"]').forEach(r => {
-      r.addEventListener('change', () => {
-        const taken = document.querySelector('input[name="taken"]:checked')?.value === 'Yes';
-        document.getElementById('countsSection').classList.toggle('hidden', !taken);
-        document.getElementById('reasonField').classList.toggle('hidden', taken);
-        if (!taken) {
-          ['total', 'present', 'absent', 'leave', 'od', 'tca', 'nr', 'sick']
-            .forEach(id => document.getElementById(id).value = '');
-          setMath('neu', '⊞ Fill counts above when class is taken');
-        }
-      });
-    });
-
-    // ═══════════════════════════════════════════════════════════════
-    //  MATH CHECK
-    // ═══════════════════════════════════════════════════════════════
-    const getN = id => parseInt(document.getElementById(id).value) || 0;
-    function setMath(cls, msg) {
-      const el = document.getElementById('mathCheck');
-      el.className = 'math-check math-' + cls;
-      el.textContent = msg;
-    }
-    function updateMath() {
-      const total = getN('total');
-      const sum = getN('present') + getN('absent') + getN('leave') + getN('od') + getN('tca') + getN('nr') + getN('sick');
-      if (!total && !sum) { setMath('neu', '⊞ Enter counts above — sum must equal Total Students'); return; }
-      if (sum === total) setMath('ok', `✅ Sum (${sum}) = Total (${total}) — Correct!`);
-      else {
-        const diff = sum - total;
-        setMath('err', `❌ Sum (${sum}) ≠ Total (${total}) — Diff: ${diff > 0 ? '+' : ''}${diff}`);
-      }
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  TOAST
-    // ═══════════════════════════════════════════════════════════════
-    function showToast(msg, dur = 3500) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), dur);
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  FORM SUBMIT
-    // ═══════════════════════════════════════════════════════════════
-    document.getElementById('attForm').addEventListener('submit', async e => {
-      e.preventDefault();
-
-      if (!currentProfile) {
-        showToast('⚠️ You are not logged in. Please refresh.');
-        return;
-      }
-
-      const teacher = currentProfile.name;  // always from authenticated profile
-      const period = document.querySelector('input[name="period"]:checked')?.value;
-      const cls = document.getElementById('cls').value;
-      const subject = document.getElementById('subject').value;
-      const taken = document.querySelector('input[name="taken"]:checked')?.value;
-
-      if (!period) { showToast('⚠️ Please select a period'); return; }
-      if (!cls) { showToast('⚠️ Please select a class'); return; }
-      if (!subject) { showToast('⚠️ Please select a subject'); return; }
-      if (!taken) { showToast('⚠️ Please select if class was taken'); return; }
-
-      if (taken === 'Yes') {
-        const total = getN('total');
-        const sum = getN('present') + getN('absent') + getN('leave') + getN('od') + getN('tca') + getN('nr') + getN('sick');
-        if (!total) { showToast('⚠️ Please enter Total Students'); return; }
-        if (sum !== total) { showToast(`❌ Math error: Sum (${sum}) ≠ Total (${total})`); return; }
-      }
-
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Submitting...';
-
-      const payload = {
-        teacher, period, class: cls, subject, taken,
-        total: taken === 'Yes' ? getN('total') : 0,
-        present: taken === 'Yes' ? getN('present') : 0,
-        leave_count: taken === 'Yes' ? getN('leave') : 0,
-        od: taken === 'Yes' ? getN('od') : 0,
-        absent: taken === 'Yes' ? getN('absent') : 0,
-        tca: taken === 'Yes' ? getN('tca') : 0,
-        nr: taken === 'Yes' ? getN('nr') : 0,
-        sick: taken === 'Yes' ? getN('sick') : 0,
-        reason: document.getElementById('reason').value,
-        remarks: document.getElementById('remarks').value.trim()
-      };
-
-      try {
-        const { error } = await db.from('attendance').insert([payload]);
-        if (error) throw error;
-        showSuccessScreen(payload);
-      } catch (err) {
-        const msg = err.message || String(err);
-        const isAuthErr = /jwt|expired|not authenticated|unauthorized|401|403/i.test(msg);
-        if (isAuthErr) {
-          showToast('⚠️ Session expired. Signing out...', 3000);
-          setTimeout(() => doLogout(), 1500);
-        } else {
-          showToast('❌ Error: ' + msg, 5000);
-        }
-        btn.disabled = false;
-        btn.textContent = 'Submit Attendance →';
-      }
-    });
-  </script>
+  <!-- Global Toast -->
+  <div id="global-toast" class="toast"></div>
+
+  <!-- App Scripts -->
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
 </body>
-
 </html>
