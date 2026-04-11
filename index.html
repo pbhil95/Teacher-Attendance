@@ -1542,34 +1542,38 @@
         return;
       }
 
-      // If session returned immediately (email confirmation disabled) → create profile now
-      if (data.session && data.user) {
+      // data.user is always returned even when email confirmation is pending.
+      // Save the profile row immediately — admin can see it straight away.
+      if (data.user) {
         const { error: profileErr } = await db.from('teacher_profiles').insert([{
           id: data.user.id,
           name,
           email,
           classes,
-          subjects
+          subjects,
+          approved: false
         }]);
 
         btn.disabled = false;
         btn.textContent = '📝 Create Account';
 
-        if (profileErr) {
-          errEl.textContent = '❌ Account created but profile error: ' + profileErr.message + '. Please contact admin.';
+        if (profileErr && profileErr.code !== '23505') {
+          // 23505 = unique_violation (profile already exists — safe to ignore)
+          errEl.textContent = '❌ Profile save error: ' + profileErr.message;
           return;
         }
-        // onAuthStateChange will trigger and show wait screen
-        return;
+      } else {
+        btn.disabled = false;
+        btn.textContent = '📝 Create Account';
       }
 
-      // Email confirmation required — show message
-      btn.disabled = false;
-      btn.textContent = '📝 Create Account';
-      successEl.textContent = '✅ Account created! Please check your email (' + email + ') to verify, then sign in. Your profile information has been saved.';
+      // If session exists (email confirmation disabled) → onAuthStateChange handles navigation
+      if (data.session) return;
+
+      // Email confirmation required → show message and switch to login
+      successEl.textContent = '✅ Account created! Your profile has been saved and is pending admin approval. You can sign in after the admin approves your account.';
       successEl.classList.remove('hidden');
-      // Switch to login tab after a delay
-      setTimeout(() => switchAuthTab('login'), 4000);
+      setTimeout(() => switchAuthTab('login'), 5000);
     }
 
     // ═══════════════════════════════════════════════════════════════

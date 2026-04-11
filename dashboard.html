@@ -927,6 +927,7 @@
     .tc-btn.reject  { background: var(--red); color: #fff; }
     .tc-btn.edit    { background: var(--kpi-blue); color: var(--blue2); border: 1px solid var(--border); }
     .tc-btn.revoke  { background: var(--kpi-amber); color: var(--amber); border: 1px solid var(--border); }
+    .tc-btn.reset   { background: var(--kpi-teal); color: var(--teal); border: 1px solid var(--border); }
 
     .approval-filter-bar {
       display: flex;
@@ -2348,10 +2349,12 @@
 
         const actionBtns = p.approved
           ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this)">🚫 Revoke</button>
-             <button class="tc-btn edit"   onclick="openEdit('${p.id}')">✏️ Edit</button>`
+             <button class="tc-btn edit"   onclick="openEdit('${p.id}')">✏️ Edit</button>
+             <button class="tc-btn reset"  onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`
           : `<button class="tc-btn approve" onclick="setApproval('${p.id}',true,this)">✅ Approve</button>
              <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this)" style="opacity:.75">🗑 Reject</button>
-             <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>`;
+             <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>
+             <button class="tc-btn reset"   onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`;
 
         return `<div class="teacher-card ${statusClass}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -2394,6 +2397,39 @@
         renderApprovals();
       } catch (e) {
         alert('Error: ' + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    // ── RESET TEACHER PASSWORD ─────────────────────────────────
+    async function resetTeacherPassword(email, btn) {
+      if (!confirm(`Send a password reset link to:\n${email}\n\nThe teacher will receive an email with a link to set a new password.`)) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner spinner-dark"></span>';
+
+      try {
+        const { error } = await db.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/index.html'
+        });
+        if (error) throw error;
+
+        btn.innerHTML = '✅ Sent!';
+        btn.style.background = 'var(--ok)';
+        btn.style.color = '#fff';
+        btn.style.borderColor = 'var(--ok)';
+        // Reset button appearance after 3 seconds
+        setTimeout(() => {
+          btn.innerHTML = '🔑 Reset Pwd';
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+          btn.disabled = false;
+        }, 3000);
+
+      } catch (e) {
+        alert('❌ Failed to send reset email: ' + e.message);
+        btn.innerHTML = '🔑 Reset Pwd';
         btn.disabled = false;
       }
     }
