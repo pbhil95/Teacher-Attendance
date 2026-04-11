@@ -1578,34 +1578,65 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    //  STARTUP — cache-first, DB-second
+    //  STARTUP — 100% synchronous, zero network wait
+    //
+    //  Supabase stores the session in localStorage under a known key.
+    //  We read the user ID synchronously — no getSession() call needed —
+    //  then serve the profile from cache INSTANTLY before any network.
+    //  Validation and DB sync happen silently in the background.
     // ═══════════════════════════════════════════════════════════════
-    db.auth.getSession().then(({ data: { session }, error }) => {
-      if (error || !session?.user) { showScreen('auth'); return; }
+    const SB_SESS_KEY = 'sb-' + SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token';
 
-      const cached = getCachedProfile(session.user.id);
-      if (cached) {
-        applyProfile(cached);                         // instant — no spinner
-        refreshProfileInBackground(session.user);     // quietly sync in background
+    function readStoredUserId() {
+      try {
+        const raw = localStorage.getItem(SB_SESS_KEY);
+        return raw ? (JSON.parse(raw)?.user?.id || null) : null;
+      } catch(e) { return null; }
+    }
+
+    // Background: validate session and refresh profile (never blocks UI)
+    async function bgValidateAndSync(expectedUserId) {
+      try {
+        const { data: { session } } = await db.auth.getSession();
+        if (!session?.user || session.user.id !== expectedUserId) {
+          // Session is gone or switched — force logout
+          currentProfile = null; clearCachedProfile();
+          await db.auth.signOut(); showScreen('auth'); return;
+        }
+        refreshProfileInBackground(session.user); // silent DB refresh
+      } catch(e) { /* network down — cached UI still shown, no action */ }
+    }
+
+    // Startup (runs synchronously on page load)
+    const _storedUid = readStoredUserId();
+    if (!_storedUid) {
+      // No stored session — go straight to login, no spinner
+      showScreen('auth');
+    } else {
+      const _cached = getCachedProfile(_storedUid);
+      if (_cached) {
+        applyProfile(_cached);              // ← INSTANT, zero network
+        bgValidateAndSync(_storedUid);      // ← background, doesn't block UI
       } else {
-        loadProfileFromDB(session.user);              // first time — show spinner
+        // Have a session but no profile cache (first ever login or cache expired).
+        // Must hit DB — show spinner while loading.
+        db.auth.getSession().then(({ data: { session } }) => {
+          if (!session?.user) { showScreen('auth'); return; }
+          loadProfileFromDB(session.user);
+        }).catch(() => showScreen('auth'));
       }
-    }).catch(() => showScreen('auth'));
+    }
 
-    // Handle auth events AFTER startup (login, sign-out, token refresh)
+    // Handle auth events after startup (login success, sign-out)
     db.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user && !currentProfile && !profileLoading) {
-        // Fired after doLogin() succeeds — load from DB (no cache yet for this login)
         const cached = getCachedProfile(session.user.id);
         if (cached) applyProfile(cached);
         else loadProfileFromDB(session.user);
       } else if (event === 'SIGNED_OUT') {
-        currentProfile = null;
-        profileLoading = false;
-        clearCachedProfile();
-        showScreen('auth');
+        currentProfile = null; profileLoading = false;
+        clearCachedProfile(); showScreen('auth');
       }
-      // TOKEN_REFRESHED: session stays valid, no action needed
     });
 
     function showScreen(name) {
