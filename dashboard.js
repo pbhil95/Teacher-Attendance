@@ -4,7 +4,7 @@
     //  Get from: supabase.com → your project → Settings → API
     // ═══════════════════════════════════════════════════════════════
     const SUPABASE_URL = 'https://cuvleeayglhpuhouvzts.supabase.co';
-    const SUPABASE_ANON = 'sb_publishable_2dIPFyaQ6DOI_f3Tlt47dg_yJEsu5B7';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1dmxlZWF5Z2xocHVob3V2enRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MjYxNzgsImV4cCI6MjA5MTUwMjE3OH0.ZTKWwnvSESrSw_h7YCan9RIZxf69mq7tpVmkcIXCG4Y';
 
     // ── DASHBOARD PIN ─────────────────────────────────────────────
     // PIN hash is fetched from Supabase admin_settings table.

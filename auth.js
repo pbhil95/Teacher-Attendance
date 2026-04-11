@@ -1,6 +1,6 @@
 // Initialize Supabase Client
 const SUPABASE_URL = 'https://cuvleeayglhpuhouvzts.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_2dIPFyaQ6DOI_f3Tlt47dg_yJEsu5B7';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1dmxlZWF5Z2xocHVob3V2enRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MjYxNzgsImV4cCI6MjA5MTUwMjE3OH0.ZTKWwnvSESrSw_h7YCan9RIZxf69mq7tpVmkcIXCG4Y';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -23,10 +23,19 @@ window.appAuth = {
   },
 
   async init() {
-    // Get current session synchronously/async on load
-    const { data: { session }, error } = await db.auth.getSession();
-    await this._handleSession(session);
+    try {
+      // Get current session synchronously/async on load
+      const { data: { session }, error } = await db.auth.getSession();
+      if (error) console.error("Session error:", error);
+      await this._handleSession(session || null);
+    } catch (err) {
+      console.error("Supabase Init Error:", err);
+      this.user = null;
+      this.profile = null;
+    }
+    
     this.initialized = true;
+    this._notify();
 
     // Listen to continuous changes
     db.auth.onAuthStateChange(async (event, session) => {
