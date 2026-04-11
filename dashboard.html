@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1a3a5c" id="themeColor">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="JNV Tarikhet Attendance Dashboard — Admin View">
+  <title>Dashboard — JNV Tarikhet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── LIGHT THEME ── */
+    :root,
+    [data-theme="light"] {
+      --ink: #1c2434;
+      --blue: #1a5276;
+      --blue2: #2471a3;
+      --teal: #117a65;
+      --amber: #b7770d;
+      --red: #922b21;
+      --ok: #1e8449;
+      --bg: #eef1f5;
+      --card: #fff;
+      --card2: #f4f6f9;
+      --border: #d5dde8;
+      --muted: #6c7a8a;
+      --fh: 'Rajdhani', sans-serif;
+      --fb: 'Inter', sans-serif;
+      --r: 10px;
+      --sh: 0 2px 14px rgba(28, 36, 52, .08);
+      --hdr1: #0d2137;
+      --hdr2: #1a5276;
+      --hdr3: #117a65;
+      --tbl-head: #f0f3f7;
+      --tbl-row: #f7f9fc;
+      --kpi-blue: #e9f1f7;
+      --kpi-teal: #e6f4f1;
+      --kpi-ok: #e6f4ea;
+      --kpi-amber: #fef9e7;
+      --kpi-red: #fdf0ee;
+    }
+
+    /* ── DARK THEME ── */
+    [data-theme="dark"] {
+      --ink: #e2e8f0;
+      --blue: #60a5fa;
+      --blue2: #93c5fd;
+      --teal: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --ok: #4ade80;
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #1f2235;
+      --border: #2d3148;
+      --muted: #8892a4;
+      --sh: 0 2px 14px rgba(0, 0, 0, .35);
+      --hdr1: #060c14;
+      --hdr2: #0f2744;
+      --hdr3: #065f46;
+      --tbl-head: #1f2235;
+      --tbl-row: #1d2133;
+      --kpi-blue: #1e3a5f;
+      --kpi-teal: #064e3b;
+      --kpi-ok: #14532d;
+      --kpi-amber: #451a03;
+      --kpi-red: #450a0a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      transition: background .3s, color .3s;
+    }
+
+    body {
+      font-family: var(--fb);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ── PIN SCREEN ── */
+    #pinScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #060c14 0%, #0f2744 60%, #065f46 100%);
+      position: relative;
+    }
+
+    .pin-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 38px 28px;
+      max-width: 380px;
+      width: 94%;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .4);
+      border: 1px solid var(--border);
+    }
+
+    .pin-logo {
+      font-size: 2.8rem;
+      margin-bottom: 8px;
+    }
+
+    .pin-card h1 {
+      font-family: var(--fh);
+      color: var(--blue);
+      font-size: 1.65rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pin-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 26px;
+    }
+
+    .pin-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 8px;
+      display: block;
+      text-align: left;
+    }
+
+    .pin-inp {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 2rem;
+      letter-spacing: 14px;
+      text-align: center;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .3s;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--card);
+    }
+
+    .pin-inp:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 4px rgba(36, 113, 163, .12);
+    }
+
+    .pin-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a5276, #117a65);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--fh);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 18px rgba(26, 82, 118, .3);
+      transition: opacity .2s;
+    }
+
+    .pin-btn:active {
+      opacity: .88;
+    }
+
+    .pin-err {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .pin-foot {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    .pin-theme {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── APP ── */
+    #app {
+      display: none;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, var(--hdr1) 0%, var(--hdr2) 58%, var(--hdr3) 100%);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, .3);
+    }
+
+    .header h1 {
+      font-family: var(--fh);
+      font-size: 1.25rem;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      opacity: .65;
+      font-size: 11px;
+    }
+
+    .hdr-r {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hdr-info {
+      text-align: right;
+      font-size: 11px;
+      opacity: .8;
+    }
+
+    .lock-btn,
+    .hdr-theme {
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 20px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 5px 11px;
+      touch-action: manipulation;
+    }
+
+    .hdr-theme {
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-right: 4px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .25
+      }
+    }
+
+    /* ── REFRESH BAR ── */
+    .refresh-bar {
+      height: 3px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .refresh-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue2), var(--teal));
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      overflow-x: auto;
+      scrollbar-width: none;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+      transition: background .3s, border-color .3s;
+    }
+
+    .toolbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .toolbar select,
+    .toolbar input[type=date] {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-family: var(--fb);
+      font-size: 13px;
+      background: var(--card2);
+      color: var(--ink);
+      min-width: 130px;
+      min-height: 42px;
+      outline: none;
+      transition: background .3s;
+    }
+
+    .btn {
+      padding: 8px 13px;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: var(--fh);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      min-height: 42px;
+      touch-action: manipulation;
+      transition: opacity .2s;
+    }
+
+    .btn:active {
+      opacity: .8;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-form {
+      background: #7b2d8b;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--kpi-blue);
+      color: var(--blue2);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .date-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--kpi-blue);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      min-height: 42px;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 1px;
+      padding: 8px 12px 0;
+      background: var(--card);
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+      transition: background .3s;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      padding: 9px 14px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: var(--fh);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      min-height: 44px;
+      touch-action: manipulation;
+      transition: color .2s, border-color .2s;
+    }
+
+    .tab-btn.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 12px 10px 40px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* ── KPI ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .kpi {
+      background: var(--card);
+      border-radius: var(--r);
+      padding: 15px 14px;
+      box-shadow: var(--sh);
+      border-left: 4px solid transparent;
+      transition: transform .2s, background .3s;
+    }
+
+    .kpi:hover {
+      transform: translateY(-2px);
+    }
+
+    .kpi.blue {
+      border-color: var(--blue2);
+      background: var(--kpi-blue);
+    }
+
+    .kpi.teal {
+      border-color: var(--teal);
+      background: var(--kpi-teal);
+    }
+
+    .kpi.ok {
+      border-color: var(--ok);
+      background: var(--kpi-ok);
+    }
+
+    .kpi.amber {
+      border-color: var(--amber);
+      background: var(--kpi-amber);
+    }
+
+    .kpi.red {
+      border-color: var(--red);
+      background: var(--kpi-red);
+    }
+
+    .kpi-val {
+      font-family: var(--fh);
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .kpi-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--r);
+      box-shadow: var(--sh);
+      margin-bottom: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: background .3s;
+    }
+
+    .card-head {
+      padding: 12px 16px;
+      background: var(--card2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      transition: background .3s;
+    }
+
+    .card-head h3 {
+      font-family: var(--fh);
+      font-size: 15px;
+      color: var(--blue);
+      letter-spacing: .5px;
+    }
+
+    .card-body {
+      padding: 12px;
+    }
+
+    /* ── TABLES ── */
+    .tbl-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    thead th {
+      padding: 9px 10px;
+      background: var(--tbl-head);
+      color: var(--blue);
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: .6px;
+      border-bottom: 2px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr.dr:hover {
+      background: var(--tbl-row);
+    }
+
+    /* ── PILLS / BARS ── */
+    .pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .pill-ok {
+      background: var(--kpi-ok);
+      color: var(--ok);
+    }
+
+    .pill-err {
+      background: var(--kpi-red);
+      color: var(--red);
+    }
+
+    .pill-warn {
+      background: var(--kpi-amber);
+      color: var(--amber);
+    }
+
+    .pill-gray {
+      background: var(--card2);
+      color: var(--muted);
+    }
+
+    .pbar {
+      background: var(--border);
+      border-radius: 6px;
+      height: 7px;
+      overflow: hidden;
+      width: 70px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    .pbar-fill {
+      height: 100%;
+      border-radius: 6px;
+    }
+
+    .pbar-hi .pbar-fill {
+      background: var(--ok);
+    }
+
+    .pbar-mid .pbar-fill {
+      background: var(--amber);
+    }
+
+    .pbar-lo .pbar-fill {
+      background: var(--red);
+    }
+
+    /* ── HEATMAP ── */
+    .heatmap-grid {
+      display: grid;
+      gap: 3px;
+    }
+
+    .hm-cell {
+      border-radius: 3px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 5px 2px;
+    }
+
+    .hm-0 {
+      background: var(--card2);
+      color: var(--muted);
+    }
+
+    [data-theme="light"] .hm-lo {
+      background: #aed6f1;
+      color: #1a5276;
+    }
+
+    [data-theme="light"] .hm-md {
+      background: #2e86c1;
+      color: #fff;
+    }
+
+    [data-theme="light"] .hm-hi {
+      background: #1a5276;
+      color: #fff;
+    }
+
+    [data-theme="dark"] .hm-lo {
+      background: #1e3a5f;
+      color: #93c5fd;
+    }
+
+    [data-theme="dark"] .hm-md {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    [data-theme="dark"] .hm-hi {
+      background: #60a5fa;
+      color: #0f1117;
+    }
+
+    .hm-hd {
+      background: var(--tbl-head);
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    /* ── MISC ── */
+    .search-box {
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      width: 180px;
+      background: var(--card2);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .expand-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 9px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--blue);
+    }
+
+    .detail-row {
+      display: none;
+      background: var(--card2);
+    }
+
+    .detail-row td {
+      padding: 0 10px 8px;
+    }
+
+    .detail-inner {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .detail-inner table {
+      margin: 0;
+    }
+
+    .detail-inner thead th {
+      background: var(--tbl-head);
+      font-size: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .date-input {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      background: var(--card2);
+      color: var(--ink);
+      min-height: 42px;
+      outline: none;
+    }
+
+    /* ── MISSING BANNER ── */
+    .missing-banner {
+      background: var(--kpi-red);
+      border: 1px solid var(--red);
+      border-radius: var(--r);
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      display: none;
+      opacity: .85;
+    }
+
+    .missing-banner h4 {
+      color: var(--red);
+      font-family: var(--fh);
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .missing-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .missing-tag {
+      background: var(--card);
+      color: var(--red);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+    button,
+    a,
+    select,
+    input {
+      touch-action: manipulation;
+    }
+
+    @media(max-width:768px) {
+      .header {
+        padding: 10px 12px;
+      }
+
+      .header h1 {
+        font-size: 1.1rem;
+      }
+
+      .header p {
+        display: none;
+      }
+
+      .toolbar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 6px 10px;
+        gap: 6px;
+      }
+
+      .toolbar select {
+        min-width: 115px;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+
+      .toolbar input[type=date] {
+        min-width: 120px;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+
+      .btn {
+        padding: 7px 10px;
+        font-size: 12px;
+        min-height: 40px;
+      }
+
+      .badge {
+        display: none;
+      }
+
+      .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 6px 10px 0;
+        gap: 1px;
+      }
+
+      .tab-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+        min-height: 40px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .kpi {
+        padding: 10px 9px;
+      }
+
+      .kpi-val {
+        font-size: 1.55rem;
+      }
+
+      .kpi-lbl {
+        font-size: 9px;
+      }
+
+      .card {
+        margin-bottom: 10px;
+      }
+
+      .card-body {
+        padding: 8px;
+      }
+
+      .container {
+        padding: 8px 6px;
+      }
+
+      table {
+        font-size: 11px;
+      }
+
+      thead th {
+        padding: 7px;
+        font-size: 9px;
+      }
+
+      tbody td {
+        padding: 7px;
+      }
+
+      .search-box {
+        width: 130px;
+        font-size: 12px;
+      }
+
+      .date-input {
+        min-height: 38px;
+        font-size: 12px;
+      }
+    }
+
+    @media(max-width:420px) {
+      .header h1 {
+        font-size: 1rem;
+      }
+
+      .kpi-val {
+        font-size: 1.3rem;
+      }
+
+      .btn {
+        padding: 6px 9px;
+        font-size: 11px;
+      }
+
+      .tab-btn {
+        font-size: 11px;
+      }
+
+      table {
+        font-size: 10px;
+      }
+
+      thead th {
+        padding: 5px;
+      }
+
+      tbody td {
+        padding: 5px;
+      }
+
+      .kpi-lbl {
+        font-size: 8px;
+        letter-spacing: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PIN SCREEN -->
+  <div id="pinScreen">
+    <button class="pin-theme" id="pinThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+    <div class="pin-card">
+      <div class="pin-logo">📋</div>
+      <h1>JNV Tarikhet</h1>
+      <div class="pin-sub">Attendance Management Dashboard</div>
+      <label class="pin-lbl" for="pinInput">Admin Access PIN</label>
+      <input type="password" class="pin-inp" id="pinInput" maxlength="8" placeholder="••••" autocomplete="off">
+      <button class="pin-btn" id="pinBtn">Open Dashboard →</button>
+      <div class="pin-err" id="pinErr">❌ Wrong PIN. Please try again.</div>
+      <div class="pin-foot">Powered by Supabase • GitHub Pages Edition</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="app">
+    <div class="header">
+      <div>
+        <h1>📋 JNV Tarikhet</h1>
+        <p>Staff Class Attendance Dashboard</p>
+      </div>
+      <div class="hdr-r">
+        <div class="hdr-info">
+          <div id="hdrClock"></div>
+          <div><span class="live-dot"></span><span id="countdownLbl" style="font-size:11px">Live</span></div>
+        </div>
+        <button class="hdr-theme" id="appThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <button class="lock-btn" onclick="lockDashboard()">🔒 Lock</button>
+      </div>
+    </div>
+    <div class="refresh-bar">
+      <div class="refresh-bar-fill" id="refreshBar" style="width:100%"></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="date" id="dateSelect" onchange="loadDaily()">
+      <span class="date-chip" id="dateDisplay">--/--/----</span>
+      <select id="teacherFilter" onchange="loadDaily()">
+        <option value="">All Teachers</option>
+      </select>
+      <button class="btn btn-primary" id="syncBtn" onclick="loadDaily(true)">
+        <span id="syncIcon">↻</span> Refresh
+      </button>
+      <a href="index.html" class="btn btn-form">📝 Form</a>
+      <span class="badge" id="lastSync">Not synced</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('today',this)">📆 Today</button>
+      <button class="tab-btn" onclick="switchTab('teachers',this)">👥 Teachers</button>
+      <button class="tab-btn" onclick="switchTab('classes',this)">🏫 Classes</button>
+      <button class="tab-btn" onclick="switchTab('heatmap',this)">🔥 Heatmap</button>
+      <button class="tab-btn" onclick="switchTab('errors',this)">⚠ Errors</button>
+      <button class="tab-btn" onclick="switchTab('weekly',this);loadWeeklyTab()">📊 Weekly</button>
+      <button class="tab-btn" onclick="switchTab('monthly',this);loadMonthlyTab()">📅 Monthly</button>
+    </div>
+
+    <div class="container">
+      <div class="missing-banner" id="missingBanner">
+        <h4>⚠️ Teachers Not Yet Submitted Today</h4>
+        <div class="missing-tags" id="missingTags"></div>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- TODAY -->
+      <div class="tab-pane active" id="tab-today">
+        <div class="card">
+          <div class="card-head">
+            <h3>Live Submissions</h3>
+            <input class="search-box" placeholder="🔍 Search..." oninput="filterTbl('todayTbl',this.value)">
+          </div>
+          <div class="card-body tbl-wrap" id="todayBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Period-wise Submissions</h3>
+          </div>
+          <div class="card-body" id="periodBars"></div>
+        </div>
+      </div>
+
+      <!-- TEACHERS -->
+      <div class="tab-pane" id="tab-teachers">
+        <div class="card">
+          <div class="card-head">
+            <h3>Teacher Performance</h3>
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('teacherTbl',this.value)">
+          </div>
+          <div class="card-body tbl-wrap" id="teacherBody"></div>
+        </div>
+      </div>
+
+      <!-- CLASSES -->
+      <div class="tab-pane" id="tab-classes">
+        <div class="card">
+          <div class="card-head">
+            <h3>Class-wise Attendance</h3>
+          </div>
+          <div class="card-body tbl-wrap" id="classBody"></div>
+        </div>
+      </div>
+
+      <!-- HEATMAP -->
+      <div class="tab-pane" id="tab-heatmap">
+        <div class="card">
+          <div class="card-head">
+            <h3>Teacher × Period Heatmap</h3>
+          </div>
+          <div class="card-body" id="heatmapBody"></div>
+        </div>
+      </div>
+
+      <!-- ERRORS -->
+      <div class="tab-pane" id="tab-errors">
+        <div class="card">
+          <div class="card-head">
+            <h3>Math Errors</h3>
+          </div>
+          <div class="card-body tbl-wrap" id="errorBody"></div>
+        </div>
+      </div>
+
+      <!-- WEEKLY -->
+      <div class="tab-pane" id="tab-weekly">
+        <div class="card">
+          <div class="card-head">
+            <h3>📊 Weekly Report</h3>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input type="date" id="weekStart" class="date-input" onchange="loadWeeklyTab()">
+              <span class="date-chip" id="weekDisplay">Week of --</span>
+              <button class="expand-btn" onclick="shiftWeek(-1)">◀</button>
+              <button class="expand-btn" onclick="shiftWeek(1)">▶</button>
+            </div>
+          </div>
+          <div class="card-body" id="weeklyKpis"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Day-wise Trend</h3>
+          </div>
+          <div class="card-body" id="weeklyDayBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Teacher Summary</h3>
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('weeklyTbl',this.value)">
+          </div>
+          <div class="card-body tbl-wrap" id="weeklyTeacherBody">
+            <div class="empty">
+              <div class="empty-icon">📊</div>Select a week above.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Class Summary</h3>
+          </div>
+          <div class="card-body tbl-wrap" id="weeklyClassBody"></div>
+        </div>
+      </div>
+
+      <!-- MONTHLY -->
+      <div class="tab-pane" id="tab-monthly">
+        <div class="card">
+          <div class="card-head">
+            <h3>📅 Monthly Report</h3>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input type="month" id="monthSelect" class="date-input" onchange="loadMonthlyTab()">
+              <span class="date-chip" id="monthDisplay">----</span>
+              <button class="expand-btn" onclick="shiftMonth(-1)">◀</button>
+              <button class="expand-btn" onclick="shiftMonth(1)">▶</button>
+            </div>
+          </div>
+          <div class="card-body" id="monthlyKpis"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Week-wise Trend</h3>
+          </div>
+          <div class="card-body" id="monthlyWeekBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Teacher Summary</h3>
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('monthlyTbl',this.value)">
+          </div>
+          <div class="card-body tbl-wrap" id="monthlyTeacherBody">
+            <div class="empty">
+              <div class="empty-icon">📅</div>Select a month above.
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Class Summary</h3>
+          </div>
+          <div class="card-body tbl-wrap" id="monthlyClassBody"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Daily Attendance Trend</h3>
+          </div>
+          <div class="card-body" id="monthlyDailyTrend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    //  STEP 1: Set your Supabase project details
+    //  Get from: supabase.com → your project → Settings → API
+    // ═══════════════════════════════════════════════════════════════
+    const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
+
+    // ── DASHBOARD PIN (change to your desired PIN) ────────────────
+    const DASHBOARD_PIN = '1234';
+
+    // ── CONFIG ────────────────────────────────────────────────────
+    const TEACHERS = [
+      "TGT Computer Science", "Librarian", "PET F", "PET M",
+      "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
+      "PGT Geography", "PGT Hindi", "PGT History", "PGT Computer Sc.",
+      "PGT Mathematics", "PGT Physics", "TGT Art", "TGT Eng-1",
+      "TGT Eng-2", "TGT Hindi-1", "TGT Hindi-2", "TGT Punjabi-1",
+      "TGT Punjabi-2", "TGT Math-1", "TGT Math-2", "TGT Music",
+      "TGT Science", "TGT Social Science", "Automotive Teacher"
+    ];
+    const CLASSES = [
+      "VI-A", "VI-B", "VII-A", "VII-B", "VIII-A", "VIII-B",
+      "IX-A", "IX-B", "X-A", "X-B", "XI-Sci", "XI-Hum", "XII-Sci", "XII-Hum"
+    ];
+    const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
+    const AUTO_REFRESH_SEC = 60;
+
+    // ── SUPABASE CLIENT ───────────────────────────────────────────
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    // ── APP STATE ─────────────────────────────────────────────────
+    let countdownSec = AUTO_REFRESH_SEC;
+    let refreshTimer = null;
+
+    // ── DARK MODE ─────────────────────────────────────────────────
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      const icon = t === 'dark' ? '☀️' : '🌙';
+      ['pinThemeBtn', 'appThemeBtn'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.textContent = icon;
+      });
+      document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
+      localStorage.setItem('theme', t);
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    }
+    applyTheme(localStorage.getItem('theme') || 'light');
+
+    // ── CLOCK ─────────────────────────────────────────────────────
+    setInterval(() => {
+      const el = document.getElementById('hdrClock');
+      if (!el) return;
+      const now = new Date();
+      el.textContent = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' }) +
+        '  ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }, 1000);
+
+    // ── AUTO-REFRESH ──────────────────────────────────────────────
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      countdownSec = AUTO_REFRESH_SEC;
+      refreshTimer = setInterval(() => {
+        countdownSec--;
+        const bar = document.getElementById('refreshBar');
+        const lbl = document.getElementById('countdownLbl');
+        if (bar) bar.style.width = (countdownSec / AUTO_REFRESH_SEC * 100) + '%';
+        if (lbl) lbl.textContent = countdownSec + 's';
+        if (countdownSec <= 0) { countdownSec = AUTO_REFRESH_SEC; loadDaily(true); }
+      }, 1000);
+    }
+    function stopAutoRefresh() {
+      if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+    }
+
+    // ── IST DATE HELPERS ──────────────────────────────────────────
+    // IST = UTC + 5:30
+    function todayIST() {
+      const now = new Date();
+      const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+      return ist.toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+    function fmtDate(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    // Returns [ISO start, ISO end] for a given YYYY-MM-DD date in IST
+    function istDayRange(dateStr) {
+      return [dateStr + 'T00:00:00+05:30', dateStr + 'T23:59:59+05:30'];
+    }
+    function istWeekRange(weekStartStr) {
+      const start = weekStartStr + 'T00:00:00+05:30';
+      const d = new Date(weekStartStr); d.setDate(d.getDate() + 6);
+      const end = fmtDate(d) + 'T23:59:59+05:30';
+      return [start, end];
+    }
+    function istMonthRange(monthStr) {
+      const [y, m] = monthStr.split('-').map(Number);
+      const lastDay = new Date(y, m, 0).getDate();
+      return [monthStr + '-01T00:00:00+05:30', monthStr + '-' + String(lastDay).padStart(2, '0') + 'T23:59:59+05:30'];
+    }
+    function formatDateLabel(v) {
+      const p = (v || '').split('-').map(Number);
+      if (p.length !== 3 || p.some(n => !n)) return '--/--/----';
+      return String(p[2]).padStart(2, '0') + '/' + String(p[1]).padStart(2, '0') + '/' + p[0];
+    }
+    function formatMonthLabel(v) {
+      const p = (v || '').split('-').map(Number);
+      if (p.length !== 2 || p.some(n => !n)) return '----';
+      return new Date(p[0], p[1] - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    }
+    function updateDateDisplays() {
+      document.getElementById('dateDisplay').textContent = formatDateLabel(document.getElementById('dateSelect').value);
+      document.getElementById('weekDisplay').textContent = 'Week of ' + formatDateLabel(document.getElementById('weekStart').value);
+      document.getElementById('monthDisplay').textContent = formatMonthLabel(document.getElementById('monthSelect').value);
+    }
+
+    // ── AGGREGATION HELPERS ───────────────────────────────────────
+    const rowSum = r => (r.present || 0) + (r.leave_count || 0) + (r.od || 0) + (r.absent || 0) + (r.tca || 0) + (r.nr || 0) + (r.sick || 0);
+    const isTaken = r => String(r.taken).trim().toLowerCase() === 'yes';
+
+    function aggregateDaily(rows, teacherFilter) {
+      const scope = teacherFilter ? [teacherFilter] : TEACHERS;
+      const taken = rows.filter(isTaken);
+      const mathErr = taken.filter(r => rowSum(r) !== (r.total || 0));
+      const submitted = new Set(rows.map(r => r.teacher));
+      const missing = scope.filter(t => !submitted.has(t));
+      const totalP = taken.reduce((a, r) => a + (r.present || 0), 0);
+      const totalS = taken.reduce((a, r) => a + (r.total || 0), 0);
+
+      // Period counts
+      const periodCounts = {};
+      PERIODS.forEach(p => periodCounts[p] = 0);
+      rows.forEach(r => { if (periodCounts[r.period] !== undefined) periodCounts[r.period]++; });
+
+      // Teacher perf
+      const perf = {};
+      scope.forEach(t => perf[t] = { total: 0, taken: 0, mathErrors: 0, absent: 0, classes: {} });
+      rows.forEach(r => {
+        const t = r.teacher, c = r.class;
+        if (!perf[t]) perf[t] = { total: 0, taken: 0, mathErrors: 0, absent: 0, classes: {} };
+        perf[t].total++;
+        if (isTaken(r)) {
+          perf[t].taken++; perf[t].absent += (r.absent || 0);
+          if (!perf[t].classes[c]) perf[t].classes[c] = { taken: 0, p: 0, a: 0, l: 0, od: 0, tca: 0, nr: 0, s: 0 };
+          const cc = perf[t].classes[c];
+          cc.taken++; cc.p += (r.present || 0); cc.a += (r.absent || 0); cc.l += (r.leave_count || 0);
+          cc.od += (r.od || 0); cc.tca += (r.tca || 0); cc.nr += (r.nr || 0); cc.s += (r.sick || 0);
+          if (rowSum(r) !== (r.total || 0)) perf[t].mathErrors++;
+        }
+      });
+
+      // Class data
+      const clsData = {};
+      CLASSES.forEach(c => clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 });
+      rows.forEach(r => {
+        const c = r.class;
+        if (!clsData[c]) clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 };
+        if (isTaken(r)) {
+          clsData[c].present += (r.present || 0); clsData[c].absent += (r.absent || 0);
+          clsData[c].leave += (r.leave_count || 0); clsData[c].total += (r.total || 0); clsData[c].count++;
+        }
+      });
+
+      // Heatmap
+      const heatmap = {};
+      rows.forEach(r => { const k = r.teacher + '||' + r.period; heatmap[k] = (heatmap[k] || 0) + 1; });
+
+      // Submissions for table
+      const submissions = rows.map(r => ({
+        teacher: r.teacher, period: r.period, cls: r.class, subject: r.subject, taken: isTaken(r),
+        total: r.total || 0, present: r.present || 0, absent: r.absent || 0, leave: r.leave_count || 0,
+        od: r.od || 0, tca: r.tca || 0, nr: r.nr || 0, sick: r.sick || 0,
+        mathOk: !isTaken(r) || rowSum(r) === (r.total || 0),
+        time: new Date(r.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        reason: r.reason || ''
+      }));
+
+      // Errors
+      const errors = rows.filter(r => isTaken(r) && rowSum(r) !== (r.total || 0)).map(r => ({
+        date: new Date(r.created_at).toLocaleDateString('en-IN'),
+        teacher: r.teacher, period: r.period, cls: r.class,
+        total: r.total, sum: rowSum(r), diff: rowSum(r) - (r.total || 0)
+      }));
+
+      return {
+        kpis: [
+          { val: rows.length, lbl: 'Submissions Today' },
+          { val: taken.length, lbl: 'Classes Taken' },
+          { val: missing.length, lbl: 'Teachers Missing' },
+          { val: mathErr.length, lbl: 'Math Errors' },
+          { val: (totalS ? Math.round(totalP / totalS * 100) : 0) + '%', lbl: 'Avg Attendance' }
+        ],
+        submissions, periodCounts,
+        perf: Object.entries(perf).map(([name, p]) => ({ name, ...p, pct: p.total ? Math.round(p.taken / p.total * 100) : 0 })).sort((a, b) => b.pct - a.pct),
+        clsData: CLASSES.map(c => ({ cls: c, ...clsData[c], pct: clsData[c].total ? Math.round(clsData[c].present / clsData[c].total * 100) : 0 })),
+        heatmap, missing, errors
+      };
+    }
+
+    function aggregateWeekly(rows, weekStartStr) {
+      const taken = rows.filter(isTaken);
+      const mathErrs = taken.filter(r => rowSum(r) !== (r.total || 0));
+      const submitted = new Set(rows.map(r => r.teacher));
+      const dayMap = {};
+      const DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStartStr + 'T00:00:00'); d.setDate(d.getDate() + i);
+        const key = fmtDate(d); dayMap[key] = { label: DAY[d.getDay()] + ' ' + String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'), count: 0 };
+      }
+      rows.forEach(r => { const k = fmtDate(new Date(r.created_at)); if (dayMap[k]) dayMap[k].count++; });
+      const uniqueDays = new Set(rows.map(r => fmtDate(new Date(r.created_at))));
+      const totalP = taken.reduce((a, r) => a + (r.present || 0), 0);
+      const totalS = taken.reduce((a, r) => a + (r.total || 0), 0);
+      const perf = {}; TEACHERS.forEach(t => perf[t] = { total: 0, taken: 0, absent: 0, mathErrors: 0 });
+      rows.forEach(r => { const t = r.teacher; if (!perf[t]) perf[t] = { total: 0, taken: 0, absent: 0, mathErrors: 0 }; perf[t].total++; if (isTaken(r)) { perf[t].taken++; perf[t].absent += (r.absent || 0); if (rowSum(r) !== (r.total || 0)) perf[t].mathErrors++; } });
+      const clsData = {}; CLASSES.forEach(c => clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 });
+      rows.forEach(r => { const c = r.class; if (!clsData[c]) clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 }; if (isTaken(r)) { clsData[c].present += (r.present || 0); clsData[c].absent += (r.absent || 0); clsData[c].leave += (r.leave_count || 0); clsData[c].total += (r.total || 0); clsData[c].count++; } });
+      return {
+        kpis: [{ val: rows.length, lbl: 'Submissions' }, { val: taken.length, lbl: 'Classes Taken' }, { val: submitted.size, lbl: 'Active Teachers' }, { val: uniqueDays.size, lbl: 'School Days' }, { val: mathErrs.length, lbl: 'Math Errors' }, { val: (totalS ? Math.round(totalP / totalS * 100) : 0) + '%', lbl: 'Avg Attendance' }],
+        dayTrend: Object.values(dayMap),
+        perf: Object.entries(perf).map(([name, p]) => ({ name, ...p, pct: p.total ? Math.round(p.taken / p.total * 100) : 0 })).sort((a, b) => b.pct - a.pct),
+        clsData: CLASSES.map(c => ({ cls: c, ...clsData[c], pct: clsData[c].total ? Math.round(clsData[c].present / clsData[c].total * 100) : 0 }))
+      };
+    }
+
+    function aggregateMonthly(rows) {
+      const taken = rows.filter(isTaken), notTaken = rows.filter(r => !isTaken(r));
+      const mathErrs = taken.filter(r => rowSum(r) !== (r.total || 0));
+      const uniqueDays = new Set(rows.map(r => fmtDate(new Date(r.created_at))));
+      const totalP = taken.reduce((a, r) => a + (r.present || 0), 0);
+      const totalS = taken.reduce((a, r) => a + (r.total || 0), 0);
+      // Daily trend
+      const dailyMap = {};
+      rows.forEach(r => { const k = fmtDate(new Date(r.created_at)); if (!dailyMap[k]) dailyMap[k] = { p: 0, t: 0 }; if (isTaken(r)) { dailyMap[k].p += (r.present || 0); dailyMap[k].t += (r.total || 0); } });
+      const dailyTrend = Object.keys(dailyMap).sort().map(k => ({ label: k, pct: dailyMap[k].t ? Math.round(dailyMap[k].p / dailyMap[k].t * 100) : 0 }));
+      // Weekly trend within month
+      const weekMap = {};
+      rows.forEach(r => { const d = new Date(r.created_at); const mon = new Date(d); mon.setDate(d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1)); const wk = 'Wk ' + fmtDate(mon); if (!weekMap[wk]) weekMap[wk] = 0; weekMap[wk]++; });
+      const weekTrend = Object.entries(weekMap).map(([label, count]) => ({ label, count }));
+      const perf = {}; TEACHERS.forEach(t => perf[t] = { total: 0, taken: 0, absent: 0, mathErrors: 0 });
+      rows.forEach(r => { const t = r.teacher; if (!perf[t]) perf[t] = { total: 0, taken: 0, absent: 0, mathErrors: 0 }; perf[t].total++; if (isTaken(r)) { perf[t].taken++; perf[t].absent += (r.absent || 0); if (rowSum(r) !== (r.total || 0)) perf[t].mathErrors++; } });
+      const clsData = {}; CLASSES.forEach(c => clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 });
+      rows.forEach(r => { const c = r.class; if (!clsData[c]) clsData[c] = { present: 0, absent: 0, leave: 0, total: 0, count: 0 }; if (isTaken(r)) { clsData[c].present += (r.present || 0); clsData[c].absent += (r.absent || 0); clsData[c].leave += (r.leave_count || 0); clsData[c].total += (r.total || 0); clsData[c].count++; } });
+      return {
+        kpis: [{ val: rows.length, lbl: 'Submissions' }, { val: taken.length, lbl: 'Classes Taken' }, { val: notTaken.length, lbl: 'Not Taken' }, { val: uniqueDays.size, lbl: 'School Days' }, { val: mathErrs.length, lbl: 'Math Errors' }, { val: (totalS ? Math.round(totalP / totalS * 100) : 0) + '%', lbl: 'Avg Attendance' }],
+        weekTrend, dailyTrend,
+        perf: Object.entries(perf).map(([name, p]) => ({ name, ...p, pct: p.total ? Math.round(p.taken / p.total * 100) : 0 })).sort((a, b) => b.pct - a.pct),
+        clsData: CLASSES.map(c => ({ cls: c, ...clsData[c], pct: clsData[c].total ? Math.round(clsData[c].present / clsData[c].total * 100) : 0 }))
+      };
+    }
+
+    // ── SUPABASE FETCH (always fresh — no cache) ──────────────────
+    async function fetchRows(startISO, endISO, teacherFilter) {
+      let q = db.from('attendance').select('*').gte('created_at', startISO).lte('created_at', endISO);
+      if (teacherFilter) q = q.eq('teacher', teacherFilter);
+      const { data, error } = await q.order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    }
+
+    // ── PIN LOGIC ─────────────────────────────────────────────────
+    document.getElementById('pinBtn').addEventListener('click', tryPin);
+    document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryPin(); });
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+
+    function tryPin() {
+      const inp = document.getElementById('pinInput');
+      const btn = document.getElementById('pinBtn');
+      const err = document.getElementById('pinErr');
+      const val = inp.value.trim();
+      if (!val) return;
+      if (val !== DASHBOARD_PIN) {
+        inp.value = ''; inp.style.border = '2px solid var(--red)';
+        err.textContent = '❌ Wrong PIN. Please try again.'; err.style.display = 'block';
+        setTimeout(() => inp.focus(), 50); return;
+      }
+      err.style.display = 'none'; inp.style.border = '';
+      btn.textContent = 'Opening...'; btn.disabled = true;
+      initApp().then(() => { btn.textContent = 'Open Dashboard →'; btn.disabled = false; });
+    }
+
+    function lockDashboard() {
+      stopAutoRefresh();
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('pinScreen').style.display = 'flex';
+      const inp = document.getElementById('pinInput');
+      inp.value = ''; inp.style.border = '';
+      document.getElementById('pinErr').style.display = 'none';
+      setTimeout(() => inp.focus(), 50);
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────
+    async function initApp() {
+      const today = todayIST();
+      document.getElementById('dateSelect').value = today;
+      const now = new Date(), day = now.getDay();
+      const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+      document.getElementById('weekStart').value = fmtDate(mon);
+      document.getElementById('monthSelect').value = today.slice(0, 7);
+      updateDateDisplays();
+
+      const sel = document.getElementById('teacherFilter');
+      if (sel.options.length <= 1) {
+        TEACHERS.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
+      }
+
+      document.getElementById('pinScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      await loadDaily(true);
+      startAutoRefresh();
+    }
+
+    // ── TABS ──────────────────────────────────────────────────────
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+    function filterTbl(tblId, q) {
+      const tbl = document.getElementById(tblId);
+      if (!tbl) return;
+      tbl.querySelectorAll('tbody tr.dr').forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+
+    // ── DAILY LOAD ────────────────────────────────────────────────
+    async function loadDaily(forceRefresh = false) {
+      const btn = document.getElementById('syncBtn');
+      const icon = document.getElementById('syncIcon');
+      const date = document.getElementById('dateSelect').value;
+      const teacher = document.getElementById('teacherFilter').value;
+      updateDateDisplays();
+      btn.disabled = true; icon.innerHTML = '<span class="spinner"></span>';
+      document.getElementById('lastSync').textContent = 'Loading...';
+      ['todayBody', 'teacherBody', 'classBody', 'heatmapBody', 'errorBody'].forEach(id =>
+        document.getElementById(id).innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Fetching fresh data...</div>');
+      if (forceRefresh) { countdownSec = AUTO_REFRESH_SEC; }
+      try {
+        const [start, end] = istDayRange(date);
+        const rows = await fetchRows(start, end, teacher);
+        const d = aggregateDaily(rows, teacher);
+        renderKpis(d.kpis, 'kpiGrid');
+        renderTodayTable(d.submissions);
+        renderPeriodBars(d.periodCounts);
+        renderTeacherTable(d.perf);
+        renderClassTable(d.clsData, 'classBody');
+        renderHeatmap(d.heatmap, rows);
+        renderErrorTable(d.errors);
+        renderMissingBanner(d.missing);
+        document.getElementById('lastSync').textContent = '✓ ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        ['todayBody', 'teacherBody', 'classBody', 'heatmapBody', 'errorBody'].forEach(id =>
+          document.getElementById(id).innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div style="font-size:12px;color:var(--red)">${e.message}</div></div>`);
+        document.getElementById('lastSync').textContent = '✗ Failed';
+      }
+      btn.disabled = false; icon.textContent = '↻';
+    }
+
+    // ── WEEKLY ────────────────────────────────────────────────────
+    async function loadWeeklyTab() {
+      const ws = document.getElementById('weekStart').value;
+      if (!ws) return;
+      updateDateDisplays();
+      document.getElementById('weeklyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
+      try {
+        const [start, end] = istWeekRange(ws);
+        const rows = await fetchRows(start, end, '');
+        const d = aggregateWeekly(rows, ws);
+        renderKpis(d.kpis, 'weeklyKpis');
+        renderBars(d.dayTrend, 'label', 'count', 'weeklyDayBars', 'var(--blue2)');
+        renderPerfTable(d.perf, 'weeklyTbl', 'weeklyTeacherBody');
+        renderClsTable(d.clsData, 'weeklyClassBody');
+      } catch (e) {
+        document.getElementById('weeklyTeacherBody').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+      }
+    }
+    function shiftWeek(dir) {
+      const d = new Date(document.getElementById('weekStart').value);
+      d.setDate(d.getDate() + dir * 7);
+      document.getElementById('weekStart').value = fmtDate(d);
+      updateDateDisplays(); loadWeeklyTab();
+    }
+
+    // ── MONTHLY ───────────────────────────────────────────────────
+    async function loadMonthlyTab() {
+      const mv = document.getElementById('monthSelect').value;
+      if (!mv) return;
+      updateDateDisplays();
+      document.getElementById('monthlyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
+      try {
+        const [start, end] = istMonthRange(mv);
+        const rows = await fetchRows(start, end, '');
+        const d = aggregateMonthly(rows);
+        renderKpis(d.kpis, 'monthlyKpis');
+        renderBars(d.weekTrend, 'label', 'count', 'monthlyWeekBars', 'var(--teal)');
+        renderBars(d.dailyTrend, 'label', 'pct', 'monthlyDailyTrend', 'var(--blue)');
+        renderPerfTable(d.perf, 'monthlyTbl', 'monthlyTeacherBody');
+        renderClsTable(d.clsData, 'monthlyClassBody');
+      } catch (e) {
+        document.getElementById('monthlyTeacherBody').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
+      }
+    }
+    function shiftMonth(dir) {
+      const val = document.getElementById('monthSelect').value;
+      const [y, m] = val.split('-').map(Number);
+      const d = new Date(y, m - 1 + dir, 1);
+      document.getElementById('monthSelect').value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      updateDateDisplays(); loadMonthlyTab();
+    }
+
+    // ── RENDER HELPERS ────────────────────────────────────────────
+    function renderMissingBanner(missing) {
+      const banner = document.getElementById('missingBanner');
+      if (!missing || !missing.length) { banner.style.display = 'none'; return; }
+      banner.style.display = '';
+      document.getElementById('missingTags').innerHTML = missing.map(t => `<span class="missing-tag">${t}</span>`).join('');
+    }
+
+    function renderKpis(kpis, targetId) {
+      const colors = ['blue', 'teal', 'ok', 'amber', 'red'];
+      document.getElementById(targetId).innerHTML = kpis.map((k, i) =>
+        `<div class="kpi ${colors[i % colors.length]}"><div class="kpi-val">${k.val}</div><div class="kpi-lbl">${k.lbl}</div></div>`
+      ).join('');
+    }
+
+    function renderTodayTable(rows) {
+      if (!rows.length) { document.getElementById('todayBody').innerHTML = '<div class="empty"><div class="empty-icon">📭</div>No submissions yet for this date.</div>'; return; }
+      let h = `<table id="todayTbl"><thead><tr>
+    <th>#</th><th>Teacher</th><th>Prd</th><th>Class</th><th>Subject</th>
+    <th>Taken</th><th>Total</th><th>Present</th><th>Absent</th>
+    <th>Leave</th><th>OD</th><th>TCA</th><th>NR</th><th>Sick</th>
+    <th>Math</th><th>Time</th></tr></thead><tbody>`;
+      rows.forEach((r, i) => {
+        const tp = r.taken ? '<span class="pill pill-ok">Yes</span>' : '<span class="pill pill-warn">No</span>';
+        const mp = !r.taken ? '<span class="pill pill-gray">N/A</span>' : r.mathOk ? '<span class="pill pill-ok">✅</span>' : '<span class="pill pill-err">❌</span>';
+        h += `<tr class="dr"><td>${i + 1}</td><td><b>${r.teacher}</b></td>
+      <td style="text-align:center"><b>${r.period}</b></td>
+      <td>${r.cls}</td><td>${r.subject}</td><td>${tp}</td>
+      <td>${r.total || ''}</td>
+      <td style="color:var(--ok);font-weight:600">${r.present || ''}</td>
+      <td style="color:var(--red)">${r.absent || ''}</td>
+      <td>${r.leave || ''}</td><td>${r.od || ''}</td>
+      <td>${r.tca || ''}</td><td>${r.nr || ''}</td><td>${r.sick || ''}</td>
+      <td>${mp}</td>
+      <td style="color:var(--muted);font-size:12px">${r.time || ''}</td></tr>`;
+      });
+      document.getElementById('todayBody').innerHTML = h + '</tbody></table>';
+    }
+
+    function renderPeriodBars(counts) {
+      const vals = PERIODS.map(p => counts[p] || 0);
+      const max = Math.max(...vals, 1);
+      let h = '<div style="display:flex;flex-direction:column;gap:7px">';
+      PERIODS.forEach((p, i) => {
+        const w = Math.round(vals[i] / max * 100);
+        h += `<div style="display:flex;align-items:center;gap:8px">
+      <div style="width:52px;font-weight:700;font-family:var(--fh);color:var(--blue);font-size:13px">Prd ${p}</div>
+      <div style="flex:1;background:var(--border);border-radius:5px;height:22px;overflow:hidden">
+        <div style="width:${w}%;background:var(--blue2);height:100%;border-radius:5px;
+             display:flex;align-items:center;padding-left:6px;color:#fff;font-size:11px;
+             font-weight:700;transition:width .6s">${vals[i]}</div>
+      </div></div>`;
+      });
+      document.getElementById('periodBars').innerHTML = h + '</div>';
+    }
+
+    function renderTeacherTable(perf) {
+      let idx = 0;
+      let h = `<div style="margin-bottom:8px">
+    <button class="expand-btn" onclick="expandAll(true)">▼ Expand All</button>
+    &nbsp;<button class="expand-btn" onclick="expandAll(false)">▲ Collapse All</button></div>
+    <table id="teacherTbl"><thead><tr>
+    <th>Rank</th><th>Teacher</th><th>Taken %</th><th>Taken</th><th>Total</th>
+    <th>Errors</th><th>Details</th></tr></thead><tbody>`;
+      perf.forEach((p, i) => {
+        const pct = p.pct, bc = pct >= 90 ? 'pbar-hi' : pct >= 75 ? 'pbar-mid' : 'pbar-lo';
+        const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        const uid = idx++;
+        let det = '';
+        if (p.classes) {
+          Object.entries(p.classes).forEach(([cls, d]) => {
+            det += `<tr><td><b>${cls}</b></td><td>${d.taken}</td>
+        <td style="color:var(--ok)">${d.p}</td><td style="color:var(--red)">${d.a}</td>
+        <td>${d.l}</td><td>${d.od}</td><td>${d.tca}</td><td>${d.nr}</td><td>${d.s}</td></tr>`;
+          });
+        }
+        h += `<tr class="dr">
+      <td style="text-align:center">${rank}</td><td><b>${p.name}</b></td>
+      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
+      <td>${p.taken}</td><td>${p.total}</td>
+      <td>${p.mathErrors > 0 ? `<span class="pill pill-err">${p.mathErrors}</span>` : '<span class="pill pill-ok">0</span>'}</td>
+      <td><button class="expand-btn" onclick="toggleDet(this,${uid})">▼</button></td></tr>
+    <tr class="detail-row" id="dr-${uid}"><td colspan="7">
+      <div class="detail-inner"><table><thead><tr>
+        <th>Class</th><th>Taken</th><th>P</th><th>A</th><th>L</th><th>OD</th><th>TCA</th><th>NR</th><th>S</th>
+      </tr></thead><tbody>${det || '<tr><td colspan="9" style="text-align:center;color:var(--muted)">No data</td></tr>'}</tbody></table></div>
+    </td></tr>`;
+      });
+      document.getElementById('teacherBody').innerHTML = h + '</tbody></table>';
+    }
+
+    function renderClassTable(clsData, targetId) {
+      let h = `<table><thead><tr><th>Class</th><th>Periods</th><th>Avg %</th>
+    <th>Present</th><th>Absent</th><th>Leave</th></tr></thead><tbody>`;
+      clsData.forEach(d => {
+        const bc = d.pct >= 90 ? 'pbar-hi' : d.pct >= 75 ? 'pbar-mid' : 'pbar-lo';
+        h += `<tr><td><b>${d.cls}</b></td><td>${d.count}</td>
+      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${d.pct}%"></div></div><b>${d.pct}%</b></td>
+      <td style="color:var(--ok);font-weight:600">${d.present}</td>
+      <td style="color:var(--red)">${d.absent}</td><td>${d.leave}</td></tr>`;
+      });
+      document.getElementById(targetId).innerHTML = h + '</tbody></table>';
+    }
+
+    function renderHeatmap(heatmap, rows) {
+      const maxVal = Math.max(...Object.values(heatmap), 1);
+      let h = `<div style="overflow-x:auto"><div class="heatmap-grid"
+    style="grid-template-columns:140px repeat(${PERIODS.length},44px)">`;
+      h += '<div class="hm-cell hm-hd" style="text-align:left;padding-left:4px">Teacher</div>';
+      PERIODS.forEach(p => h += `<div class="hm-cell hm-hd">P${p}</div>`);
+      TEACHERS.forEach(t => {
+        h += `<div class="hm-cell hm-hd" style="text-align:left;padding-left:4px;font-size:9px;
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${t}">${t}</div>`;
+        PERIODS.forEach(p => {
+          const v = heatmap[t + '||' + p] || 0;
+          const cls = v === 0 ? 'hm-0' : v / maxVal < .34 ? 'hm-lo' : v / maxVal < .67 ? 'hm-md' : 'hm-hi';
+          h += `<div class="hm-cell ${cls}" title="${t} — P${p}: ${v}">${v || ''}</div>`;
+        });
+      });
+      document.getElementById('heatmapBody').innerHTML = h + '</div></div>';
+    }
+
+    function renderErrorTable(errors) {
+      if (!errors.length) { document.getElementById('errorBody').innerHTML = '<div class="empty"><div class="empty-icon">✅</div>No math errors today.</div>'; return; }
+      let h = `<table><thead><tr><th>Date</th><th>Teacher</th><th>Prd</th>
+    <th>Class</th><th>Total</th><th>Sum</th><th>Diff</th></tr></thead><tbody>`;
+      errors.forEach(r => {
+        const color = r.diff > 0 ? 'var(--red)' : 'var(--blue2)';
+        h += `<tr><td>${r.date}</td><td><b>${r.teacher}</b></td>
+      <td>${r.period}</td><td>${r.cls}</td><td>${r.total}</td><td>${r.sum}</td>
+      <td style="color:${color};font-weight:700">${r.diff > 0 ? '+' : ''}${r.diff}</td></tr>`;
+      });
+      document.getElementById('errorBody').innerHTML = h + '</tbody></table>';
+    }
+
+    function toggleDet(btn, id) {
+      const row = document.getElementById('dr-' + id);
+      if (!row) return;
+      const open = row.style.display !== 'table-row';
+      row.style.display = open ? 'table-row' : 'none';
+      btn.textContent = open ? '▲' : '▼';
+    }
+    function expandAll(flag) {
+      document.querySelectorAll('.detail-row').forEach(r => r.style.display = flag ? 'table-row' : 'none');
+      document.querySelectorAll('.expand-btn[onclick*="toggleDet"]').forEach(b => b.textContent = flag ? '▲' : '▼');
+    }
+
+    function renderBars(items, lk, vk, targetId, color) {
+      if (!items || !items.length) { document.getElementById(targetId).innerHTML = '<div class="empty">No data</div>'; return; }
+      const max = Math.max(...items.map(i => i[vk] || 0), 1);
+      let h = '<div style="display:flex;flex-direction:column;gap:6px">';
+      items.forEach(it => {
+        const w = Math.round((it[vk] || 0) / max * 100);
+        h += `<div style="display:flex;align-items:center;gap:7px">
+      <div style="width:88px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${it[lk]}">${it[lk]}</div>
+      <div style="flex:1;background:var(--border);border-radius:5px;height:20px;overflow:hidden">
+        <div style="width:${w}%;background:${color};height:100%;border-radius:5px;
+             display:flex;align-items:center;padding-left:6px;color:#fff;font-size:11px;
+             font-weight:700;transition:width .6s">${it[vk]}</div>
+      </div></div>`;
+      });
+      document.getElementById(targetId).innerHTML = h + '</div>';
+    }
+
+    function renderPerfTable(perf, tblId, targetId) {
+      let h = `<table id="${tblId}"><thead><tr>
+    <th>Rank</th><th>Teacher</th><th>Taken %</th>
+    <th>Taken</th><th>Total</th><th>Absent</th><th>Errors</th>
+    </tr></thead><tbody>`;
+      perf.forEach((p, i) => {
+        const pct = p.pct, bc = pct >= 90 ? 'pbar-hi' : pct >= 75 ? 'pbar-mid' : 'pbar-lo';
+        const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        h += `<tr class="dr"><td style="text-align:center">${rank}</td><td><b>${p.name}</b></td>
+      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
+      <td>${p.taken}</td><td>${p.total}</td>
+      <td style="color:var(--red)">${p.absent}</td>
+      <td>${p.mathErrors > 0 ? `<span class="pill pill-err">${p.mathErrors}</span>` : '<span class="pill pill-ok">0</span>'}</td></tr>`;
+      });
+      document.getElementById(targetId).innerHTML = h + '</tbody></table>';
+    }
+
+    function renderClsTable(clsData, targetId) {
+      let h = `<table><thead><tr><th>Class</th><th>Periods</th><th>Avg %</th>
+    <th>Present</th><th>Absent</th><th>Leave</th></tr></thead><tbody>`;
+      clsData.forEach(d => {
+        const bc = d.pct >= 90 ? 'pbar-hi' : d.pct >= 75 ? 'pbar-mid' : 'pbar-lo';
+        h += `<tr><td><b>${d.cls}</b></td><td>${d.count}</td>
+      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${d.pct}%"></div></div><b>${d.pct}%</b></td>
+      <td style="color:var(--ok);font-weight:600">${d.present}</td>
+      <td style="color:var(--red)">${d.absent}</td><td>${d.leave}</td></tr>`;
+      });
+      document.getElementById(targetId).innerHTML = h + '</tbody></table>';
+    }
+  </script>
+</body>
+
+</html>

@@ -1,1087 +1,904 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1a5276">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>JNV Attendance Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
-<style>
-/* ── STEP 1: Replace this URL with your GAS web app URL ─────── */
-/* API_URL is set in the <script> section below                   */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1a3a5c" id="themeColor">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="JNV Tarikhet Staff Class Attendance Submission Form">
+  <title>Attendance Form — JNV Tarikhet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── LIGHT THEME ── */
+    :root,
+    [data-theme="light"] {
+      --blue: #1a5276;
+      --blue2: #2471a3;
+      --blue-light: #eaf2f8;
+      --teal: #117a65;
+      --teal-light: #e8f8f5;
+      --green: #1e8449;
+      --green-light: #eafaf1;
+      --amber: #b7770d;
+      --red: #922b21;
+      --red-light: #fdedec;
+      --ink: #1c2434;
+      --muted: #6c7a8a;
+      --border: #d5dde8;
+      --bg: #f0f3f8;
+      --card: #ffffff;
+      --card2: #fafbfd;
+      --fh: 'Rajdhani', sans-serif;
+      --fb: 'Inter', sans-serif;
+      --r: 14px;
+      --sh: 0 4px 24px rgba(28, 36, 52, .10);
+      --hdr1: #1a3a5c;
+      --hdr2: #1a5276;
+      --hdr3: #117a65;
+    }
 
-:root {
-  --ink:#1c2434; --blue:#1a5276; --blue2:#2471a3; --teal:#148f77;
-  --amber:#b7770d; --red:#922b21; --ok:#1e8449;
-  --bg:#eef1f5; --card:#fff; --border:#d8dde6; --muted:#7f8c9a;
-  --fh:'Rajdhani',sans-serif; --fb:'Source Sans 3',sans-serif;
-  --r:10px; --sh:0 2px 12px rgba(28,36,52,.08);
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--fb);background:var(--bg);color:var(--ink);font-size:14px;
-  overscroll-behavior:none;-webkit-text-size-adjust:100%;}
+    /* ── DARK THEME ── */
+    [data-theme="dark"] {
+      --blue: #60a5fa;
+      --blue2: #93c5fd;
+      --blue-light: #1e3a5f;
+      --teal: #34d399;
+      --teal-light: #064e3b;
+      --green: #4ade80;
+      --green-light: #14532d;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --red-light: #450a0a;
+      --ink: #e2e8f0;
+      --muted: #8892a4;
+      --border: #2d3148;
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #1f2235;
+      --sh: 0 4px 24px rgba(0, 0, 0, .4);
+      --hdr1: #0d1b2e;
+      --hdr2: #0f2744;
+      --hdr3: #065f46;
+    }
 
-/* ── PIN SCREEN ── */
-#pinScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#1a3a5c 0%,#1a5276 60%,#148f77 100%);}
-.pin-card{background:#fff;border-radius:16px;padding:36px 28px;max-width:360px;
-  width:92%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.3);}
-.pin-logo{font-size:2.8rem;margin-bottom:8px;}
-.pin-card h1{font-family:var(--fh);color:var(--blue);font-size:1.6rem;margin-bottom:4px;}
-.pin-sub{color:var(--muted);font-size:12px;margin-bottom:24px;}
-.pin-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.8px;margin-bottom:8px;display:block;text-align:left;}
-.pin-inp{width:100%;padding:14px;border:2px solid var(--border);border-radius:8px;
-  font-size:1.8rem;letter-spacing:10px;text-align:center;color:var(--ink);outline:none;
-  transition:.2s;-webkit-appearance:none;}
-.pin-inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,82,118,.15);}
-.pin-btn{width:100%;margin-top:14px;padding:14px;background:var(--blue);color:#fff;
-  border:none;border-radius:8px;font-family:var(--fh);font-size:1.1rem;font-weight:700;
-  cursor:pointer;letter-spacing:1px;transition:.2s;touch-action:manipulation;}
-.pin-btn:active{background:#154360;}
-.pin-err{color:#c0392b;font-size:13px;margin-top:10px;display:none;font-weight:600;}
-.pin-foot{font-size:11px;color:#ccc;margin-top:20px;}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* ── DASHBOARD ── */
-#app{display:none;}
-.header{background:linear-gradient(135deg,#1a3a5c 0%,#1a5276 60%,#148f77 100%);
-  color:#fff;padding:14px 16px;display:flex;align-items:center;
-  justify-content:space-between;box-shadow:0 3px 12px rgba(0,0,0,.25);}
-.header h1{font-family:var(--fh);font-size:1.3rem;letter-spacing:1px;}
-.header p{opacity:.7;font-size:11px;}
-.hdr-r{text-align:right;font-size:11px;opacity:.8;display:flex;flex-direction:column;
-  align-items:flex-end;gap:4px;}
-.lock-btn{background:none;border:none;color:rgba(255,255,255,.7);font-size:12px;
-  cursor:pointer;padding:2px 0;touch-action:manipulation;}
+    html {
+      transition: background .3s, color .3s;
+    }
 
-/* ── TOOLBAR ── */
-.toolbar{background:var(--card);border-bottom:1px solid var(--border);
-  padding:8px 12px;display:flex;align-items:center;gap:8px;
-  position:sticky;top:0;z-index:50;overflow-x:auto;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  box-shadow:0 1px 6px rgba(0,0,0,.07);}
-.toolbar::-webkit-scrollbar{display:none;}
-.toolbar select,.toolbar input[type=date]{padding:8px 10px;border:1px solid var(--border);
-  border-radius:6px;font-family:var(--fb);font-size:13px;background:#f7f8fa;
-  color:var(--ink);min-width:130px;min-height:42px;touch-action:manipulation;}
-.btn{padding:9px 13px;border:none;border-radius:6px;cursor:pointer;
-  font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.5px;
-  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
-  min-height:42px;touch-action:manipulation;transition:opacity .2s;}
-.btn:active{opacity:.8;}
-.btn-primary{background:var(--blue);color:#fff;}
-.btn-teal{background:var(--teal);color:#fff;}
-.btn-sheet{background:#1e6b3c;color:#fff;text-decoration:none;}
-.btn-share{background:#0277bd;color:#fff;}
-.badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;
-  background:#e9f5fb;color:var(--blue2);border:1px solid #d0eaf5;white-space:nowrap;}
+    body {
+      font-family: var(--fb);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      min-height: 100vh;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+      transition: background .3s, color .3s;
+    }
 
-/* ── TABS ── */
-.tabs{display:flex;gap:2px;padding:8px 12px 0;background:var(--card);
-  border-bottom:2px solid var(--border);overflow-x:auto;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.tabs::-webkit-scrollbar{display:none;}
-.tab-btn{padding:9px 13px;border:none;background:none;cursor:pointer;
-  font-family:var(--fh);font-size:13px;font-weight:700;color:var(--muted);
-  border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;
-  min-height:44px;touch-action:manipulation;transition:.2s;}
-.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, var(--hdr1) 0%, var(--hdr2) 55%, var(--hdr3) 100%);
+      color: #fff;
+      padding: 16px 20px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .25);
+      position: relative;
+    }
 
-/* ── LAYOUT ── */
-.container{max-width:1260px;margin:0 auto;padding:12px 10px;padding-bottom:env(safe-area-inset-bottom,12px);}
-.tab-pane{display:none;} .tab-pane.active{display:block;}
+    .header-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-/* ── KPI ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:10px;margin-bottom:14px;}
-.kpi{background:var(--card);border-radius:var(--r);padding:14px 12px;
-  box-shadow:var(--sh);border-left:4px solid transparent;}
-.kpi.blue{border-color:var(--blue2);} .kpi.teal{border-color:var(--teal);}
-.kpi.ok{border-color:var(--ok);} .kpi.amber{border-color:#e67e22;}
-.kpi.red{border-color:var(--red);}
-.kpi-val{font-family:var(--fh);font-size:1.8rem;font-weight:700;line-height:1;}
-.kpi-lbl{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;
-  letter-spacing:.7px;}
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
 
-/* ── CARDS ── */
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
-  margin-bottom:14px;overflow:hidden;}
-.card-head{padding:12px 14px;background:#f4f6f9;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.card-head h3{font-family:var(--fh);font-size:15px;color:var(--blue);letter-spacing:.5px;}
-.card-body{padding:12px;}
+    .header-logo {
+      font-size: 2rem;
+      margin-bottom: 2px;
+    }
 
-/* ── TABLES ── */
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-table{width:100%;border-collapse:collapse;font-size:13px;word-break:break-word;}
-thead th{padding:9px 10px;background:#f0f3f7;color:var(--blue);
-  text-transform:uppercase;font-size:10px;letter-spacing:.6px;
-  border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;}
-tbody td{padding:9px 10px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
-tbody tr:last-child td{border-bottom:none;}
-tbody tr:hover{background:#f7f9fc;}
+    .header h1 {
+      font-family: var(--fh);
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 1px;
+    }
 
-/* ── PILLS / BARS ── */
-.pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;}
-.pill-ok{background:#d4efdf;color:#1e6632;} .pill-err{background:#fde8e6;color:#7b1a12;}
-.pill-warn{background:#fef3cd;color:#856404;} .pill-gray{background:#e9ecef;color:#555;}
-.pbar{background:#e8ecf0;border-radius:6px;height:7px;overflow:hidden;width:70px;
-  display:inline-block;vertical-align:middle;margin-right:5px;}
-.pbar-fill{height:100%;border-radius:6px;}
-.pbar-hi .pbar-fill{background:var(--ok);} .pbar-mid .pbar-fill{background:#e67e22;}
-.pbar-lo .pbar-fill{background:var(--red);}
+    .header p {
+      opacity: .72;
+      font-size: 11px;
+      font-weight: 500;
+    }
 
-/* ── HEATMAP ── */
-.heatmap-grid{display:grid;gap:3px;}
-.hm-cell{border-radius:3px;text-align:center;font-size:10px;font-weight:600;padding:5px 2px;}
-.hm-0{background:#e9ecef;color:#aaa;} .hm-lo{background:#aed6f1;color:#1a5276;}
-.hm-md{background:#2e86c1;color:#fff;} .hm-hi{background:#1a5276;color:#fff;}
-.hm-hd{background:#f0f3f7;color:var(--blue);font-weight:700;font-size:10px;}
+    .header-badge {
+      display: inline-block;
+      margin-top: 7px;
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 20px;
+      padding: 3px 13px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
 
-/* ── MISC ── */
-.search-box{padding:7px 11px;border:1px solid var(--border);border-radius:6px;
-  font-size:13px;width:180px;-webkit-appearance:none;}
-.expand-btn{background:none;border:1px solid var(--border);border-radius:4px;
-  padding:4px 9px;font-size:11px;cursor:pointer;color:var(--blue);
-  touch-action:manipulation;}
-.detail-row{display:none;background:#f7f9fc;}
-.detail-row td{padding:0 10px 8px;}
-.detail-inner{border:1px solid #e0e4e9;border-radius:6px;overflow:hidden;margin-top:6px;}
-.detail-inner table{margin:0;}
-.detail-inner thead th{background:#e8edf3;font-size:10px;}
-.empty{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
-.empty-icon{font-size:2rem;margin-bottom:6px;}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);
-  border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.date-input{padding:7px 10px;border:1px solid var(--border);border-radius:6px;
-  font-size:13px;background:#f7f8fa;color:var(--ink);min-height:42px;}
-.date-chip{display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #d0eaf5;
-  border-radius:6px;background:#eef5fb;color:var(--blue);font-size:12px;font-weight:600;
-  white-space:nowrap;min-height:42px;}
+    .theme-btn {
+      background: rgba(255, 255, 255, .15);
+      border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
 
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,36,52,.55);
-  z-index:200;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:12px;padding:22px 20px;max-width:440px;
-  width:94%;box-shadow:0 8px 32px rgba(0,0,0,.22);}
-.modal h2{font-family:var(--fh);color:var(--blue);margin-bottom:14px;font-size:1.2rem;}
-.modal-section{margin-bottom:14px;}
-.modal-section label{display:block;font-size:11px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;}
-.url-row{display:flex;gap:6px;align-items:center;}
-.url-box{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:6px;
-  font-size:11px;background:#f7f8fa;white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis;font-family:'Courier New',monospace;}
-.copy-btn{padding:7px 12px;background:var(--blue);color:#fff;border:none;
-  border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;}
-.copy-btn.copied{background:var(--ok);}
-.share-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.share-btn{padding:7px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;
-  font-weight:600;display:inline-flex;align-items:center;gap:5px;text-decoration:none;
-  touch-action:manipulation;}
-.share-wa{background:#25d366;color:#fff;} .share-email{background:#ea4335;color:#fff;}
-.share-open{background:#1565c0;color:#fff;}
-.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;
-  color:var(--muted);}
-.qr-note{font-size:11px;color:var(--muted);margin-top:8px;}
+    .theme-btn:hover {
+      background: rgba(255, 255, 255, .25);
+    }
 
-/* ── MOBILE FIRST ── */
-/* Touch targets */
-button, a, select, input { touch-action: manipulation; }
+    /* ── LAYOUT ── */
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px 14px 40px;
+    }
 
-/* Smooth scroll on iOS */
-.toolbar, .tabs, .tbl-wrap {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
+    /* ── SECTION ── */
+    .section {
+      background: var(--card);
+      border-radius: var(--r);
+      box-shadow: var(--sh);
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: background .3s, border-color .3s;
+    }
 
-/* Prevent page bounce */
-body { overscroll-behavior: none; }
+    .section-head {
+      padding: 13px 18px 11px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card2);
+      transition: background .3s, border-color .3s;
+    }
 
-/* ── TABLET (≤768px) ── */
-@media(max-width:768px){
-  /* Header compact */
-  .header { padding: 10px 12px; }
-  .header h1 { font-size: 1.1rem; }
-  .header p { display: none; }
+    .section-icon {
+      font-size: 1.25rem;
+    }
 
-  /* Toolbar: horizontal scroll, no wrap, hide labels */
-  .toolbar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 6px 10px;
-    gap: 6px;
-  }
-  .toolbar select { min-width: 120px; font-size: 12px; padding: 6px 8px; }
-  .toolbar input[type=date] { min-width: 125px; font-size: 12px; padding: 6px 8px; }
-  .btn { padding: 7px 10px; font-size: 12px; min-height: 40px; }
-  .badge { display: none; }
+    .section-head h2 {
+      font-family: var(--fh);
+      font-size: 1.05rem;
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
 
-  /* Tabs: scroll, no wrap */
-  .tabs { flex-wrap: nowrap; overflow-x: auto; padding: 6px 10px 0; gap: 1px; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab-btn { padding: 7px 10px; font-size: 12px; min-height: 40px; white-space: nowrap; }
+    .section-body {
+      padding: 16px 18px;
+    }
 
-  /* KPI 2 columns */
-  .kpi-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 10px; }
-  .kpi { padding: 10px 8px; }
-  .kpi-val { font-size: 1.5rem; }
-  .kpi-lbl { font-size: 9px; }
+    /* ── FORM FIELDS ── */
+    .field {
+      margin-bottom: 15px;
+    }
 
-  /* Cards */
-  .card { margin-bottom: 10px; }
-  .card-head { padding: 9px 10px; gap: 6px; }
-  .card-head h3 { font-size: 13px; }
-  .card-body { padding: 8px; }
-  .container { padding: 8px 6px; }
+    .field:last-child {
+      margin-bottom: 0;
+    }
 
-  /* Tables */
-  table { font-size: 11px; }
-  thead th { padding: 7px 7px; font-size: 9px; }
-  tbody td { padding: 7px 7px; }
+    label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      margin-bottom: 6px;
+    }
 
-  /* Search */
-  .search-box { width: 130px; font-size: 12px; padding: 6px 8px; }
+    label .req {
+      color: var(--red);
+      margin-left: 2px;
+    }
 
-  /* Weekly/Monthly pickers */
-  .date-input { min-height: 38px; font-size: 12px; padding: 6px 8px; }
-  .date-chip { min-height: 38px; font-size: 11px; padding: 6px 8px; }
-  .expand-btn { min-height: 34px; padding: 4px 8px; font-size: 11px; }
+    select,
+    input[type=text],
+    input[type=number],
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--fb);
+      font-size: 15px;
+      color: var(--ink);
+      background: var(--card);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .3s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
 
-  /* Modal */
-  .modal { padding: 16px 14px; }
-  .modal h2 { font-size: 1rem; }
-  .url-box { font-size: 10px; }
-}
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(36, 113, 163, .15);
+    }
 
-/* ── SMALL PHONE (≤420px) ── */
-@media(max-width:420px){
-  .header h1 { font-size: 1rem; }
-  .kpi-val { font-size: 1.3rem; }
-  .btn { padding: 6px 9px; font-size: 11px; }
-  .tab-btn { padding: 6px 9px; font-size: 11px; }
-  table { font-size: 10px; }
-  thead th { padding: 5px 5px; }
-  tbody td { padding: 5px 5px; }
-  .kpi-lbl { font-size: 8px; letter-spacing: 0; }
-}
-</style>
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+      line-height: 1.5;
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* ── RADIO TOGGLE ── */
+    .radio-group {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .radio-opt {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .radio-opt input[type=radio] {
+      display: none;
+    }
+
+    .radio-opt label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--muted);
+      transition: all .2s;
+      background: var(--card2);
+    }
+
+    .radio-opt input[type=radio]:checked+label {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .radio-opt.yes input[type=radio]:checked+label {
+      border-color: var(--green);
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .radio-opt.no input[type=radio]:checked+label {
+      border-color: var(--red);
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    /* ── PERIOD PILLS ── */
+    .period-group {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .period-opt input[type=radio] {
+      display: none;
+    }
+
+    .period-opt label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 46px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--fh);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--card2);
+      transition: all .2s;
+    }
+
+    .period-opt input[type=radio]:checked+label {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    /* ── NUMBER GRID ── */
+    .num-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+      gap: 9px;
+    }
+
+    .num-card {
+      background: var(--card2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      transition: background .3s, border-color .3s;
+    }
+
+    .num-card label {
+      font-size: 10.5px;
+      margin-bottom: 4px;
+    }
+
+    .num-card input {
+      border: none;
+      background: transparent;
+      padding: 4px 0;
+      font-size: 1.45rem;
+      font-family: var(--fh);
+      font-weight: 700;
+      color: var(--ink);
+      width: 100%;
+      outline: none;
+      transition: color .3s;
+    }
+
+    .num-card input::-webkit-outer-spin-button,
+    .num-card input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* ── MATH CHECK ── */
+    .math-check {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .3s;
+      margin-top: 13px;
+    }
+
+    .math-ok {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid var(--teal-light);
+    }
+
+    .math-err {
+      background: var(--red-light);
+      color: var(--red);
+      border: 1px solid #fca5a5;
+    }
+
+    .math-neu {
+      background: var(--card2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ── SUBMIT ── */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--hdr2), var(--hdr3));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--fh);
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      box-shadow: 0 4px 18px rgba(26, 82, 118, .3);
+      margin-top: 4px;
+    }
+
+    .submit-btn:hover {
+      opacity: .93;
+    }
+
+    .submit-btn:active {
+      transform: scale(.98);
+    }
+
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255, 255, 255, .4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── DASHBOARD LINK ── */
+    .dash-link {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .dash-link a {
+      color: var(--blue2);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: 0 2px 8px rgba(28, 36, 52, .07);
+      transition: background .2s;
+    }
+
+    .dash-link a:hover {
+      background: var(--blue-light);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1c2434;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all .3s;
+      z-index: 999;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+    }
+
+    [data-theme="dark"] .toast {
+      background: #e2e8f0;
+      color: #1c2434;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:480px) {
+      .page {
+        padding: 14px 10px 32px;
+      }
+
+      .section-body {
+        padding: 14px;
+      }
+
+      .header h1 {
+        font-size: 1.25rem;
+      }
+
+      .num-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .period-group {
+        gap: 5px;
+      }
+
+      .period-opt label {
+        width: 44px;
+        height: 42px;
+        font-size: .95rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ── PIN SCREEN ───────────────────────────────────────────── -->
-<div id="pinScreen">
-  <div class="pin-card">
-    <div class="pin-logo">📋</div>
-    <h1>JNV Attendance</h1>
-    <div class="pin-sub" id="pinSchool">Jawahar Navodaya Vidyalaya, Tarikhet • Almora</div>
-    <label class="pin-lbl" for="pinInput">Access PIN</label>
-    <input type="password" class="pin-inp" id="pinInput" maxlength="8"
-           placeholder="••••" autocomplete="off">
-    <button class="pin-btn" id="pinBtn">Open Dashboard →</button>
-    <div class="pin-err" id="pinErr">❌ Wrong PIN. Please try again.</div>
-    <div class="pin-foot">Attendance Management System v29</div>
-  </div>
-</div>
-
-<!-- ── DASHBOARD APP ─────────────────────────────────────────── -->
-<div id="app">
-
-<div class="header">
-  <div>
-    <h1 id="appTitle">📋 JNV Tarikhet</h1>
-    <p>Staff Class Attendance Dashboard</p>
-  </div>
-  <div class="hdr-r">
-    <div id="hdrClock"></div>
-    <button class="lock-btn" onclick="lockDashboard()">🔒 Lock</button>
-  </div>
-</div>
-
-<div class="toolbar">
-  <input type="date" id="dateSelect" onchange="loadDaily()">
-  <span class="date-chip" id="dateDisplay">--/--/----</span>
-  <select id="teacherFilter" onchange="loadDaily()">
-    <option value="">All Teachers</option>
-  </select>
-  <button class="btn btn-primary" id="syncBtn" onclick="loadDaily(true)">
-    <span id="syncIcon">↻</span> Refresh
-  </button>
-  <button class="btn btn-teal" onclick="doExportCSV()">⬇ CSV</button>
-  <a id="btnSheet" href="#" target="_blank" class="btn btn-sheet"
-     style="opacity:.5;pointer-events:none">📊 Sheet</a>
-  <button class="btn btn-share" onclick="openShareModal()">🔗 Share</button>
-  <span class="badge" id="lastSync">Not synced</span>
-</div>
-
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('today',this)">📆 Today</button>
-  <button class="tab-btn" onclick="switchTab('teachers',this)">👥 Teachers</button>
-  <button class="tab-btn" onclick="switchTab('classes',this)">🏫 Classes</button>
-  <button class="tab-btn" onclick="switchTab('heatmap',this)">🔥 Heatmap</button>
-  <button class="tab-btn" onclick="switchTab('errors',this)">⚠ Errors</button>
-  <button class="tab-btn" onclick="switchTab('weekly',this);loadWeeklyTab()">📊 Weekly</button>
-  <button class="tab-btn" onclick="switchTab('monthly',this);loadMonthlyTab()">📅 Monthly</button>
-</div>
-
-<div class="container">
-  <div class="kpi-grid" id="kpiGrid"></div>
-
-  <!-- TODAY -->
-  <div class="tab-pane active" id="tab-today">
-    <div class="card">
-      <div class="card-head">
-        <h3>Live Submissions</h3>
-        <input class="search-box" placeholder="🔍 Search..." oninput="filterTbl('todayTbl',this.value)">
+  <div class="header">
+    <div class="header-inner">
+      <div style="width:40px"></div>
+      <div class="header-center">
+        <div class="header-logo">📋</div>
+        <h1>JNV Tarikhet</h1>
+        <p>Jawahar Navodaya Vidyalaya, Tarikhet • Almora</p>
+        <div class="header-badge">Staff Class Attendance Form</div>
       </div>
-      <div class="card-body tbl-wrap" id="todayBody"></div>
-    </div>
-    <div class="card">
-      <div class="card-head"><h3>Period-wise Submissions</h3></div>
-      <div class="card-body" id="periodBars"></div>
+      <button class="theme-btn" id="themeToggle" title="Toggle dark mode" onclick="toggleTheme()">🌙</button>
     </div>
   </div>
 
-  <!-- TEACHERS -->
-  <div class="tab-pane" id="tab-teachers">
-    <div class="card">
-      <div class="card-head">
-        <h3>Teacher Performance</h3>
-        <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('teacherTbl',this.value)">
-      </div>
-      <div class="card-body tbl-wrap" id="teacherBody"></div>
-    </div>
-  </div>
+  <div class="page">
+    <form id="attForm" novalidate>
 
-  <!-- CLASSES -->
-  <div class="tab-pane" id="tab-classes">
-    <div class="card">
-      <div class="card-head"><h3>Class-wise Attendance</h3></div>
-      <div class="card-body tbl-wrap" id="classBody"></div>
-    </div>
-  </div>
-
-  <!-- HEATMAP -->
-  <div class="tab-pane" id="tab-heatmap">
-    <div class="card">
-      <div class="card-head"><h3>Teacher × Period Heatmap</h3></div>
-      <div class="card-body" id="heatmapBody"></div>
-    </div>
-  </div>
-
-  <!-- ERRORS -->
-  <div class="tab-pane" id="tab-errors">
-    <div class="card">
-      <div class="card-head"><h3>Math Errors</h3></div>
-      <div class="card-body tbl-wrap" id="errorBody"></div>
-    </div>
-  </div>
-
-  <!-- WEEKLY -->
-  <div class="tab-pane" id="tab-weekly">
-    <div class="card">
-      <div class="card-head">
-        <h3>📊 Weekly Report</h3>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input type="date" id="weekStart" class="date-input" onchange="loadWeeklyTab()">
-          <span class="date-chip" id="weekDisplay">Week of --/--/----</span>
-          <button class="expand-btn" onclick="shiftWeek(-1)">◀</button>
-          <button class="expand-btn" onclick="shiftWeek(1)">▶</button>
+      <!-- TEACHER -->
+      <div class="section">
+        <div class="section-head">
+          <span class="section-icon">👤</span>
+          <h2>Teacher Information</h2>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label for="teacher">Your Name / Designation <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="teacher" required>
+                <option value="">— Select your name —</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Period Number <span class="req">*</span></label>
+            <div class="period-group" id="periodGroup"></div>
+          </div>
         </div>
       </div>
-      <div class="card-body" id="weeklyKpis"></div>
-    </div>
-    <div class="card"><div class="card-head"><h3>Day-wise Trend</h3></div>
-      <div class="card-body" id="weeklyDayBars"></div></div>
-    <div class="card">
-      <div class="card-head"><h3>Teacher Summary</h3>
-        <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('weeklyTbl',this.value)">
-      </div>
-      <div class="card-body tbl-wrap" id="weeklyTeacherBody">
-        <div class="empty"><div class="empty-icon">📊</div>Select a week above.</div>
-      </div>
-    </div>
-    <div class="card"><div class="card-head"><h3>Class Summary</h3></div>
-      <div class="card-body tbl-wrap" id="weeklyClassBody"></div></div>
-  </div>
 
-  <!-- MONTHLY -->
-  <div class="tab-pane" id="tab-monthly">
-    <div class="card">
-      <div class="card-head">
-        <h3>📅 Monthly Report</h3>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input type="month" id="monthSelect" class="date-input" onchange="loadMonthlyTab()">
-          <span class="date-chip" id="monthDisplay">----</span>
-          <button class="expand-btn" onclick="shiftMonth(-1)">◀</button>
-          <button class="expand-btn" onclick="shiftMonth(1)">▶</button>
+      <!-- CLASS DETAILS -->
+      <div class="section">
+        <div class="section-head">
+          <span class="section-icon">🏫</span>
+          <h2>Class Details</h2>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label for="cls">Class <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="cls" required>
+                <option value="">— Select class —</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="subject">Subject Taught <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="subject" required>
+                <option value="">— Select subject —</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Was the Class Taken? <span class="req">*</span></label>
+            <div class="radio-group">
+              <div class="radio-opt yes">
+                <input type="radio" name="taken" id="takenYes" value="Yes" required>
+                <label for="takenYes">✅ Yes, class was taken</label>
+              </div>
+              <div class="radio-opt no">
+                <input type="radio" name="taken" id="takenNo" value="No">
+                <label for="takenNo">❌ No, class not taken</label>
+              </div>
+            </div>
+          </div>
+          <div class="field hidden" id="reasonField">
+            <label for="reason">Reason for Not Taking Class</label>
+            <div class="select-wrap">
+              <select id="reason">
+                <option value="">— Select reason —</option>
+                <option>Leave</option>
+                <option>Medical Leave</option>
+                <option>Assembly / Prayer</option>
+                <option>Official Duty</option>
+                <option>School Event</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card-body" id="monthlyKpis"></div>
-    </div>
-    <div class="card"><div class="card-head"><h3>Week-wise Trend</h3></div>
-      <div class="card-body" id="monthlyWeekBars"></div></div>
-    <div class="card">
-      <div class="card-head"><h3>Teacher Summary</h3>
-        <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('monthlyTbl',this.value)">
+
+      <!-- ATTENDANCE COUNTS -->
+      <div class="section hidden" id="countsSection">
+        <div class="section-head">
+          <span class="section-icon">🔢</span>
+          <h2>Attendance Count</h2>
+        </div>
+        <div class="section-body">
+          <div class="num-grid">
+            <div class="num-card">
+              <label for="total">Total Students</label>
+              <input type="number" id="total" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+            <div class="num-card">
+              <label for="present" style="color:var(--green)">Present</label>
+              <input type="number" id="present" min="0" max="60" placeholder="0" oninput="updateMath()"
+                style="color:var(--green)">
+            </div>
+            <div class="num-card">
+              <label for="absent" style="color:var(--red)">Absent</label>
+              <input type="number" id="absent" min="0" max="60" placeholder="0" oninput="updateMath()"
+                style="color:var(--red)">
+            </div>
+            <div class="num-card">
+              <label for="leave">On Leave</label>
+              <input type="number" id="leave" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+            <div class="num-card">
+              <label for="od">On OD</label>
+              <input type="number" id="od" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+            <div class="num-card">
+              <label for="tca">TCA</label>
+              <input type="number" id="tca" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+            <div class="num-card">
+              <label for="nr">NR</label>
+              <input type="number" id="nr" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+            <div class="num-card">
+              <label for="sick">Sick</label>
+              <input type="number" id="sick" min="0" max="60" placeholder="0" oninput="updateMath()">
+            </div>
+          </div>
+          <div id="mathCheck" class="math-check math-neu">
+            ⊞ Fill counts — total must equal Present + Absent + Leave + OD + TCA + NR + Sick
+          </div>
+        </div>
       </div>
-      <div class="card-body tbl-wrap" id="monthlyTeacherBody">
-        <div class="empty"><div class="empty-icon">📅</div>Select a month above.</div>
+
+      <!-- REMARKS -->
+      <div class="section">
+        <div class="section-head">
+          <span class="section-icon">💬</span>
+          <h2>Additional Remarks</h2>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label for="remarks">Remarks (optional)</label>
+            <textarea id="remarks" placeholder="Any additional notes..."></textarea>
+          </div>
+        </div>
       </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Attendance →</button>
+    </form>
+
+    <div class="dash-link">
+      <a href="dashboard.html">📊 Open Admin Dashboard</a>
     </div>
-    <div class="card"><div class="card-head"><h3>Class Summary</h3></div>
-      <div class="card-body tbl-wrap" id="monthlyClassBody"></div></div>
-    <div class="card"><div class="card-head"><h3>Daily Attendance Trend</h3></div>
-      <div class="card-body" id="monthlyDailyTrend"></div></div>
   </div>
-</div><!-- /container -->
 
-</div><!-- /app -->
+  <div class="toast" id="toast"></div>
 
-<!-- SHARE MODAL -->
-<div class="modal-overlay" id="shareModal" onclick="if(event.target===this)closeShareModal()">
-  <div class="modal">
-    <button class="modal-close" onclick="closeShareModal()">✕</button>
-    <h2>🔗 Share Form</h2>
-    <div class="modal-section">
-      <label>Submit Link (for teachers)</label>
-      <div class="url-row">
-        <div class="url-box" id="mFillUrl">Loading...</div>
-        <button class="copy-btn" onclick="copyBox('mFillUrl',this)">📋</button>
-      </div>
-      <div class="share-actions">
-        <a id="mWa" href="#" target="_blank" class="share-btn share-wa">💬 WhatsApp</a>
-        <a id="mEm" href="#" class="share-btn share-email">✉️ Email</a>
-        <a id="mOp" href="#" target="_blank" class="share-btn share-open">↗ Open</a>
-      </div>
-    </div>
-    <div class="modal-section">
-      <label>Edit Form (admin)</label>
-      <div class="url-row">
-        <div class="url-box" id="mEditUrl">Loading...</div>
-        <button class="copy-btn" onclick="copyBox('mEditUrl',this)">📋</button>
-      </div>
-      <div class="share-actions">
-        <a id="mEd" href="#" target="_blank" class="share-btn share-open">↗ Open Editor</a>
-      </div>
-    </div>
-    <p class="qr-note">💡 Share the Submit Link with all teachers via WhatsApp group.</p>
-  </div>
-</div>
+  <!-- Supabase JS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    //  STEP 1: Set your Supabase project details here
+    //  Get them from: supabase.com → your project → Settings → API
+    // ═══════════════════════════════════════════════════════════════
+    const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
 
-<script>
-// ════════════════════════════════════════════════════════════
-//  STEP 1: Paste your GAS Web App URL here
-//  Get it from: Apps Script → Deploy → Manage Deployments
-// ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycby9XJtadC1lZo6vmp7TWRnO_nq-LoVZnpsqWB_drSTLPXYfM5zTkCjQn8PxTVuZvdaO1Q/exec';
+    // ── SUPABASE CLIENT ──────────────────────────────────────────
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ════════════════════════════════════════════════════════════
-//  STATE
-// ════════════════════════════════════════════════════════════
-let PIN = '';
-let META = { teachers:[], classes:[], periods:[], school:'JNV Tarikhet' };
-let LINKS = { sheetUrl:'', formFillUrl:'', formEditUrl:'' };
-const CLIENT_CACHE_TTL_MS = 30000;
-const RESPONSE_CACHE = new Map();
-const INFLIGHT_REQUESTS = new Map();
+    // ── CONFIG ───────────────────────────────────────────────────
+    const TEACHERS = [
+      "TGT Computer Science", "Librarian", "PET F", "PET M",
+      "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
+      "PGT Geography", "PGT Hindi", "PGT History", "PGT Computer Sc.",
+      "PGT Mathematics", "PGT Physics", "TGT Art", "TGT Eng-1",
+      "TGT Eng-2", "TGT Hindi-1", "TGT Hindi-2", "TGT Punjabi-1",
+      "TGT Punjabi-2", "TGT Math-1", "TGT Math-2", "TGT Music",
+      "TGT Science", "TGT Social Science", "Automotive Teacher"
+    ];
+    const SUBJECTS = [
+      "Art", "Biology", "Chemistry", "Computer", "Economics", "English",
+      "Geography", "Hindi", "History", "Library", "Hindi/Punjabi",
+      "Mathematics", "Music", "Physical Education", "Physics", "Science",
+      "Social Science", "SUPW", "3rd Language", "G.S. / G.F.C",
+      "SEWA / WE", "ICT (Comp. Lab)", "Vocational Education", "Hindi/CS",
+      "IT/Automotive", "Computer Science", "Math/Biology",
+      "Art Education (Music)", "Art Education (Drawing)", "Automotive"
+    ];
+    const CLASSES = [
+      "VI-A", "VI-B", "VII-A", "VII-B", "VIII-A", "VIII-B",
+      "IX-A", "IX-B", "X-A", "X-B", "XI-Sci", "XI-Hum", "XII-Sci", "XII-Hum"
+    ];
+    const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
-// ════════════════════════════════════════════════════════════
-//  STATIC DATA — populated without server round-trip
-//  Keep in sync with CONFIG.teachers in Code_API.gs
-// ════════════════════════════════════════════════════════════
-const STATIC_TEACHERS = [
-  "TGT Computer Science","Librarian","PET F","PET M",
-  "PGT Biology","PGT Chemistry","PGT Economics","PGT English",
-  "PGT Geography","PGT Hindi","PGT History","PGT Computer Sc.",
-  "PGT Mathematics","PGT Physics","TGT Art","TGT Eng-1",
-  "TGT Eng-2","TGT Hindi-1","TGT Hindi-2","TGT Punjabi-1",
-  "TGT Punjabi-2","TGT Math-1","TGT Math-2","TGT Music",
-  "TGT Science","TGT Social Science","Automotive Teacher"
-];
-const STATIC_PERIODS = ["1","2","3","4","5","6","7","8"];
-const STATIC_CLASSES  = [
-  "VI-A","VI-B","VII-A","VII-B","VIII-A","VIII-B",
-  "IX-A","IX-B","X-A","X-B","XI-Sci","XI-Hum","XII-Sci","XII-Hum"
-];
-// Pre-fill META so renders work before ping returns
-META = { teachers: STATIC_TEACHERS, periods: STATIC_PERIODS,
-         classes: STATIC_CLASSES, school: 'JNV Tarikhet, Almora' };
-document.getElementById('appTitle').textContent = '📋 JNV Tarikhet';
-
-// ════════════════════════════════════════════════════════════
-//  API — simple fetch via CORS proxy
-//  corsproxy.io adds Access-Control-Allow-Origin: * header
-//  so the browser allows cross-origin requests to GAS.
-// ════════════════════════════════════════════════════════════
-async function apiRaw(params) {
-  if (!params.pin) params.pin = PIN;
-
-  if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
-    throw new Error('Set your API URL in index.html');
-  }
-
-  const qs  = Object.entries(params)
-    .filter(([,v]) => v !== undefined && v !== null && v !== '')
-    .map(([k,v]) => k + '=' + encodeURIComponent(v))
-    .join('&');
-
-  // Use CORS proxy to allow cross-origin fetch to GAS
-  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(API_URL + '?' + qs);
-
-  let json;
-  try {
-    const res  = await fetch(proxyUrl);
-    const text = await res.text();
-    json = JSON.parse(text);
-  } catch(e) {
-    throw new Error('Network error: ' + e.message);
-  }
-
-  // Wrong PIN — lock back to PIN screen
-  if (json.code === 401) {
-    PIN = '';
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('pinScreen').style.display = 'flex';
-    const inp = document.getElementById('pinInput');
-    inp.value = ''; inp.style.border = '2px solid #c0392b';
-    setTimeout(() => inp.focus(), 50);
-    const err = document.getElementById('pinErr');
-    err.textContent = '❌ Wrong PIN. Please try again.';
-    err.style.display = 'block';
-    document.getElementById('pinBtn').textContent = 'Open Dashboard →';
-    document.getElementById('pinBtn').disabled = false;
-    throw new Error('Invalid PIN');
-  }
-
-  if (json.error) throw new Error(json.error);
-  return json;
-}
-
-async function api(params, opts = {}) {
-  if (!params.pin) params.pin = PIN;
-  const useCache = opts.useCache !== false;
-  const force = opts.force === true;
-  const cacheKey = JSON.stringify(params);
-
-  if (useCache && !force) {
-    const cached = RESPONSE_CACHE.get(cacheKey);
-    if (cached && (Date.now() - cached.ts) < CLIENT_CACHE_TTL_MS) {
-      return cached.data;
+    // ── DARK MODE ─────────────────────────────────────────────────
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+      document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
+      localStorage.setItem('theme', t);
     }
-    if (INFLIGHT_REQUESTS.has(cacheKey)) {
-      return INFLIGHT_REQUESTS.get(cacheKey);
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
     }
-  }
+    applyTheme(localStorage.getItem('theme') || 'light');
 
-  const request = apiRaw({ ...params });
-  if (useCache && !force) {
-    INFLIGHT_REQUESTS.set(cacheKey, request);
-  }
-
-  try {
-    const data = await request;
-    if (useCache) {
-      RESPONSE_CACHE.set(cacheKey, { ts: Date.now(), data });
+    // ── POPULATE DROPDOWNS ────────────────────────────────────────
+    function populateSelect(id, items) {
+      const sel = document.getElementById(id);
+      items.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
     }
-    return data;
-  } finally {
-    if (useCache) {
-      INFLIGHT_REQUESTS.delete(cacheKey);
-    }
-  }
-}
+    populateSelect('teacher', TEACHERS);
+    populateSelect('cls', CLASSES);
+    populateSelect('subject', SUBJECTS);
 
-// ════════════════════════════════════════════════════════════
-//  CLOCK
-// ════════════════════════════════════════════════════════════
-setInterval(() => {
-  const now = new Date();
-  const el = document.getElementById('hdrClock');
-  if (el) el.textContent =
-    now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'}) +
-    '  ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-}, 1000);
-
-// ════════════════════════════════════════════════════════════
-//  PIN SCREEN
-// ════════════════════════════════════════════════════════════
-document.getElementById('pinBtn').addEventListener('click', tryPin);
-document.getElementById('pinInput').addEventListener('keydown', e => { if(e.key==='Enter') tryPin(); });
-document.getElementById('pinInput').focus();
-
-async function tryPin() {
-  const inp = document.getElementById('pinInput');
-  const btn = document.getElementById('pinBtn');
-  const err = document.getElementById('pinErr');
-  const pin = inp.value.trim();
-  if (!pin) return;
-  err.style.display = 'none';
-
-  // ── Fast path: store PIN and open dashboard immediately ──────
-  // The first real API call (ping/daily) will fail with 401 if
-  // the PIN is wrong, and we lock back to the PIN screen then.
-  // This makes login feel instant — no waiting for GAS round-trip.
-  PIN = pin;
-  btn.textContent = 'Opening...'; btn.disabled = true;
-  await initApp();
-  btn.textContent = 'Open Dashboard →'; btn.disabled = false;
-}
-
-function lockDashboard() {
-  PIN = '';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('pinScreen').style.display = 'flex';
-  const inp = document.getElementById('pinInput');
-  inp.value = ''; inp.style.border = '2px solid #d8dde6';
-  document.getElementById('pinErr').style.display = 'none';
-  setTimeout(() => inp.focus(), 50);
-}
-
-// ════════════════════════════════════════════════════════════
-//  APP INIT — runs once after correct PIN
-// ════════════════════════════════════════════════════════════
-async function initApp() {
-  // ── Show dashboard shell IMMEDIATELY — don't wait for server ──
-  const today = todayLocal();
-  document.getElementById('dateSelect').value = today;
-  const now = new Date();
-  const day = now.getDay();
-  const mon = new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1));
-  document.getElementById('weekStart').value = fmtDate(mon);
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  document.getElementById('monthSelect').value = now.getFullYear()+'-'+mm;
-  updateDateDisplays();
-
-  // Populate dropdown with CONFIG teachers immediately (no server needed)
-  const sel = document.getElementById('teacherFilter');
-  if (sel.options.length <= 1) {
-    STATIC_TEACHERS.forEach(t => {
-      const o = document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o);
+    const pg = document.getElementById('periodGroup');
+    PERIODS.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'period-opt';
+      div.innerHTML = `<input type="radio" name="period" id="p${p}" value="${p}" required>
+    <label for="p${p}">P${p}</label>`;
+      pg.appendChild(div);
     });
-  }
 
-  // Hide PIN, show dashboard
-  document.getElementById('pinScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-
-  // ── Load data + metadata in parallel (GAS cold start happens here) ──
-  // User sees the dashboard shell instantly; data fills in when ready
-  loadDaily();  // starts fetching — shows spinner
-
-  // Fetch links in background (non-blocking)
-  api({ action:'links' }).then(links => {
-    LINKS = links;
-    const btnSheet = document.getElementById('btnSheet');
-    if (links.sheetUrl) {
-      btnSheet.href=links.sheetUrl;
-      btnSheet.style.opacity='1';
-      btnSheet.style.pointerEvents='auto';
-    }
-    if (links.formFillUrl) {
-      document.getElementById('mFillUrl').textContent = links.formFillUrl;
-      document.getElementById('mEditUrl').textContent = links.formEditUrl||'—';
-      document.getElementById('mWa').href = 'https://wa.me/?text='+encodeURIComponent((META.school||'JNV')+' — Attendance Form\n'+links.formFillUrl);
-      document.getElementById('mEm').href = 'mailto:?subject='+encodeURIComponent((META.school||'JNV')+' — Attendance Form')+'&body='+encodeURIComponent('Please fill attendance:\n\n'+links.formFillUrl);
-      document.getElementById('mOp').href = links.formFillUrl;
-      if(links.formEditUrl) document.getElementById('mEd').href = links.formEditUrl;
-    }
-  }).catch(e => console.warn('links:', e));
-}
-
-function fmtDate(d) {
-  // Use local date parts — avoids UTC timezone shift
-  const y  = d.getFullYear();
-  const m  = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  return y+'-'+m+'-'+dd;
-}
-// Get today's date in IST-friendly way (avoids UTC midnight issue)
-function todayLocal() {
-  const now = new Date();
-  // Add 5h30m offset for IST to ensure correct date even near midnight
-  const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
-  return ist.getUTCFullYear()+'-'+
-    String(ist.getUTCMonth()+1).padStart(2,'0')+'-'+
-    String(ist.getUTCDate()).padStart(2,'0');
-}
-function formatDateLabel(isoDate) {
-  const parts = (isoDate || '').split('-').map(Number);
-  if (parts.length !== 3 || parts.some(n => !n)) return '--/--/----';
-  const [y,m,d] = parts;
-  return String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;
-}
-function formatMonthLabel(monthValue) {
-  const parts = (monthValue || '').split('-').map(Number);
-  if (parts.length !== 2 || parts.some(n => !n)) return '----';
-  const [y,m] = parts;
-  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', {
-    month: 'long',
-    year: 'numeric'
-  });
-}
-function updateDateDisplays() {
-  const dateValue = document.getElementById('dateSelect').value;
-  const weekValue = document.getElementById('weekStart').value;
-  const monthValue = document.getElementById('monthSelect').value;
-  document.getElementById('dateDisplay').textContent = formatDateLabel(dateValue);
-  document.getElementById('weekDisplay').textContent = 'Week of ' + formatDateLabel(weekValue);
-  document.getElementById('monthDisplay').textContent = formatMonthLabel(monthValue);
-}
-
-// ════════════════════════════════════════════════════════════
-//  TABS
-// ════════════════════════════════════════════════════════════
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-}
-function filterTbl(tblId, q) {
-  const tbl = document.getElementById(tblId);
-  if (!tbl) return;
-  tbl.querySelectorAll('tbody tr.dr').forEach(r => {
-    r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
-  });
-}
-
-// ════════════════════════════════════════════════════════════
-//  DAILY DATA
-// ════════════════════════════════════════════════════════════
-async function loadDaily(forceRefresh = false) {
-  const btn  = document.getElementById('syncBtn');
-  const icon = document.getElementById('syncIcon');
-  const date = document.getElementById('dateSelect').value;
-  const teacher = document.getElementById('teacherFilter').value;
-  updateDateDisplays();
-  btn.disabled = true;
-  icon.innerHTML = '<span class="spinner"></span>';
-  document.getElementById('lastSync').textContent = 'Loading...';
-  // Show loading skeletons immediately
-  ['todayBody','teacherBody','classBody','heatmapBody','errorBody'].forEach(id => {
-    document.getElementById(id).innerHTML =
-      '<div class="empty"><div class="empty-icon">⏳</div>Fetching data from server...</div>';
-  });
-  try {
-    const d = await api(
-      { action:'daily', date, teacher, fresh: forceRefresh ? '1' : '' },
-      { force: forceRefresh }
-    );
-    renderKpis(d.kpis, 'kpiGrid');
-    renderTodayTable(d.submissions);
-    renderPeriodBars(d.periodCounts);
-    renderTeacherTable(d.perf, d.classes || META.classes);
-    renderClassTable(d.clsData);
-    renderHeatmap(d.heatmap, d.submissions);
-    renderErrorTable(d.errors);
-    document.getElementById('lastSync').textContent = 'Synced '+d.time;
-  } catch(e) {
-    const msg = e.message || String(e);
-    ['todayBody','teacherBody','classBody','heatmapBody','errorBody'].forEach(id => {
-      document.getElementById(id).innerHTML =
-        '<div class="empty"><div class="empty-icon">❌</div>' +
-        '<div style="font-size:12px;color:#c0392b;max-width:320px;margin:0 auto;text-align:left;white-space:pre-wrap">' +
-        msg + '</div></div>';
-    });
-    document.getElementById('lastSync').textContent = 'Failed';
-  }
-  btn.disabled = false;
-  icon.textContent = '↻';
-}
-
-// ── Render helpers ────────────────────────────────────────────
-function renderKpis(kpis, targetId) {
-  const colors = ['blue','teal','ok','amber','red'];
-  document.getElementById(targetId).innerHTML =
-    kpis.map((k,i) =>
-      `<div class="kpi ${colors[i%colors.length]}">
-        <div class="kpi-val">${k.val}</div>
-        <div class="kpi-lbl">${k.lbl}</div>
-      </div>`
-    ).join('');
-}
-
-function renderTodayTable(rows) {
-  if (!rows.length) { document.getElementById('todayBody').innerHTML='<div class="empty"><div class="empty-icon">📭</div>No submissions.</div>'; return; }
-  let h = `<table id="todayTbl"><thead><tr>
-    <th>#</th><th>Teacher</th><th>Prd</th><th>Class</th><th>Subject</th>
-    <th>Taken</th><th>Total</th><th>Present</th><th>Absent</th>
-    <th>Leave</th><th>OD</th><th>TCA</th><th>NR</th><th>Sick</th>
-    <th>Math</th><th>Time</th></tr></thead><tbody>`;
-  rows.forEach((r,i) => {
-    const tp = r.taken ? '<span class="pill pill-ok">Yes</span>' : '<span class="pill pill-warn">No</span>';
-    const mp = !r.taken ? '<span class="pill pill-gray">N/A</span>' :
-               r.mathOk  ? '<span class="pill pill-ok">✅</span>' : '<span class="pill pill-err">❌</span>';
-    h += `<tr class="dr"><td>${i+1}</td><td><b>${r.teacher}</b></td>
-      <td style="text-align:center"><b>${r.period}</b></td>
-      <td>${r.cls}</td><td>${r.subject}</td><td>${tp}</td>
-      <td>${r.total||''}</td>
-      <td style="color:var(--ok);font-weight:600">${r.present||''}</td>
-      <td style="color:var(--red)">${r.absent||''}</td>
-      <td>${r.leave||''}</td><td>${r.od||''}</td>
-      <td>${r.tca||''}</td><td>${r.nr||''}</td><td>${r.sick||''}</td>
-      <td>${mp}</td>
-      <td style="color:var(--muted);font-size:12px">${r.time||''}</td></tr>`;
-  });
-  document.getElementById('todayBody').innerHTML = h + '</tbody></table>';
-}
-
-function renderPeriodBars(counts) {
-  const periods = META.periods.length ? META.periods : Object.keys(counts);
-  const vals = periods.map(p => counts[p]||0);
-  const max = Math.max(...vals, 1);
-  let h = '<div style="display:flex;flex-direction:column;gap:7px">';
-  periods.forEach((p,i) => {
-    const w = Math.round(vals[i]/max*100);
-    h += `<div style="display:flex;align-items:center;gap:8px">
-      <div style="width:52px;font-weight:700;font-family:var(--fh);color:var(--blue);font-size:13px">Prd ${p}</div>
-      <div style="flex:1;background:#e8ecf0;border-radius:5px;height:20px;overflow:hidden">
-        <div style="width:${w}%;background:var(--blue2);height:100%;border-radius:5px;
-             display:flex;align-items:center;padding-left:6px;color:#fff;font-size:11px;font-weight:700;
-             transition:width .5s">${vals[i]}</div>
-      </div></div>`;
-  });
-  document.getElementById('periodBars').innerHTML = h + '</div>';
-}
-
-function renderTeacherTable(perf, classes) {
-  let idx = 0;
-  let h = `<div style="margin-bottom:8px">
-    <button class="expand-btn" onclick="expandAll(true)">▼ Expand All</button>
-    &nbsp;<button class="expand-btn" onclick="expandAll(false)">▲ Collapse All</button></div>
-    <table id="teacherTbl"><thead><tr>
-    <th>Rank</th><th>Teacher</th><th>Taken %</th><th>Taken</th><th>Total</th>
-    <th>Errors</th><th>Details</th></tr></thead><tbody>`;
-  perf.forEach((p,i) => {
-    const pct = p.pct, bc = pct>=90?'pbar-hi':pct>=75?'pbar-mid':'pbar-lo';
-    const rank = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    const uid = idx++;
-    let det = '';
-    if (p.classes) {
-      Object.entries(p.classes).forEach(([cls,d]) => {
-        det += `<tr><td><b>${cls}</b></td><td>${d.taken}</td>
-          <td style="color:var(--ok)">${d.p}</td><td style="color:var(--red)">${d.a}</td>
-          <td>${d.l}</td><td>${d.od}</td><td>${d.tca}</td><td>${d.nr}</td><td>${d.s}</td></tr>`;
+    // ── TAKEN TOGGLE ──────────────────────────────────────────────
+    document.querySelectorAll('input[name="taken"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const taken = document.querySelector('input[name="taken"]:checked')?.value === 'Yes';
+        document.getElementById('countsSection').classList.toggle('hidden', !taken);
+        document.getElementById('reasonField').classList.toggle('hidden', taken);
+        if (!taken) {
+          ['total', 'present', 'absent', 'leave', 'od', 'tca', 'nr', 'sick'].forEach(id => document.getElementById(id).value = '');
+          setMath('neu', '⊞ Fill counts above when class is taken');
+        }
       });
-    }
-    h += `<tr class="dr">
-      <td style="text-align:center">${rank}</td><td><b>${p.name}</b></td>
-      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
-      <td>${p.taken}</td><td>${p.total}</td>
-      <td>${p.mathErrors>0?`<span class="pill pill-err">${p.mathErrors}</span>`:'<span class="pill pill-ok">0</span>'}</td>
-      <td><button class="expand-btn" onclick="toggleDet(this,${uid})">▼</button></td></tr>
-    <tr class="detail-row" id="dr-${uid}"><td colspan="7">
-      <div class="detail-inner"><table><thead><tr>
-        <th>Class</th><th>Taken</th><th style="color:var(--ok)">P</th>
-        <th style="color:var(--red)">A</th><th>L</th><th>OD</th><th>TCA</th><th>NR</th><th>Sick</th>
-      </tr></thead><tbody>${det||'<tr><td colspan="9" style="text-align:center;color:var(--muted)">No data</td></tr>'}</tbody></table></div>
-    </td></tr>`;
-  });
-  document.getElementById('teacherBody').innerHTML = h + '</tbody></table>';
-}
-
-function renderClassTable(clsData) {
-  let h = `<table><thead><tr><th>Class</th><th>Periods</th><th>Avg %</th>
-    <th>Present</th><th>Absent</th><th>Leave</th></tr></thead><tbody>`;
-  clsData.forEach(d => {
-    const bc = d.pct>=90?'pbar-hi':d.pct>=75?'pbar-mid':'pbar-lo';
-    h += `<tr><td><b>${d.cls}</b></td><td>${d.count}</td>
-      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${d.pct}%"></div></div><b>${d.pct}%</b></td>
-      <td style="color:var(--ok);font-weight:600">${d.present}</td>
-      <td style="color:var(--red)">${d.absent}</td><td>${d.leave}</td></tr>`;
-  });
-  document.getElementById('classBody').innerHTML = h + '</tbody></table>';
-}
-
-function renderHeatmap(heatmap, submissions) {
-  const teachers = META.teachers.length ? META.teachers :
-    [...new Set(submissions.map(r=>r.teacher))];
-  const periods  = META.periods.length ? META.periods : ['1','2','3','4','5','6','7','8'];
-  const maxVal   = Math.max(...Object.values(heatmap), 1);
-  let h = `<div style="overflow-x:auto"><div class="heatmap-grid"
-    style="grid-template-columns:140px repeat(${periods.length},44px)">`;
-  h += '<div class="hm-cell hm-hd" style="text-align:left;padding-left:4px">Teacher</div>';
-  periods.forEach(p => h += `<div class="hm-cell hm-hd">P${p}</div>`);
-  teachers.forEach(t => {
-    h += `<div class="hm-cell hm-hd" style="text-align:left;padding-left:4px;font-size:9px;
-          white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${t}">${t}</div>`;
-    periods.forEach(p => {
-      const v = heatmap[t+'||'+p]||0;
-      const cls = v===0?'hm-0':v/maxVal<.34?'hm-lo':v/maxVal<.67?'hm-md':'hm-hi';
-      h += `<div class="hm-cell ${cls}" title="${t} — P${p}: ${v}">${v||''}</div>`;
     });
-  });
-  document.getElementById('heatmapBody').innerHTML = h+'</div></div>';
-}
 
-function renderErrorTable(errors) {
-  if (!errors.length) { document.getElementById('errorBody').innerHTML='<div class="empty"><div class="empty-icon">✅</div>No math errors.</div>'; return; }
-  let h = `<table><thead><tr><th>Date</th><th>Teacher</th><th>Prd</th>
-    <th>Class</th><th>Total</th><th>Sum</th><th>Diff</th></tr></thead><tbody>`;
-  errors.forEach(r => {
-    const color = r.diff>0?'var(--red)':'#2471a3';
-    h += `<tr><td>${r.date}</td><td><b>${r.teacher}</b></td>
-      <td>${r.period}</td><td>${r.cls}</td><td>${r.total}</td><td>${r.sum}</td>
-      <td style="color:${color};font-weight:700">${r.diff>0?'+':''}${r.diff}</td></tr>`;
-  });
-  document.getElementById('errorBody').innerHTML = h+'</tbody></table>';
-}
+    // ── MATH CHECK ────────────────────────────────────────────────
+    const getN = id => parseInt(document.getElementById(id).value) || 0;
+    function setMath(cls, msg) {
+      const el = document.getElementById('mathCheck');
+      el.className = 'math-check math-' + cls;
+      el.textContent = msg;
+    }
+    function updateMath() {
+      const total = getN('total');
+      const sum = getN('present') + getN('absent') + getN('leave') + getN('od') + getN('tca') + getN('nr') + getN('sick');
+      if (!total && !sum) { setMath('neu', '⊞ Enter counts above — sum must equal Total Students'); return; }
+      if (sum === total) setMath('ok', `✅ Sum (${sum}) = Total (${total}) — Correct!`);
+      else {
+        const diff = sum - total;
+        setMath('err', `❌ Sum (${sum}) ≠ Total (${total}) — Diff: ${diff > 0 ? '+' : ''}${diff}`);
+      }
+    }
 
-function toggleDet(btn, id) {
-  const row = document.getElementById('dr-'+id);
-  if (!row) return;
-  const open = row.style.display !== 'table-row';
-  row.style.display = open ? 'table-row' : 'none';
-  btn.textContent = open ? '▲' : '▼';
-}
-function expandAll(flag) {
-  document.querySelectorAll('.detail-row').forEach(r => r.style.display=flag?'table-row':'none');
-  document.querySelectorAll('.expand-btn[onclick*="toggleDet"]').forEach(b => b.textContent=flag?'▲':'▼');
-}
+    // ── TOAST ─────────────────────────────────────────────────────
+    function showToast(msg, dur = 3500) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), dur);
+    }
 
-// ════════════════════════════════════════════════════════════
-//  WEEKLY
-// ════════════════════════════════════════════════════════════
-async function loadWeeklyTab() {
-  const ws = document.getElementById('weekStart').value;
-  if (!ws) return;
-  updateDateDisplays();
-  document.getElementById('weeklyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
-  try {
-    const d = await api({ action:'weekly', weekStart:ws });
-    renderKpis(d.kpis, 'weeklyKpis');
-    renderBars(d.dayTrend, 'label', 'count', 'weeklyDayBars', 'var(--blue2)');
-    renderPerfTable(d.perf, 'weeklyTbl', 'weeklyTeacherBody');
-    renderClsTable(d.clsData, 'weeklyClassBody');
-  } catch(e) {
-    document.getElementById('weeklyTeacherBody').innerHTML='<div class="empty">❌ '+e.message+'</div>';
-  }
-}
-function shiftWeek(dir) {
-  const d = new Date(document.getElementById('weekStart').value);
-  d.setDate(d.getDate()+dir*7);
-  document.getElementById('weekStart').value = fmtDate(d);
-  updateDateDisplays();
-  loadWeeklyTab();
-}
+    // ── SUBMIT ────────────────────────────────────────────────────
+    document.getElementById('attForm').addEventListener('submit', async e => {
+      e.preventDefault();
 
-// ════════════════════════════════════════════════════════════
-//  MONTHLY
-// ════════════════════════════════════════════════════════════
-async function loadMonthlyTab() {
-  const mv = document.getElementById('monthSelect').value;
-  if (!mv) return;
-  updateDateDisplays();
-  document.getElementById('monthlyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
-  try {
-    const d = await api({ action:'monthly', month:mv });
-    renderKpis(d.kpis, 'monthlyKpis');
-    renderBars(d.weekTrend,  'label','count','monthlyWeekBars','var(--teal)');
-    renderBars(d.dailyTrend, 'label','pct',  'monthlyDailyTrend','var(--blue)');
-    renderPerfTable(d.perf,   'monthlyTbl','monthlyTeacherBody');
-    renderClsTable(d.clsData, 'monthlyClassBody');
-  } catch(e) {
-    document.getElementById('monthlyTeacherBody').innerHTML='<div class="empty">❌ '+e.message+'</div>';
-  }
-}
-function shiftMonth(dir) {
-  const val = document.getElementById('monthSelect').value;
-  const [y,m] = val.split('-').map(Number);
-  const d = new Date(y, m-1+dir, 1);
-  document.getElementById('monthSelect').value = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-  updateDateDisplays();
-  loadMonthlyTab();
-}
+      const teacher = document.getElementById('teacher').value;
+      const period = document.querySelector('input[name="period"]:checked')?.value;
+      const cls = document.getElementById('cls').value;
+      const subject = document.getElementById('subject').value;
+      const taken = document.querySelector('input[name="taken"]:checked')?.value;
 
-// Shared bar chart
-function renderBars(items, lk, vk, targetId, color) {
-  if (!items||!items.length) { document.getElementById(targetId).innerHTML='<div class="empty">No data</div>'; return; }
-  const max = Math.max(...items.map(i=>i[vk]||0), 1);
-  let h = '<div style="display:flex;flex-direction:column;gap:6px">';
-  items.forEach(it => {
-    const w = Math.round((it[vk]||0)/max*100);
-    h += `<div style="display:flex;align-items:center;gap:7px">
-      <div style="width:88px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${it[lk]}">${it[lk]}</div>
-      <div style="flex:1;background:#e8ecf0;border-radius:5px;height:19px;overflow:hidden">
-        <div style="width:${w}%;background:${color};height:100%;border-radius:5px;
-             display:flex;align-items:center;padding-left:6px;color:#fff;font-size:11px;font-weight:700;
-             transition:width .5s">${it[vk]}</div>
-      </div></div>`;
-  });
-  document.getElementById(targetId).innerHTML = h+'</div>';
-}
+      if (!teacher) { showToast('⚠️ Please select your name'); return; }
+      if (!period) { showToast('⚠️ Please select a period'); return; }
+      if (!cls) { showToast('⚠️ Please select a class'); return; }
+      if (!subject) { showToast('⚠️ Please select a subject'); return; }
+      if (!taken) { showToast('⚠️ Please select if class was taken'); return; }
 
-// Shared perf table (weekly/monthly)
-function renderPerfTable(perf, tblId, targetId) {
-  let h = `<table id="${tblId}"><thead><tr>
-    <th>Rank</th><th>Teacher</th><th>Taken %</th>
-    <th>Taken</th><th>Total</th><th>Absent Students</th><th>Errors</th>
-    </tr></thead><tbody>`;
-  perf.forEach((p,i) => {
-    const pct=p.pct, bc=pct>=90?'pbar-hi':pct>=75?'pbar-mid':'pbar-lo';
-    const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    h += `<tr class="dr"><td style="text-align:center">${rank}</td><td><b>${p.name}</b></td>
-      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
-      <td>${p.taken}</td><td>${p.total}</td>
-      <td style="color:var(--red)">${p.absent}</td>
-      <td>${p.mathErrors>0?`<span class="pill pill-err">${p.mathErrors}</span>`:'<span class="pill pill-ok">0</span>'}</td></tr>`;
-  });
-  document.getElementById(targetId).innerHTML = h+'</tbody></table>';
-}
+      if (taken === 'Yes') {
+        const total = getN('total');
+        const sum = getN('present') + getN('absent') + getN('leave') + getN('od') + getN('tca') + getN('nr') + getN('sick');
+        if (!total) { showToast('⚠️ Please enter Total Students'); return; }
+        if (sum !== total) { showToast(`❌ Math error: Sum (${sum}) ≠ Total (${total})`); return; }
+      }
 
-// Shared class table (weekly/monthly)
-function renderClsTable(clsData, targetId) {
-  let h = `<table><thead><tr><th>Class</th><th>Periods</th><th>Avg %</th>
-    <th>Present</th><th>Absent</th><th>Leave</th></tr></thead><tbody>`;
-  clsData.forEach(d => {
-    const bc=d.pct>=90?'pbar-hi':d.pct>=75?'pbar-mid':'pbar-lo';
-    h += `<tr><td><b>${d.cls}</b></td><td>${d.count}</td>
-      <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${d.pct}%"></div></div><b>${d.pct}%</b></td>
-      <td style="color:var(--ok);font-weight:600">${d.present}</td>
-      <td style="color:var(--red)">${d.absent}</td><td>${d.leave}</td></tr>`;
-  });
-  document.getElementById(targetId).innerHTML = h+'</tbody></table>';
-}
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting...';
 
-// ════════════════════════════════════════════════════════════
-//  EXPORT CSV
-// ════════════════════════════════════════════════════════════
-async function doExportCSV() {
-  const date    = document.getElementById('dateSelect').value;
-  const teacher = document.getElementById('teacherFilter').value;
-  try {
-    const r = await api({ action:'exportCSV', date, teacher }, { useCache:false, force:true });
-    alert(r.msg + (r.url ? '\n' + r.url : ''));
-  } catch(e) { alert('Export failed: '+e.message); }
-}
+      const payload = {
+        teacher, period, class: cls, subject, taken,
+        total: taken === 'Yes' ? getN('total') : 0,
+        present: taken === 'Yes' ? getN('present') : 0,
+        leave_count: taken === 'Yes' ? getN('leave') : 0,
+        od: taken === 'Yes' ? getN('od') : 0,
+        absent: taken === 'Yes' ? getN('absent') : 0,
+        tca: taken === 'Yes' ? getN('tca') : 0,
+        nr: taken === 'Yes' ? getN('nr') : 0,
+        sick: taken === 'Yes' ? getN('sick') : 0,
+        reason: document.getElementById('reason').value,
+        remarks: document.getElementById('remarks').value.trim()
+      };
 
-// ════════════════════════════════════════════════════════════
-//  SHARE MODAL
-// ════════════════════════════════════════════════════════════
-function openShareModal()  { document.getElementById('shareModal').classList.add('open'); }
-function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
-
-function copyBox(boxId, btn) {
-  const text = document.getElementById(boxId).textContent.trim();
-  if (!text || text === '—' || text === 'Loading...') return;
-  try {
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-  } catch(e) { window.prompt('Copy:', text); return; }
-  const orig = btn.textContent;
-  btn.textContent = '✅'; btn.classList.add('copied');
-  setTimeout(() => { btn.textContent=orig; btn.classList.remove('copied'); }, 2000);
-}
-</script>
+      try {
+        const { error } = await db.from('attendance').insert([payload]);
+        if (error) throw error;
+        // Save for success page display
+        sessionStorage.setItem('lastSubmission', JSON.stringify({
+          ...payload, leave: payload.leave_count
+        }));
+        window.location.href = 'form-success.html';
+      } catch (err) {
+        showToast('❌ Error: ' + (err.message || String(err)), 5000);
+        btn.disabled = false;
+        btn.textContent = 'Submit Attendance →';
+      }
+    });
+  </script>
 </body>
+
 </html>
