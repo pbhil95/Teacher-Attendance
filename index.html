@@ -1376,12 +1376,14 @@
         if (el) el.textContent = icon;
       });
       document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
-      localStorage.setItem('theme', t);
+      try { localStorage.setItem('theme', t); } catch(e) {}
     }
     function toggleTheme() {
       applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
-    applyTheme(localStorage.getItem('theme') || 'light');
+    let savedTheme = 'light';
+    try { savedTheme = localStorage.getItem('theme') || 'light'; } catch(e) {}
+    applyTheme(savedTheme);
 
     // ═══════════════════════════════════════════════════════════════
     //  AUTH STATE MANAGEMENT
@@ -1404,12 +1406,20 @@
 
     // Startup session check — getSession() waits for token auto-refresh to complete,
     // so it is the reliable source of truth on page load (including "Submit Another Entry" returns).
-    db.auth.getSession().then(({ data: { session } }) => {
+    db.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+        showScreen('auth');
+        return;
+      }
       if (session && session.user) {
         if (!currentProfile && !profileLoading) loadProfile(session.user);
       } else {
         showScreen('auth');
       }
+    }).catch(err => {
+      console.error('Failed to get session:', err);
+      showScreen('auth');
     });
 
     async function loadProfile(user) {
@@ -1468,9 +1478,10 @@
       } catch (err) {
         console.error('Error loading profile:', err);
         showToast('❌ Profile load error: ' + (err.message || String(err)), 6000);
+        showScreen('auth');
         document.getElementById('loginBtn').disabled = false;
         document.getElementById('loginBtn').textContent = '🔐 Sign In';
-        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
+        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please sign in again.';
       } finally {
         profileLoading = false;
       }
