@@ -433,28 +433,35 @@ META = { teachers: STATIC_TEACHERS, periods: STATIC_PERIODS,
 document.getElementById('appTitle').textContent = '📋 JNV Tarikhet';
 
 // ════════════════════════════════════════════════════════════
-//  API — uses hidden iframe + postMessage to bypass CORS
-//
-//  Why: fetch() blocked by CORS, JSONP blocked by GAS redirect.
-//  Solution: GAS returns an HTML page with a <script> that calls
-//  window.parent.postMessage(data, "*"). We load that in a hidden
-//  iframe and listen for the message. No CORS issues.
+//  API — simple fetch via CORS proxy
+//  corsproxy.io adds Access-Control-Allow-Origin: * header
+//  so the browser allows cross-origin requests to GAS.
 // ════════════════════════════════════════════════════════════
-let _reqId = 0;
-const _pending = {};
+async function api(params) {
+  if (!params.pin) params.pin = PIN;
 
-// Listen for postMessage responses from GAS iframes
-window.addEventListener('message', function(e) {
-  // Accept messages from GAS domains only
-  if (!e.origin.includes('google.com') && !e.origin.includes('googleusercontent.com')) return;
-  const data = e.data;
-  if (!data || !data.__reqId) return;
-  const p = _pending[data.__reqId];
-  if (!p) return;
-  delete _pending[data.__reqId];
-  clearTimeout(p.timer);
-  p.iframe.remove();
-  if (data.code === 401) {
+  if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    throw new Error('Set your API URL in index.html');
+  }
+
+  const qs  = Object.entries(params)
+    .map(([k,v]) => k + '=' + encodeURIComponent(v == null ? '' : v))
+    .join('&');
+
+  // Use CORS proxy to allow cross-origin fetch to GAS
+  const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(API_URL + '?' + qs);
+
+  let json;
+  try {
+    const res  = await fetch(proxyUrl);
+    const text = await res.text();
+    json = JSON.parse(text);
+  } catch(e) {
+    throw new Error('Network error: ' + e.message);
+  }
+
+  // Wrong PIN — lock back to PIN screen
+  if (json.code === 401) {
     PIN = '';
     document.getElementById('app').style.display = 'none';
     document.getElementById('pinScreen').style.display = 'flex';
@@ -466,44 +473,11 @@ window.addEventListener('message', function(e) {
     err.style.display = 'block';
     document.getElementById('pinBtn').textContent = 'Open Dashboard →';
     document.getElementById('pinBtn').disabled = false;
-    p.reject(new Error('Invalid PIN'));
-    return;
+    throw new Error('Invalid PIN');
   }
-  if (data.error) { p.reject(new Error(data.error)); return; }
-  p.resolve(data);
-});
 
-function api(params) {
-  return new Promise((resolve, reject) => {
-    if (!params.pin) params.pin = PIN;
-    if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
-      reject(new Error('API URL not set in index.html'));
-      return;
-    }
-
-    const id = ++_reqId;
-    params.__reqId = id;  // so GAS echoes it back in response
-
-    const qs = Object.entries(params)
-      .map(([k,v]) => k + '=' + encodeURIComponent(v == null ? '' : v))
-      .join('&');
-
-    // Create hidden iframe pointing to GAS
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:fixed;';
-    iframe.src = API_URL + '?' + qs;
-    document.body.appendChild(iframe);
-
-    const timer = setTimeout(() => {
-      if (_pending[id]) {
-        delete _pending[id];
-        iframe.remove();
-        reject(new Error('Request timed out (30s). GAS cold start — please try again.'));
-      }
-    }, 30000);
-
-    _pending[id] = { resolve, reject, iframe, timer };
-  });
+  if (json.error) throw new Error(json.error);
+  return json;
 }
 
 // ════════════════════════════════════════════════════════════
