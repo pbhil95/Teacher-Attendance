@@ -1607,23 +1607,33 @@
       } catch(e) { /* network down — cached UI still shown, no action */ }
     }
 
-    // Startup (runs synchronously on page load)
+    // Startup (runs synchronously on page load — zero network calls)
     const _storedUid = readStoredUserId();
     if (!_storedUid) {
-      // No stored session — go straight to login, no spinner
+      // No stored session at all → show login immediately
       showScreen('auth');
     } else {
       const _cached = getCachedProfile(_storedUid);
       if (_cached) {
-        applyProfile(_cached);              // ← INSTANT, zero network
-        bgValidateAndSync(_storedUid);      // ← background, doesn't block UI
+        // INSTANT path: cached profile → show form right now, validate in background
+        applyProfile(_cached);
+        bgValidateAndSync(_storedUid);
       } else {
-        // Have a session but no profile cache (first ever login or cache expired).
-        // Must hit DB — show spinner while loading.
+        // Session exists but cache is empty (first login or expired).
+        // NEVER show the spinner — show login screen immediately instead.
+        // Try to auto-reconnect in the background; form shows automatically when ready.
+        showScreen('auth');
+        const reconnectMsg = document.getElementById('loginError');
+        reconnectMsg.style.color = 'var(--blue,#1a5276)';
+        reconnectMsg.textContent = '🔄 Reconnecting your session…';
         db.auth.getSession().then(({ data: { session } }) => {
-          if (!session?.user) { showScreen('auth'); return; }
-          loadProfileFromDB(session.user);
-        }).catch(() => showScreen('auth'));
+          reconnectMsg.textContent = '';
+          reconnectMsg.style.color = '';
+          if (session?.user && !currentProfile) loadProfileFromDB(session.user);
+        }).catch(() => {
+          reconnectMsg.textContent = '';
+          reconnectMsg.style.color = '';
+        });
       }
     }
 
