@@ -413,7 +413,8 @@ let LINKS = { sheetUrl:'', formFillUrl:'', formEditUrl:'' };
 //  API FETCH — simple wrapper
 // ════════════════════════════════════════════════════════════
 async function api(params) {
-  params.pin = PIN;
+  // Only set PIN from global state if not already explicitly provided in params
+  if (!params.pin) params.pin = PIN;
   const qs = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v||'')).join('&');
   const res = await fetch(API_URL + '?' + qs);
   const json = await res.json();
