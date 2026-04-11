@@ -141,11 +141,14 @@ function setupTeacherForm(profile) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-  // Theme Toggle
+  // Theme Toggle — synced with nova-theme key
   document.querySelectorAll('.theme-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('nova-theme', next);
+      document.querySelectorAll('.theme-toggle').forEach(b => b.textContent = next === 'dark' ? '☀' : '🌙');
     });
   });
 
@@ -332,12 +335,23 @@ async function handleAttendanceSubmit(e) {
   if (error) {
     showToast('❌ Error submitting: ' + error.message);
   } else {
-    // Show success details
-    document.getElementById('suc-details').innerHTML = `
-       Class: ${cls} - ${subject} <br>
-       Period: ${period} <br>
-       Status: ${taken === 'Yes' ? 'Taken' : 'Not Taken'}
-    `;
+    // Build detail rows for success screen
+    const rows = [
+      ['Teacher', payload.teacher],
+      ['Period',  'Period ' + period],
+      ['Class',   cls],
+      ['Subject', subject],
+      ['Status',  taken === 'Yes'
+        ? '<span class="badge badge-success">✅ Class Taken</span>'
+        : '<span class="badge badge-danger">❌ Not Taken</span>']
+    ];
+    if (payload.reason) rows.push(['Reason', payload.reason]);
+
+    let html = rows.map(([l,v]) =>
+      `<div class="detail-row-item"><div class="detail-label">${l}</div><div class="detail-val">${v}</div></div>`
+    ).join('');
+
+    document.getElementById('suc-details').innerHTML = html;
     showScreen('success');
     window.scrollTo(0,0);
   }

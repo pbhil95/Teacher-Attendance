@@ -1,63 +1,246 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="JNV Tarikhet – Staff Class Attendance Portal. Secure, fast, and mobile-friendly.">
-  <title>Attendance Form — JNV Tarikhet</title>
+  <meta name="description" content="JNV Tarikhet – Staff Attendance Portal. Secure, fast, and mobile-friendly.">
+  <title>Attendance — JNV Tarikhet</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    /* ─── Page-specific overrides ─── */
+    body { background: var(--bg-base); }
+
+    /* Animated mesh orbs */
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+      filter: blur(80px); opacity: 0.55;
+    }
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(99,102,241,0.35) 0%, transparent 70%);
+      top: -150px; left: -150px;
+      animation: orbFloat1 12s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, transparent 70%);
+      bottom: 0; right: -80px;
+      animation: orbFloat2 15s ease-in-out infinite;
+    }
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0); }
+      50%       { transform: translate(40px, 30px); }
+    }
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0); }
+      50%       { transform: translate(-30px, -20px); }
+    }
+
+    /* Loading Screen */
+    #screen-loading {
+      gap: 14px;
+    }
+    .loading-brand {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: -0.5px;
+      margin-top: 4px;
+    }
+    .loading-sub {
+      font-size: 0.72rem;
+      color: var(--t3);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Auth Screen layout */
+    #screen-auth {
+      background: transparent;
+    }
+
+    /* Form screen */
+    #screen-main {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Teacher banner overrides */
+    .teacher-banner { margin-bottom: 0; }
+
+    /* Card stagger animation */
+    .glass-card:nth-child(1) { animation-delay: 0.05s; }
+    .glass-card:nth-child(2) { animation-delay: 0.10s; }
+    .glass-card:nth-child(3) { animation-delay: 0.15s; }
+    .glass-card:nth-child(4) { animation-delay: 0.20s; }
+
+    /* Submit button container */
+    .submit-wrap {
+      position: sticky;
+      bottom: 20px;
+      z-index: 50;
+    }
+    .submit-wrap .btn {
+      box-shadow: 0 6px 28px var(--indigo-glow), 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Math checker states */
+    .math-ok {
+      background: var(--emerald-sub) !important;
+      border-color: var(--emerald-border) !important;
+      color: var(--emerald-lt) !important;
+    }
+    .math-err {
+      background: var(--rose-sub) !important;
+      border-color: var(--rose-border) !important;
+      color: var(--rose-lt) !important;
+    }
+
+    /* Success screen */
+    #screen-success { background: transparent; }
+    .success-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--glass-bd);
+      border-radius: var(--r-2xl);
+      overflow: hidden;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: var(--sh-xl), 0 0 60px rgba(16,185,129,0.08);
+      animation: fadeSlideIn 0.5s var(--spring) both;
+    }
+    .success-hero {
+      padding: 40px 32px 28px;
+      text-align: center;
+      background: linear-gradient(135deg,
+        rgba(16,185,129,0.12) 0%,
+        rgba(99,102,241,0.08) 100%);
+      border-bottom: 1px solid var(--bd);
+      position: relative;
+    }
+    .success-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(16,185,129,0.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .tick-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 16px;
+      animation: popIn 0.6s var(--spring) both;
+    }
+    .success-title {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--emerald-lt);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .success-sub {
+      color: var(--t2);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+    .detail-list { padding: 0; }
+    .detail-row-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--bd);
+    }
+    .detail-row-item:last-child { border-bottom: none; }
+    .detail-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      min-width: 90px;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+    .detail-val {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .success-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 24px;
+      background: var(--bg-raised);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .success-hero { padding: 28px 20px 20px; }
+      .success-title { font-size: 1.6rem; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ===========================
+  <!-- Ambient orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ═══════════════════════════════════
        LOADING SCREEN
-       =========================== -->
+  ═══════════════════════════════════ -->
   <div id="screen-loading" class="fullscreen-overlay">
-    <div class="spinner"></div>
-    <div style="font-weight:600; color:var(--text-secondary); font-size:0.95rem; animation:fadeSlideIn 0.6s ease;">
-      Loading your profile…
+    <div class="pin-logo-wrap" style="margin-bottom:0;">
+      <div class="pin-logo-ring"><div class="pin-logo-ring-inner">📋</div></div>
     </div>
+    <div class="loading-brand">JNV Tarikhet</div>
+    <div class="loading-sub">Attendance Portal</div>
+    <div class="spinner" style="margin-top:8px; margin-bottom:0;"></div>
   </div>
 
-  <!-- ===========================
-       AUTH SCREEN (Login / Register)
-       =========================== -->
+  <!-- ═══════════════════════════════════
+       AUTH SCREEN
+  ═══════════════════════════════════ -->
   <div id="screen-auth" class="fullscreen-overlay hidden">
-    <div class="auth-card" style="margin-top:24px; max-height:92vh; overflow-y:auto;">
+    <div class="auth-card" style="max-height:92dvh; overflow-y:auto;">
 
-      <!-- Branding -->
-      <div class="text-center mb-4" style="margin-bottom:28px;">
-        <div class="pin-logo-wrap" style="margin-bottom:18px;">
-          <div class="pin-logo-ring"><div class="pin-logo-ring-inner">📋</div></div>
-        </div>
-        <h1 style="font-family:var(--font-heading); font-size:1.8rem; font-weight:800; color:var(--text-primary); letter-spacing:-0.5px;">JNV Tarikhet</h1>
-        <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Staff Portal</div>
+      <!-- Logo + Branding -->
+      <div class="text-center" style="margin-bottom:28px;">
+        <div class="pin-logo-wrap"><div class="pin-logo-ring"><div class="pin-logo-ring-inner">📋</div></div></div>
+        <h1 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;color:var(--t1);letter-spacing:-0.5px;margin:0;">JNV Tarikhet</h1>
+        <div style="font-size:0.65rem;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:2.5px;margin-top:5px;">Staff Portal</div>
       </div>
 
-      <!-- Auth Tabs -->
-      <div style="display:flex; border-bottom:2px solid var(--input-border); margin-bottom:24px;">
-        <button id="tab-login" class="btn" style="flex:1; background:transparent; border-radius:0; border-bottom:3px solid var(--primary); color:var(--primary); font-size:0.95rem; padding:11px; transition:all 0.2s;" onclick="switchAuthTab('login')">Sign In</button>
-        <button id="tab-register" class="btn" style="flex:1; background:transparent; border-radius:0; border-bottom:3px solid transparent; color:var(--text-muted); font-size:0.95rem; padding:11px; transition:all 0.2s;" onclick="switchAuthTab('register')">Register</button>
+      <!-- Tabs -->
+      <div class="auth-tabs-bar">
+        <button id="tab-login"    class="auth-tab-btn" style="border-bottom-color:var(--indigo);color:var(--indigo-lt);" onclick="switchAuthTab('login')">Sign In</button>
+        <button id="tab-register" class="auth-tab-btn" onclick="switchAuthTab('register')">Register</button>
       </div>
 
       <!-- Login Form -->
       <form id="form-login">
-        <div id="err-login" class="alert alert-danger hidden"></div>
+        <div id="err-login" class="alert alert-danger hidden" style="margin-bottom:16px;"></div>
+
         <div class="form-group">
-          <label class="form-label" for="log-email">Email</label>
-          <input type="email" id="log-email" class="form-input" placeholder="you@example.com" required>
+          <label class="form-label" for="log-email">Email Address</label>
+          <input type="email" id="log-email" class="form-input" placeholder="you@example.com" required autocomplete="email">
         </div>
         <div class="form-group">
           <label class="form-label" for="log-pwd">Password</label>
-          <input type="password" id="log-pwd" class="form-input" placeholder="••••••••" required>
+          <input type="password" id="log-pwd" class="form-input" placeholder="••••••••" required autocomplete="current-password">
         </div>
-        <button type="submit" id="btn-login" class="btn btn-primary mt-4">Sign In →</button>
+        <button type="submit" id="btn-login" class="btn btn-primary" style="margin-top:8px;">Sign In →</button>
       </form>
 
       <!-- Register Form -->
       <form id="form-register" class="hidden">
-        <div id="err-register" class="alert alert-danger hidden"></div>
+        <div id="err-register" class="alert alert-danger hidden" style="margin-bottom:16px;"></div>
 
         <div class="form-group">
           <label class="form-label" for="reg-name">Designation <span class="req">*</span></label>
@@ -67,7 +250,7 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="reg-email">Email <span class="req">*</span></label>
-          <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required>
+          <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" required autocomplete="email">
         </div>
         <div class="form-group">
           <label class="form-label" for="reg-pwd">Password <span class="req">*</span></label>
@@ -79,78 +262,81 @@
         </div>
         <div class="form-group">
           <label class="form-label">Classes Handled <span class="req">*</span></label>
-          <div id="reg-classes" class="chip-group"></div>
+          <div id="reg-classes" class="chip-group" style="max-height:130px;overflow-y:auto;border:1px solid var(--input-border);border-radius:var(--r-md);padding:10px;background:var(--input-bg);"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Subjects Handled <span class="req">*</span></label>
-          <div id="reg-subjects" class="chip-group"></div>
+          <div id="reg-subjects" class="chip-group" style="max-height:130px;overflow-y:auto;border:1px solid var(--input-border);border-radius:var(--r-md);padding:10px;background:var(--input-bg);"></div>
         </div>
-
-        <button type="submit" id="btn-register" class="btn btn-primary mt-4">Create Account →</button>
+        <button type="submit" id="btn-register" class="btn btn-primary" style="margin-top:8px;">Create Account →</button>
       </form>
 
-      <div style="text-align:center; margin-top:20px; font-size:0.75rem; color:var(--text-muted);">
-        Powered by <span style="font-weight:700; color:var(--primary);">Supabase</span>
+      <div class="auth-footer-note">Powered by <strong>Supabase</strong></div>
+
+      <div style="text-align:center; margin-top:16px;">
+        <a href="dashboard.html"
+           style="display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;color:var(--t3);text-decoration:none;padding:8px 16px;border-radius:var(--r-full);border:1px solid var(--bd2);background:var(--bg-raised);transition:all 0.2s var(--ease);"
+           onmouseover="this.style.color='var(--indigo-lt)';this.style.borderColor='var(--indigo-border)';this.style.background='var(--indigo-sub)';"
+           onmouseout="this.style.color='var(--t3)';this.style.borderColor='var(--bd2)';this.style.background='var(--bg-raised)';">
+          📊 Open Admin Dashboard
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- ===========================
-       WAIT SCREEN (Pending Approval)
-       =========================== -->
+  <!-- ═══════════════════════════════════
+       WAIT SCREEN
+  ═══════════════════════════════════ -->
   <div id="screen-wait" class="fullscreen-overlay hidden">
-    <div class="glass-card" style="padding:44px 32px; text-align:center; max-width:420px; width:90%;">
-      <div style="font-size:3.5rem; margin-bottom:16px; animation:spin 6s linear infinite;">⏳</div>
-      <h2 style="font-family:var(--font-heading); font-size:1.6rem; font-weight:800; color:var(--text-primary); margin-bottom:6px;">Awaiting Approval</h2>
-      <div style="background:var(--success-bg); color:var(--success); border:1px solid var(--success-border); border-radius:30px; padding:6px 18px; display:inline-block; font-weight:700; font-size:0.9rem; margin:12px 0 20px;" id="wait-name"></div>
-      <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.7; margin-bottom:28px;">Your account has been created successfully. Please wait for an administrator to approve your profile before you can submit attendance.</p>
-
-      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn btn-primary" id="btn-refresh-status" style="width:auto; padding:11px 24px; border-radius:30px; font-size:0.9rem;">🔄 Check Status</button>
-        <button class="btn btn-outline btn-logout" style="width:auto; padding:11px 24px; border-radius:30px; font-size:0.9rem;">🚪 Sign Out</button>
+    <div class="wait-card">
+      <span class="wait-icon">⏳</span>
+      <h2 class="wait-title">Awaiting Approval</h2>
+      <div class="wait-name-badge" id="wait-name"></div>
+      <p class="wait-desc">Your account is created. An administrator needs to approve your profile before you can submit attendance records.</p>
+      <div class="wait-actions">
+        <button class="btn btn-primary" id="btn-refresh-status">🔄 Check Status</button>
+        <button class="btn btn-outline btn-logout">Sign Out</button>
       </div>
     </div>
   </div>
 
-  <!-- ===========================
+  <!-- ═══════════════════════════════════
        MAIN FORM SCREEN
-       =========================== -->
+  ═══════════════════════════════════ -->
   <div id="screen-main" class="hidden">
 
     <!-- Header -->
     <header class="app-header">
       <div class="header-branding">
-        <h1 class="header-title">📋 JNV Tarikhet</h1>
-        <div class="header-subtitle">Staff Attendance Form</div>
+        <h1 class="header-title">
+          <span class="logo-icon">📋</span>
+          JNV Tarikhet
+        </h1>
+        <div class="header-subtitle">Staff Attendance</div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn theme-toggle" title="Toggle theme">☀</button>
-        <button class="icon-btn btn-logout" title="Sign Out">🚪</button>
+        <button class="icon-btn theme-toggle" id="themeToggleMain" title="Toggle theme" aria-label="Toggle dark/light mode">🌙</button>
+        <button class="icon-btn btn-logout" title="Sign Out" aria-label="Sign out">🚪</button>
       </div>
     </header>
 
     <div class="glass-container">
 
-      <!-- Teacher Info Badge -->
-      <div class="glass-card" style="background:linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); color:white; border:none; box-shadow:0 8px 28px var(--primary-glow);">
-        <div class="glass-card::before" style="display:none;"></div>
-        <div style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
-          <div style="width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:2px solid rgba(255,255,255,0.35);">👤</div>
-          <div>
-            <div style="font-size:0.7rem;opacity:0.75;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Logged In As</div>
-            <div style="font-size:1.15rem;font-weight:800;font-family:var(--font-heading);letter-spacing:-0.3px;" id="teacher-name-display">—</div>
-          </div>
-          <div style="margin-left:auto;">
-            <a href="dashboard.html" style="color:rgba(255,255,255,0.85);font-size:0.78rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,0.15);padding:7px 14px;border-radius:20px;transition:background 0.2s;border:1px solid rgba(255,255,255,0.25);" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">📊 Dashboard</a>
-          </div>
+      <!-- Teacher Identity Banner -->
+      <div class="teacher-banner">
+        <div class="teacher-avatar">👤</div>
+        <div class="teacher-info">
+          <div class="teacher-meta-label">Logged In As</div>
+          <div class="teacher-name" id="teacher-name-display">—</div>
         </div>
+        <a href="dashboard.html" class="teacher-dash-link">📊 Dashboard</a>
       </div>
 
       <!-- Attendance Form -->
       <form id="attendance-form">
 
-        <!-- Class Details -->
-        <div class="glass-card form-group">
+        <!-- Section 1: Class Details -->
+        <div class="glass-card">
           <div class="card-header">
             <span class="card-icon">🏫</span>
             <h2 class="card-title">Class Details</h2>
@@ -164,91 +350,100 @@
 
             <div class="form-group">
               <label class="form-label" for="form-class">Class <span class="req">*</span></label>
-              <select id="form-class" class="form-select" required></select>
+              <select id="form-class" class="form-select" required>
+                <option value="">— Select class —</option>
+              </select>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="form-subject">Subject Taught <span class="req">*</span></label>
-              <select id="form-subject" class="form-select" required></select>
+              <select id="form-subject" class="form-select" required>
+                <option value="">— Select subject —</option>
+              </select>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Was the class taken? <span class="req">*</span></label>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Was the Class Taken? <span class="req">*</span></label>
               <div class="chip-group">
                 <div class="chip success">
                   <input type="radio" name="taken" id="taken-yes" value="Yes" required checked>
-                  <label for="taken-yes">✅ Yes, class taken</label>
+                  <label for="taken-yes">✅ Yes, taken</label>
                 </div>
                 <div class="chip danger">
-                  <input type="radio" name="taken" id="taken-no" value="No" required>
-                  <label for="taken-no">❌ No, not taken</label>
+                  <input type="radio" name="taken" id="taken-no" value="No">
+                  <label for="taken-no">❌ Not taken</label>
                 </div>
               </div>
             </div>
 
-            <!-- Reason (conditionally visible) -->
-            <div class="form-group hidden" id="reason-section">
-              <label class="form-label" for="form-reason">Reason for not taking class</label>
+            <!-- Reason (shown when not taken) -->
+            <div class="form-group hidden" id="reason-section" style="margin-top:16px;margin-bottom:0;">
+              <label class="form-label" for="form-reason">Reason for not taking</label>
               <select id="form-reason" class="form-select">
                 <option value="">— Select reason —</option>
-                <option>Leave</option><option>Medical Leave</option>
-                <option>Assembly / Prayer</option><option>Official Duty</option>
-                <option>School Event</option><option>Other</option>
+                <option>Leave</option>
+                <option>Medical Leave</option>
+                <option>Assembly / Prayer</option>
+                <option>Official Duty</option>
+                <option>School Event</option>
+                <option>Other</option>
               </select>
             </div>
 
           </div>
         </div>
 
-        <!-- Attendance Counts -->
-        <div class="glass-card form-group" id="counts-section">
+        <!-- Section 2: Attendance Counts -->
+        <div class="glass-card" id="counts-section">
           <div class="card-header">
             <span class="card-icon">🔢</span>
             <h2 class="card-title">Attendance Counts</h2>
           </div>
           <div class="card-body">
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; margin-bottom:16px;">
-              <div>
+            <div class="counts-grid">
+              <div class="count-field">
                 <label class="form-label">Total</label>
                 <input type="number" id="count-tot" class="form-input" min="0" max="60" placeholder="0">
               </div>
-              <div>
-                <label class="form-label" style="color:var(--success);">Present</label>
-                <input type="number" id="count-pre" class="form-input" min="0" max="60" placeholder="0" style="border-color:var(--success-border);">
+              <div class="count-field">
+                <label class="form-label count-label-green">Present</label>
+                <input type="number" id="count-pre" class="form-input count-input-green" min="0" max="60" placeholder="0">
               </div>
-              <div>
-                <label class="form-label" style="color:var(--danger);">Absent</label>
-                <input type="number" id="count-abs" class="form-input" min="0" max="60" placeholder="0" style="border-color:var(--danger-border);">
+              <div class="count-field">
+                <label class="form-label count-label-red">Absent</label>
+                <input type="number" id="count-abs" class="form-input count-input-red" min="0" max="60" placeholder="0">
               </div>
-              <div>
+              <div class="count-field">
                 <label class="form-label">On Leave</label>
                 <input type="number" id="count-lea" class="form-input" min="0" max="60" placeholder="0">
               </div>
-              <div>
+              <div class="count-field">
                 <label class="form-label">On OD</label>
                 <input type="number" id="count-od" class="form-input" min="0" max="60" placeholder="0">
               </div>
-              <div>
+              <div class="count-field">
                 <label class="form-label">TCA</label>
                 <input type="number" id="count-tca" class="form-input" min="0" max="60" placeholder="0">
               </div>
-              <div>
+              <div class="count-field">
                 <label class="form-label">NR</label>
                 <input type="number" id="count-nr" class="form-input" min="0" max="60" placeholder="0">
               </div>
-              <div>
+              <div class="count-field">
                 <label class="form-label">Sick</label>
                 <input type="number" id="count-sick" class="form-input" min="0" max="60" placeholder="0">
               </div>
             </div>
-            <div id="math-checker" class="alert" style="background:rgba(79,70,229,0.06);color:var(--text-muted);margin:0;border:1px solid var(--input-border);">
-              ⊞ Fill counts above when class is taken
+
+            <!-- Math validation -->
+            <div id="math-checker" class="math-checker">
+              ⊞ Fill counts — the sum must equal Total Students
             </div>
           </div>
         </div>
 
-        <!-- Remarks -->
-        <div class="glass-card form-group">
+        <!-- Section 3: Remarks -->
+        <div class="glass-card">
           <div class="card-header">
             <span class="card-icon">💬</span>
             <h2 class="card-title">Remarks</h2>
@@ -258,39 +453,60 @@
           </div>
         </div>
 
-        <button type="submit" id="btn-submit" class="btn btn-primary" style="margin-top:6px;">
-          Submit Attendance &rarr;
-        </button>
+        <!-- Submit -->
+        <div class="submit-wrap">
+          <button type="submit" id="btn-submit" class="btn btn-primary">
+            Submit Attendance →
+          </button>
+        </div>
+
       </form>
+    </div><!-- /.glass-container -->
+  </div><!-- /#screen-main -->
 
-    </div>
-  </div>
-
-  <!-- ===========================
+  <!-- ═══════════════════════════════════
        SUCCESS SCREEN
-       =========================== -->
-  <div id="screen-success" class="fullscreen-overlay hidden" style="justify-content:flex-start; padding-top:10vh;">
-    <div class="glass-card" style="padding:44px 28px; text-align:center; max-width:460px; width:100%;">
-      <div style="font-size:4.5rem; margin-bottom:16px; animation:fadeSlideIn 0.5s ease;">✅</div>
-      <h2 style="font-family:var(--font-heading); font-size:2rem; font-weight:800; color:var(--success); margin-bottom:10px; letter-spacing:-0.5px;">Submitted!</h2>
-      <p style="color:var(--text-secondary); margin-bottom:24px; font-size:0.92rem;">Your attendance record has been securely saved to the database.</p>
-
-      <div style="background:var(--input-bg); border:1px solid var(--glass-border); border-radius:var(--radius-md); padding:18px; margin-bottom:28px; text-align:left; font-size:0.88rem; color:var(--text-primary); line-height:1.8;" id="suc-details">
-        <!-- Details injected via JS -->
+  ═══════════════════════════════════ -->
+  <div id="screen-success" class="fullscreen-overlay hidden" style="padding-top:10dvh; justify-content:flex-start;">
+    <div class="success-card">
+      <div class="success-hero">
+        <span class="tick-icon">✅</span>
+        <h2 class="success-title">Submitted!</h2>
+        <p class="success-sub">Attendance record saved securely to the database.</p>
       </div>
-
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="btn btn-primary" onclick="submitAnother()">Submit Another Entry</button>
-        <a href="dashboard.html" class="btn btn-outline" style="text-decoration:none;">📊 Open Admin Dashboard</a>
+      <div id="suc-details" class="detail-list"></div>
+      <div class="success-actions">
+        <button class="btn btn-primary" onclick="submitAnother()">➕ Submit Another Entry</button>
+        <a href="dashboard.html" class="btn btn-outline" style="text-decoration:none;text-align:center;">📊 Open Admin Dashboard</a>
       </div>
     </div>
   </div>
 
-  <!-- Global Toast -->
+  <!-- Toast notification -->
   <div id="global-toast" class="toast"></div>
 
-  <!-- App Scripts -->
+  <!-- Scripts -->
   <script src="auth.js"></script>
   <script src="app.js"></script>
+
+  <!-- Theme bootstrap -->
+  <script>
+    (function(){
+      const t = localStorage.getItem('nova-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.theme-toggle').forEach(btn => {
+          btn.textContent = t === 'dark' ? '☀' : '🌙';
+          btn.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('nova-theme', next);
+            document.querySelectorAll('.theme-toggle').forEach(b => b.textContent = next === 'dark' ? '☀' : '🌙');
+          });
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

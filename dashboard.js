@@ -103,7 +103,8 @@
     function toggleTheme() {
       applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
-    applyTheme(localStorage.getItem('theme') || 'light');
+    applyTheme(localStorage.getItem('theme') || 'dark');
+
 
     // ── CLOCK ─────────────────────────────────────────────────────
     setInterval(() => {
