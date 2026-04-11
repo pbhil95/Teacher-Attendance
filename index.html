@@ -433,76 +433,76 @@ META = { teachers: STATIC_TEACHERS, periods: STATIC_PERIODS,
 document.getElementById('appTitle').textContent = '📋 JNV Tarikhet';
 
 // ════════════════════════════════════════════════════════════
-//  API — uses JSONP to avoid CORS issues with GAS
-//  fetch() is blocked cross-origin by browsers; JSONP works
-//  by injecting a <script> tag instead.
+//  API — uses hidden iframe + postMessage to bypass CORS
+//
+//  Why: fetch() blocked by CORS, JSONP blocked by GAS redirect.
+//  Solution: GAS returns an HTML page with a <script> that calls
+//  window.parent.postMessage(data, "*"). We load that in a hidden
+//  iframe and listen for the message. No CORS issues.
 // ════════════════════════════════════════════════════════════
-let _cbCount = 0;
+let _reqId = 0;
+const _pending = {};
+
+// Listen for postMessage responses from GAS iframes
+window.addEventListener('message', function(e) {
+  // Accept messages from GAS domains only
+  if (!e.origin.includes('google.com') && !e.origin.includes('googleusercontent.com')) return;
+  const data = e.data;
+  if (!data || !data.__reqId) return;
+  const p = _pending[data.__reqId];
+  if (!p) return;
+  delete _pending[data.__reqId];
+  clearTimeout(p.timer);
+  p.iframe.remove();
+  if (data.code === 401) {
+    PIN = '';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('pinScreen').style.display = 'flex';
+    const inp = document.getElementById('pinInput');
+    inp.value = ''; inp.style.border = '2px solid #c0392b';
+    setTimeout(() => inp.focus(), 50);
+    const err = document.getElementById('pinErr');
+    err.textContent = '❌ Wrong PIN. Please try again.';
+    err.style.display = 'block';
+    document.getElementById('pinBtn').textContent = 'Open Dashboard →';
+    document.getElementById('pinBtn').disabled = false;
+    p.reject(new Error('Invalid PIN'));
+    return;
+  }
+  if (data.error) { p.reject(new Error(data.error)); return; }
+  p.resolve(data);
+});
 
 function api(params) {
   return new Promise((resolve, reject) => {
     if (!params.pin) params.pin = PIN;
-
     if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
       reject(new Error('API URL not set in index.html'));
       return;
     }
 
-    // Unique callback name for this request
-    const cbName = '_gasCb' + (++_cbCount);
-    params.callback = cbName;
+    const id = ++_reqId;
+    params.__reqId = id;  // so GAS echoes it back in response
 
     const qs = Object.entries(params)
       .map(([k,v]) => k + '=' + encodeURIComponent(v == null ? '' : v))
       .join('&');
 
-    // Timeout — GAS cold start can take 15s, give it 30s
+    // Create hidden iframe pointing to GAS
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:fixed;';
+    iframe.src = API_URL + '?' + qs;
+    document.body.appendChild(iframe);
+
     const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error('Request timed out (30s). GAS may be sleeping — try again.'));
+      if (_pending[id]) {
+        delete _pending[id];
+        iframe.remove();
+        reject(new Error('Request timed out (30s). GAS cold start — please try again.'));
+      }
     }, 30000);
 
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[cbName];
-      const s = document.getElementById(cbName);
-      if (s) s.remove();
-    }
-
-    // JSONP callback
-    window[cbName] = function(json) {
-      cleanup();
-
-      // Wrong PIN — lock back to PIN screen
-      if (json && json.code === 401) {
-        PIN = '';
-        document.getElementById('app').style.display = 'none';
-        document.getElementById('pinScreen').style.display = 'flex';
-        const inp = document.getElementById('pinInput');
-        const err = document.getElementById('pinErr');
-        inp.value = ''; inp.style.border = '2px solid #c0392b';
-        setTimeout(() => inp.focus(), 50);
-        err.textContent = '❌ Wrong PIN. Please try again.';
-        err.style.display = 'block';
-        document.getElementById('pinBtn').textContent = 'Open Dashboard →';
-        document.getElementById('pinBtn').disabled = false;
-        reject(new Error('Invalid PIN'));
-        return;
-      }
-
-      if (json && json.error) { reject(new Error(json.error)); return; }
-      resolve(json);
-    };
-
-    // Inject script tag — this is the JSONP request
-    const script = document.createElement('script');
-    script.id  = cbName;
-    script.src = API_URL + '?' + qs;
-    script.onerror = function() {
-      cleanup();
-      reject(new Error('Failed to reach GAS. Check your API URL and deployment.'));
-    };
-    document.head.appendChild(script);
+    _pending[id] = { resolve, reject, iframe, timer };
   });
 }
 
