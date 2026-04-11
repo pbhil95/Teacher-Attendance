@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1a5276">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -92,7 +92,7 @@ body{font-family:var(--fb);background:var(--bg);color:var(--ink);font-size:14px;
 .tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
 
 /* ── LAYOUT ── */
-.container{max-width:1260px;margin:0 auto;padding:12px 10px;}
+.container{max-width:1260px;margin:0 auto;padding:12px 10px;padding-bottom:env(safe-area-inset-bottom,12px);}
 .tab-pane{display:none;} .tab-pane.active{display:block;}
 
 /* ── KPI ── */
@@ -117,7 +117,7 @@ body{font-family:var(--fb);background:var(--bg);color:var(--ink);font-size:14px;
 
 /* ── TABLES ── */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
+table{width:100%;border-collapse:collapse;font-size:13px;word-break:break-word;}
 thead th{padding:9px 10px;background:#f0f3f7;color:var(--blue);
   text-transform:uppercase;font-size:10px;letter-spacing:.6px;
   border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;}
@@ -188,11 +188,84 @@ tbody tr:hover{background:#f7f9fc;}
   color:var(--muted);}
 .qr-note{font-size:11px;color:var(--muted);margin-top:8px;}
 
-@media(max-width:480px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .kpi-val{font-size:1.5rem;}
-  table{font-size:12px;}
-  .search-box{width:140px;}
+/* ── MOBILE FIRST ── */
+/* Touch targets */
+button, a, select, input { touch-action: manipulation; }
+
+/* Smooth scroll on iOS */
+.toolbar, .tabs, .tbl-wrap {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent page bounce */
+body { overscroll-behavior: none; }
+
+/* ── TABLET (≤768px) ── */
+@media(max-width:768px){
+  /* Header compact */
+  .header { padding: 10px 12px; }
+  .header h1 { font-size: 1.1rem; }
+  .header p { display: none; }
+
+  /* Toolbar: horizontal scroll, no wrap, hide labels */
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .toolbar select { min-width: 120px; font-size: 12px; padding: 6px 8px; }
+  .toolbar input[type=date] { min-width: 125px; font-size: 12px; padding: 6px 8px; }
+  .btn { padding: 7px 10px; font-size: 12px; min-height: 40px; }
+  .badge { display: none; }
+
+  /* Tabs: scroll, no wrap */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; padding: 6px 10px 0; gap: 1px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 7px 10px; font-size: 12px; min-height: 40px; white-space: nowrap; }
+
+  /* KPI 2 columns */
+  .kpi-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 10px; }
+  .kpi { padding: 10px 8px; }
+  .kpi-val { font-size: 1.5rem; }
+  .kpi-lbl { font-size: 9px; }
+
+  /* Cards */
+  .card { margin-bottom: 10px; }
+  .card-head { padding: 9px 10px; gap: 6px; }
+  .card-head h3 { font-size: 13px; }
+  .card-body { padding: 8px; }
+  .container { padding: 8px 6px; }
+
+  /* Tables */
+  table { font-size: 11px; }
+  thead th { padding: 7px 7px; font-size: 9px; }
+  tbody td { padding: 7px 7px; }
+
+  /* Search */
+  .search-box { width: 130px; font-size: 12px; padding: 6px 8px; }
+
+  /* Weekly/Monthly pickers */
+  .date-input { min-height: 38px; font-size: 12px; padding: 6px 8px; }
+  .expand-btn { min-height: 34px; padding: 4px 8px; font-size: 11px; }
+
+  /* Modal */
+  .modal { padding: 16px 14px; }
+  .modal h2 { font-size: 1rem; }
+  .url-box { font-size: 10px; }
+}
+
+/* ── SMALL PHONE (≤420px) ── */
+@media(max-width:420px){
+  .header h1 { font-size: 1rem; }
+  .kpi-val { font-size: 1.3rem; }
+  .btn { padding: 6px 9px; font-size: 11px; }
+  .tab-btn { padding: 6px 9px; font-size: 11px; }
+  table { font-size: 10px; }
+  thead th { padding: 5px 5px; }
+  tbody td { padding: 5px 5px; }
+  .kpi-lbl { font-size: 8px; letter-spacing: 0; }
 }
 </style>
 </head>
@@ -531,7 +604,7 @@ function lockDashboard() {
 // ════════════════════════════════════════════════════════════
 async function initApp() {
   // ── Show dashboard shell IMMEDIATELY — don't wait for server ──
-  const today = fmtDate(new Date());
+  const today = todayLocal();
   document.getElementById('dateSelect').value = today;
   const now = new Date();
   const day = now.getDay();
@@ -577,7 +650,20 @@ async function initApp() {
 }
 
 function fmtDate(d) {
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  // Use local date parts — avoids UTC timezone shift
+  const y  = d.getFullYear();
+  const m  = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
+// Get today's date in IST-friendly way (avoids UTC midnight issue)
+function todayLocal() {
+  const now = new Date();
+  // Add 5h30m offset for IST to ensure correct date even near midnight
+  const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+  return ist.getUTCFullYear()+'-'+
+    String(ist.getUTCMonth()+1).padStart(2,'0')+'-'+
+    String(ist.getUTCDate()).padStart(2,'0');
 }
 
 // ════════════════════════════════════════════════════════════
