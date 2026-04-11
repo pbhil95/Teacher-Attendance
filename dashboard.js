@@ -608,7 +608,7 @@
     function renderMissingBanner(missing) {
       const banner = document.getElementById('missingBanner');
       if (!missing || !missing.length) { banner.style.display = 'none'; return; }
-      banner.style.display = '';
+      banner.style.display = 'flex';
       document.getElementById('missingTags').innerHTML = missing.map(t => `<span class="missing-tag">${t}</span>`).join('');
     }
 
@@ -853,7 +853,7 @@
 
     function setApprovalFilter(f, btn) {
       approvalFilter = f;
-      document.querySelectorAll('.approval-filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderApprovals();
     }

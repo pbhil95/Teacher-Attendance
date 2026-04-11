@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="JNV Tarikhet – Attendance Management Admin Dashboard.">
   <title>Dashboard — JNV Tarikhet</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="dashboard.css">
@@ -10,45 +11,63 @@
 </head>
 <body>
 
-  <!-- ===============================
+  <!-- ===========================
        PIN SCREEN
-       =============================== -->
-  <div id="pinScreen" class="fullscreen-overlay" style="z-index: 2000;">
-    <button class="icon-btn theme-toggle" id="pinThemeBtn" onclick="toggleTheme()" title="Toggle dark mode" style="position:absolute; top:20px; right:20px;">🌙</button>
-    
-    <div class="glass-card auth-card text-center" style="max-width:380px;">
-      <h1 style="font-size:3.5rem; line-height:1; margin-bottom:12px;">📋</h1>
-      <h2 class="header-title" style="justify-content:center; color:var(--primary); font-size:1.8rem; margin-bottom:4px;">JNV Tarikhet</h2>
-      <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:32px;">Attendance Management Dashboard</p>
-      
+       =========================== -->
+  <div id="pinScreen" class="fullscreen-overlay" style="z-index:2000;">
+    <button class="icon-btn" id="pinThemeBtn" onclick="toggleTheme()" title="Toggle dark mode"
+      style="position:absolute;top:20px;right:20px;background:rgba(0,0,0,0.08);border-color:var(--input-border);color:var(--text-secondary);">🌙</button>
+
+    <div class="auth-card text-center" style="max-width:400px;">
+      <!-- Animated Logo Ring -->
+      <div class="pin-logo-wrap" style="margin-bottom:22px;">
+        <div class="pin-logo-ring"><div class="pin-logo-ring-inner">📋</div></div>
+      </div>
+
+      <h1 style="font-family:var(--font-heading); font-size:2rem; font-weight:800; color:var(--text-primary); letter-spacing:-0.5px; margin-bottom:4px;">JNV Tarikhet</h1>
+      <p style="color:var(--text-muted); font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:32px;">Attendance Dashboard</p>
+
       <div class="form-group text-left">
         <label class="form-label" for="pinInput">Admin Access PIN</label>
-        <input type="password" class="form-input" id="pinInput" maxlength="12" placeholder="••••" autocomplete="off" style="font-size:2rem; letter-spacing:8px; text-align:center; padding:16px;">
+        <input type="password" class="form-input" id="pinInput" maxlength="12" placeholder="••••"
+          autocomplete="off"
+          style="font-size:2rem;letter-spacing:10px;text-align:center;padding:16px;font-weight:800;">
       </div>
-      
-      <div class="alert alert-danger hidden" id="pinErr" style="margin-top:-10px; margin-bottom:16px;">❌ Wrong PIN. Please try again.</div>
-      
+
+      <div class="alert alert-danger hidden" id="pinErr" style="margin-top:-8px;margin-bottom:16px;">
+        ❌ Wrong PIN. Please try again.
+      </div>
+
       <button class="btn btn-primary" id="pinBtn">Open Dashboard &rarr;</button>
-      <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:24px; font-weight:500;">Powered by Supabase</div>
+
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:24px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">
+        Powered by <span style="color:var(--primary);">Supabase</span>
+      </div>
     </div>
   </div>
 
-  <!-- ===============================
+  <!-- ===========================
        DASHBOARD MAIN APP
-       =============================== -->
+       =========================== -->
   <div id="app" style="display:none;">
-    
-    <header class="app-header" style="z-index:100;">
+
+    <!-- Top Progress Bar -->
+    <div style="height:3px;width:100%;background:var(--input-border);position:fixed;top:0;z-index:300;">
+      <div id="refreshBar" style="height:100%;width:100%;transition:width 1s linear;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header" style="z-index:200;">
       <div class="header-branding">
-        <h1 class="header-title">📋 JNV Tarikhet Dashboard</h1>
-        <div class="header-subtitle">Administrative Staff View</div>
+        <h1 class="header-title">📋 JNV Tarikhet</h1>
+        <div class="header-subtitle">Administrative Dashboard</div>
       </div>
       <div class="header-actions">
-        <div style="text-align:right; margin-right:12px; font-size:0.75rem; font-family:var(--font-body); font-weight:600; opacity:0.9;">
-          <div id="hdrClock"></div>
-          <div><span style="display:inline-block;width:6px;height:6px;background:var(--success);border-radius:50%;margin-right:4px;"></span><span id="countdownLbl">Live</span></div>
+        <div class="header-right-info">
+          <div id="hdrClock" class="header-clock"></div>
+          <div><span class="live-dot"></span><span id="countdownLbl" style="font-size:0.72rem;">Live</span></div>
         </div>
-        <button class="icon-btn theme-toggle" id="appThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <button class="icon-btn" id="appThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
         <button class="icon-btn" onclick="openChangePinModal()" title="Change admin PIN">🔐</button>
         <button class="icon-btn" onclick="lockDashboard()" title="Lock Session">🔒</button>
       </div>
@@ -56,24 +75,24 @@
 
     <!-- Toolbar Filters -->
     <div class="toolbar">
-      <input type="date" id="dateSelect" class="form-input" style="width:auto; padding:8px; min-height:40px;" onchange="loadDaily()">
-      <div class="badge badge-success" style="font-size:0.85rem; padding:8px 12px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--primary);" id="dateDisplay">--/--/----</div>
-      
-      <select id="teacherFilter" class="form-select" style="width:auto; padding:8px; min-height:40px; margin-left:8px;" onchange="loadDaily()">
+      <input type="date" id="dateSelect" class="form-input" style="width:auto;padding:8px 12px;min-height:40px;font-size:0.9rem;" onchange="loadDaily()">
+      <div class="badge badge-primary" id="dateDisplay">--/--/----</div>
+
+      <select id="teacherFilter" class="form-select" style="width:auto;padding:8px 12px;min-height:40px;font-size:0.9rem;margin-left:4px;" onchange="loadDaily()">
         <option value="">All Teachers</option>
       </select>
-      
-      <button class="btn btn-primary" id="syncBtn" style="width:auto; padding:8px 16px; font-size:0.9rem;" onclick="loadDaily(true)">
+
+      <button class="btn btn-primary" id="syncBtn" style="width:auto;padding:8px 18px;font-size:0.88rem;" onclick="loadDaily(true)">
         <span id="syncIcon">↻</span> Refresh
       </button>
-      
-      <a href="index.html" class="btn btn-outline" style="width:auto; padding:8px 16px; font-size:0.9rem;">📝 Form View</a>
-      
-      <div class="badge" id="lastSync" style="margin-left:auto; background:transparent; border:1px solid var(--glass-border); color:var(--text-secondary); padding:6px 12px; font-size:0.75rem;">Not synced</div>
+
+      <a href="index.html" class="btn btn-outline" style="width:auto;padding:8px 18px;font-size:0.88rem;text-decoration:none;">📝 Form View</a>
+
+      <div id="lastSync" style="margin-left:auto;font-size:0.75rem;white-space:nowrap;padding:7px 14px;border-radius:20px;background:transparent;border:1px solid var(--glass-border);color:var(--text-muted);">Not synced</div>
     </div>
 
-    <!-- Main Tabs Navigation -->
-    <div class="tabs" style="position:sticky; top:134px; z-index:40;">
+    <!-- Tab Navigation -->
+    <div class="tabs" style="top:calc(var(--header-height) + 65px);">
       <button class="tab-btn active" onclick="switchTab('today',this)">📆 Today</button>
       <button class="tab-btn" onclick="switchTab('teachers',this)">👥 Teachers</button>
       <button class="tab-btn" onclick="switchTab('classes',this)">🏫 Classes</button>
@@ -81,35 +100,33 @@
       <button class="tab-btn" onclick="switchTab('errors',this)">⚠ Errors</button>
       <button class="tab-btn" onclick="switchTab('weekly',this);loadWeeklyTab()">📊 Weekly</button>
       <button class="tab-btn" onclick="switchTab('monthly',this);loadMonthlyTab()">📅 Monthly</button>
-      <button class="tab-btn" id="approvalsTabBtn" onclick="switchTab('approvals',this);loadApprovals()">🔑 Approvals <span id="pendingBadge" style="display:none; background:var(--danger); color:white; border-radius:12px; padding:2px 8px; font-size:0.7rem; margin-left:4px;"></span></button>
+      <button class="tab-btn" id="approvalsTabBtn" onclick="switchTab('approvals',this);loadApprovals()">
+        🔑 Approvals <span id="pendingBadge" style="display:none;"></span>
+      </button>
     </div>
 
-    <!-- ProgressBar auto-refresh -->
-    <div style="height:3px; width:100%; background:var(--input-border); position:fixed; top:0; z-index:200;">
-      <div id="refreshBar" style="height:100%; background:var(--secondary); transition:width 1s linear; width:100%;"></div>
-    </div>
+    <!-- Main Content -->
+    <div style="max-width:1400px;margin:0 auto;padding:24px 20px 60px;position:relative;z-index:1;">
 
-    <div class="glass-container" style="max-width:1400px; margin:0 auto; padding-top:24px;">
-      
       <!-- Missing Teachers Banner -->
-      <div class="alert alert-danger" id="missingBanner" style="display:none; flex-direction:column; align-items:flex-start;">
-        <div style="font-weight:700; margin-bottom:8px;">⚠️ Teachers Not Yet Submitted Today</div>
-        <div id="missingTags" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      <div class="alert" id="missingBanner" style="display:none;flex-direction:column;align-items:flex-start;background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border);border-radius:var(--radius-lg);margin-bottom:20px;">
+        <div style="font-weight:800;margin-bottom:10px;font-size:0.95rem;">⚠️ Teachers Not Yet Submitted Today</div>
+        <div id="missingTags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
       </div>
 
       <!-- KPI Grid -->
-      <div class="kpi-grid glass-card card-body" id="kpiGrid"></div>
+      <div class="kpi-grid" id="kpiGrid"></div>
 
-      <!-- ===============================
+      <!-- ===========================
            TAB PANES
-           =============================== -->
-           
+           =========================== -->
+
       <!-- TODAY -->
       <div class="tab-pane active" id="tab-today">
         <div class="glass-card mb-4">
-          <div class="card-header" style="justify-content:space-between; flex-wrap:wrap;">
+          <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;">
             <h3 class="card-title">Live Submissions</h3>
-            <input class="form-input" style="width:200px; padding:6px 12px; min-height:36px;" placeholder="🔍 Search..." oninput="filterTbl('todayTbl',this.value)">
+            <input class="form-input" style="width:220px;padding:7px 14px;min-height:38px;font-size:0.88rem;" placeholder="🔍 Search teacher, class…" oninput="filterTbl('todayTbl',this.value)">
           </div>
           <div class="table-responsive" id="todayBody"></div>
         </div>
@@ -122,9 +139,9 @@
       <!-- TEACHERS -->
       <div class="tab-pane" id="tab-teachers">
         <div class="glass-card">
-          <div class="card-header" style="justify-content:space-between; flex-wrap:wrap;">
+          <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;">
             <h3 class="card-title">Teacher Performance</h3>
-            <input class="form-input" style="width:200px; padding:6px 12px; min-height:36px;" placeholder="🔍 Search..." oninput="filterTbl('teacherTbl',this.value)">
+            <input class="form-input" style="width:220px;padding:7px 14px;min-height:38px;font-size:0.88rem;" placeholder="🔍 Search…" oninput="filterTbl('teacherTbl',this.value)">
           </div>
           <div class="table-responsive" id="teacherBody"></div>
         </div>
@@ -149,7 +166,7 @@
       <!-- ERRORS -->
       <div class="tab-pane" id="tab-errors">
         <div class="glass-card">
-          <div class="card-header"><h3 class="card-title">Math Errors</h3></div>
+          <div class="card-header"><h3 class="card-title">⚠ Math Errors</h3></div>
           <div class="table-responsive" id="errorBody"></div>
         </div>
       </div>
@@ -157,22 +174,27 @@
       <!-- WEEKLY -->
       <div class="tab-pane" id="tab-weekly">
         <div class="glass-card mb-4">
-          <div class="card-header" style="gap:12px; flex-wrap:wrap;">
+          <div class="card-header" style="gap:12px;flex-wrap:wrap;">
             <h3 class="card-title">📊 Weekly Report</h3>
-            <input type="date" id="weekStart" class="form-input" style="width:auto; padding:6px 12px; min-height:36px;" onchange="loadWeeklyTab()">
-            <div class="badge badge-success" style="font-size:0.8rem; background:var(--input-bg); color:var(--primary); padding:8px 12px;" id="weekDisplay">Week of --</div>
-            <button class="btn btn-outline" style="width:auto; padding:6px 12px;" onclick="shiftWeek(-1)">◀</button>
-            <button class="btn btn-outline" style="width:auto; padding:6px 12px;" onclick="shiftWeek(1)">▶</button>
+            <input type="date" id="weekStart" class="form-input" style="width:auto;padding:7px 12px;min-height:38px;font-size:0.88rem;" onchange="loadWeeklyTab()">
+            <div class="badge badge-primary" id="weekDisplay">Week of --</div>
+            <button class="btn btn-outline" style="width:auto;padding:7px 14px;font-size:0.88rem;" onclick="shiftWeek(-1)">◀ Prev</button>
+            <button class="btn btn-outline" style="width:auto;padding:7px 14px;font-size:0.88rem;" onclick="shiftWeek(1)">Next ▶</button>
           </div>
-          <div class="card-body kpi-grid" id="weeklyKpis" style="margin-bottom:0;"></div>
+          <div class="card-body kpi-grid" id="weeklyKpis" style="margin-bottom:0;padding:20px;"></div>
         </div>
         <div class="glass-card mb-4">
           <div class="card-header"><h3 class="card-title">Day-wise Trend</h3></div>
           <div class="card-body" id="weeklyDayBars"></div>
         </div>
         <div class="glass-card mb-4">
-          <div class="card-header"><h3 class="card-title">Teacher Summary</h3><input class="form-input" style="width:200px; padding:6px 12px; min-height:36px;" placeholder="🔍 Filter..." oninput="filterTbl('weeklyTbl',this.value)"></div>
-          <div class="table-responsive" id="weeklyTeacherBody"><div class="text-center" style="padding:40px; color:var(--text-secondary);">Select a week to view data.</div></div>
+          <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;">
+            <h3 class="card-title">Teacher Summary</h3>
+            <input class="form-input" style="width:200px;padding:7px 12px;min-height:38px;font-size:0.88rem;" placeholder="🔍 Filter…" oninput="filterTbl('weeklyTbl',this.value)">
+          </div>
+          <div class="table-responsive" id="weeklyTeacherBody">
+            <div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">Select a week to view data.</div></div>
+          </div>
         </div>
         <div class="glass-card">
           <div class="card-header"><h3 class="card-title">Class Summary</h3></div>
@@ -183,22 +205,27 @@
       <!-- MONTHLY -->
       <div class="tab-pane" id="tab-monthly">
         <div class="glass-card mb-4">
-          <div class="card-header" style="gap:12px; flex-wrap:wrap;">
+          <div class="card-header" style="gap:12px;flex-wrap:wrap;">
             <h3 class="card-title">📅 Monthly Report</h3>
-            <input type="month" id="monthSelect" class="form-input" style="width:auto; padding:6px 12px; min-height:36px;" onchange="loadMonthlyTab()">
-            <div class="badge badge-success" style="font-size:0.8rem; background:var(--input-bg); color:var(--primary); padding:8px 12px;" id="monthDisplay">----</div>
-            <button class="btn btn-outline" style="width:auto; padding:6px 12px;" onclick="shiftMonth(-1)">◀</button>
-            <button class="btn btn-outline" style="width:auto; padding:6px 12px;" onclick="shiftMonth(1)">▶</button>
+            <input type="month" id="monthSelect" class="form-input" style="width:auto;padding:7px 12px;min-height:38px;font-size:0.88rem;" onchange="loadMonthlyTab()">
+            <div class="badge badge-primary" id="monthDisplay">----</div>
+            <button class="btn btn-outline" style="width:auto;padding:7px 14px;font-size:0.88rem;" onclick="shiftMonth(-1)">◀ Prev</button>
+            <button class="btn btn-outline" style="width:auto;padding:7px 14px;font-size:0.88rem;" onclick="shiftMonth(1)">Next ▶</button>
           </div>
-          <div class="card-body kpi-grid" id="monthlyKpis" style="margin-bottom:0;"></div>
+          <div class="card-body kpi-grid" id="monthlyKpis" style="margin-bottom:0;padding:20px;"></div>
         </div>
         <div class="glass-card mb-4">
           <div class="card-header"><h3 class="card-title">Week-wise Trend</h3></div>
           <div class="card-body" id="monthlyWeekBars"></div>
         </div>
         <div class="glass-card mb-4">
-          <div class="card-header"><h3 class="card-title">Teacher Summary</h3><input class="form-input" style="width:200px; padding:6px 12px; min-height:36px;" placeholder="🔍 Filter..." oninput="filterTbl('monthlyTbl',this.value)"></div>
-          <div class="table-responsive" id="monthlyTeacherBody"><div class="text-center" style="padding:40px; color:var(--text-secondary);">Select a month to view data.</div></div>
+          <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;">
+            <h3 class="card-title">Teacher Summary</h3>
+            <input class="form-input" style="width:200px;padding:7px 12px;min-height:38px;font-size:0.88rem;" placeholder="🔍 Filter…" oninput="filterTbl('monthlyTbl',this.value)">
+          </div>
+          <div class="table-responsive" id="monthlyTeacherBody">
+            <div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Select a month to view data.</div></div>
+          </div>
         </div>
         <div class="glass-card mb-4">
           <div class="card-header"><h3 class="card-title">Class Summary</h3></div>
@@ -213,18 +240,18 @@
       <!-- APPROVALS -->
       <div class="tab-pane" id="tab-approvals">
         <div class="glass-card">
-          <div class="card-header" style="justify-content:space-between; flex-wrap:wrap;">
+          <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;">
             <h3 class="card-title">🔑 Teacher Account Approvals</h3>
-            <button class="btn btn-primary" style="font-size:0.85rem; padding:8px 16px; width:auto;" onclick="loadApprovals()">↻ Refresh</button>
+            <button class="btn btn-primary" style="font-size:0.85rem;padding:8px 18px;width:auto;" onclick="loadApprovals()">↻ Refresh</button>
           </div>
           <div class="card-body">
-            <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
-              <button class="btn btn-primary" id="fAll" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="setApprovalFilter('all',this)">All</button>
-              <button class="btn btn-outline" id="fPend" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="setApprovalFilter('pending',this)">⏳ Pending</button>
-              <button class="btn btn-outline" id="fApprv" style="width:auto; padding:6px 16px; font-size:0.85rem;" onclick="setApprovalFilter('approved',this)">✅ Approved</button>
+            <div style="display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap;">
+              <button class="filter-pill active" id="fAll"   onclick="setApprovalFilter('all',this)">All</button>
+              <button class="filter-pill"        id="fPend"  onclick="setApprovalFilter('pending',this)">⏳ Pending</button>
+              <button class="filter-pill"        id="fApprv" onclick="setApprovalFilter('approved',this)">✅ Approved</button>
             </div>
             <div id="approvalsBody">
-              <div class="text-center" style="padding:40px; color:var(--text-secondary);">Click the Approvals tab to load.</div>
+              <div class="empty-state"><div class="empty-state-icon">🔑</div><div class="empty-state-text">Click the Approvals tab to load.</div></div>
             </div>
           </div>
         </div>
@@ -233,68 +260,64 @@
     </div>
   </div>
 
-  <!-- ===============================
+  <!-- ===========================
        CHANGE PIN MODAL
-       =============================== -->
+       =========================== -->
   <div id="changePinModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)closeChangePinModal()">
-    <div class="modal-content" style="max-width:400px;" onclick="event.stopPropagation()">
-      <div class="card-title" style="justify-content:space-between; margin-bottom:16px;">
-        <span>🔐 Change Admin PIN</span>
-        <button class="icon-btn" style="background:transparent; color:var(--text-secondary); border:none;" onclick="closeChangePinModal()">✕</button>
+    <div class="modal-content" style="max-width:420px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">🔐 Change Admin PIN</div>
+        <button class="modal-close" onclick="closeChangePinModal()">✕</button>
       </div>
-      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:24px;">Enter your current PIN to confirm identity, then set a new encrypted PIN.</p>
-      
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;line-height:1.6;">Enter your current PIN to confirm identity, then set a new encrypted PIN.</p>
+
       <div class="form-group">
         <label class="form-label">Current PIN</label>
-        <input type="password" id="cpCurrent" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem; letter-spacing:6px; text-align:center;" oninput="document.getElementById('cpCurrentErr').textContent=''">
-        <div id="cpCurrentErr" style="color:var(--danger); font-size:0.75rem; font-weight:600; margin-top:4px;"></div>
+        <input type="password" id="cpCurrent" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem;letter-spacing:8px;text-align:center;" oninput="document.getElementById('cpCurrentErr').textContent=''">
+        <div id="cpCurrentErr" style="color:var(--danger);font-size:0.75rem;font-weight:600;margin-top:5px;"></div>
       </div>
-      
       <div class="form-group">
         <label class="form-label">New PIN</label>
-        <input type="password" id="cpNew" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem; letter-spacing:6px; text-align:center;" oninput="document.getElementById('cpErr').textContent=''">
+        <input type="password" id="cpNew" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem;letter-spacing:8px;text-align:center;" oninput="document.getElementById('cpErr').textContent=''">
       </div>
-      
       <div class="form-group">
         <label class="form-label">Confirm New PIN</label>
-        <input type="password" id="cpConfirm" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem; letter-spacing:6px; text-align:center;" oninput="document.getElementById('cpErr').textContent=''" onkeydown="if(event.key==='Enter')saveNewPin()">
+        <input type="password" id="cpConfirm" class="form-input" maxlength="12" placeholder="••••" style="font-size:1.5rem;letter-spacing:8px;text-align:center;" oninput="document.getElementById('cpErr').textContent=''" onkeydown="if(event.key==='Enter')saveNewPin()">
       </div>
-      
-      <div id="cpErr" style="color:var(--danger); font-size:0.85rem; font-weight:600; margin-bottom:12px; min-height:20px;"></div>
-      <div id="cpSuccess" class="alert alert-success hidden" style="background:var(--success-bg); color:var(--success); border:1px solid var(--success); font-weight:600; padding:12px; margin-bottom:12px;"></div>
-      
+
+      <div id="cpErr" style="color:var(--danger);font-size:0.85rem;font-weight:600;margin-bottom:12px;min-height:20px;"></div>
+      <div id="cpSuccess" class="alert alert-success hidden"></div>
+
       <button class="btn btn-primary" id="cpSaveBtn" onclick="saveNewPin()">💾 Save New PIN</button>
     </div>
   </div>
 
-  <!-- ===============================
+  <!-- ===========================
        EDIT TEACHER MODAL
-       =============================== -->
+       =========================== -->
   <div id="editModal" class="modal-backdrop" style="display:none;" onclick="closeModal(event)">
-    <div class="modal-content" style="max-width:560px;" onclick="event.stopPropagation()">
-      <div class="card-title" style="justify-content:space-between; margin-bottom:12px;">
-        <span>✏️ Edit Teacher Profile</span>
-        <button class="icon-btn" style="background:transparent; color:var(--text-secondary); border:none;" onclick="closeModal()">✕</button>
+    <div class="modal-content" style="max-width:580px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">✏️ Edit Teacher Profile</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
-      <div style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:16px;">Editing: <strong id="modalTeacherName" style="color:var(--primary);"></strong></div>
-      
+      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:20px;">Editing: <strong id="modalTeacherName" style="color:var(--primary);"></strong></p>
+
       <div class="form-group">
-        <label class="form-label" style="margin-top:20px;">Classes Teaches</label>
-        <div class="chip-group" id="modalClasses" style="max-height:180px; overflow-y:auto; border:1px solid var(--input-border); padding:8px; border-radius:var(--radius-sm); background:var(--input-bg);"></div>
+        <label class="form-label">Classes Teaches</label>
+        <div class="chip-group" id="modalClasses" style="max-height:180px;overflow-y:auto;border:1.5px solid var(--input-border);padding:10px;border-radius:var(--radius-md);background:var(--input-bg);gap:6px;"></div>
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Subjects Teaches</label>
-        <div class="chip-group" id="modalSubjects" style="max-height:180px; overflow-y:auto; border:1px solid var(--input-border); padding:8px; border-radius:var(--radius-sm); background:var(--input-bg);"></div>
+        <div class="chip-group" id="modalSubjects" style="max-height:180px;overflow-y:auto;border:1.5px solid var(--input-border);padding:10px;border-radius:var(--radius-md);background:var(--input-bg);gap:6px;"></div>
       </div>
-      
-      <div id="modalError" style="color:var(--danger); font-size:0.85rem; margin-top:12px; font-weight:600;"></div>
+
+      <div id="modalError" style="color:var(--danger);font-size:0.85rem;margin-top:12px;font-weight:600;"></div>
       <button class="btn btn-primary mt-4" id="modalSaveBtn" onclick="saveProfile()">💾 Save Changes</button>
     </div>
   </div>
 
-  <!-- Dashboard Script that we extracted -->
   <script src="dashboard.js"></script>
-
 </body>
 </html>
