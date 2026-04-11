@@ -1376,6 +1376,8 @@
     // ═══════════════════════════════════════════════════════════════
     db.auth.onAuthStateChange(async (event, session) => {
       if (session && session.user) {
+        // Skip reload on token refresh if already logged in — avoids spurious sign-out loops
+        if (event === 'TOKEN_REFRESHED' && currentProfile) return;
         await loadProfile(session.user);
       } else if (event === 'SIGNED_OUT' || (!session && event === 'INITIAL_SESSION')) {
         currentProfile = null;
@@ -1412,6 +1414,13 @@
         }
 
         if (error || !profile) {
+          // Distinguish transient network/RLS error vs truly missing profile
+          if (error && error.code !== 'PGRST116') {
+            // Transient error — don't sign out, just show auth screen so user can retry
+            showScreen('auth');
+            document.getElementById('loginError').textContent = '⚠️ Could not load your profile. Please sign in again.';
+            return;
+          }
           // Profile truly missing — sign out
           await db.auth.signOut();
           showScreen('auth');
@@ -1440,6 +1449,11 @@
       document.getElementById('authScreen').classList.toggle('hidden', name !== 'auth');
       document.getElementById('waitScreen').classList.toggle('hidden', name !== 'wait');
       document.getElementById('mainContent').classList.toggle('hidden', name !== 'form');
+      // Always reset login button when returning to auth screen
+      if (name === 'auth') {
+        const btn = document.getElementById('loginBtn');
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Sign In'; }
+      }
     }
 
     function showForm(profile) {
