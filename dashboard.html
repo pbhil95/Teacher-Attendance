@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 
 <head>
@@ -7,14 +7,14 @@
   <meta name="theme-color" content="#1a3a5c" id="themeColor">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="JNV Tarikhet Attendance Dashboard â€” Admin View">
-  <title>Dashboard â€” JNV Tarikhet</title>
+  <meta name="description" content="JNV Tarikhet Attendance Dashboard — Admin View">
+  <title>Dashboard — JNV Tarikhet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
-    /* â”€â”€ LIGHT THEME â”€â”€ */
+    /* ── LIGHT THEME ── */
     :root,
     [data-theme="light"] {
       --ink: #1c2434;
@@ -45,7 +45,7 @@
       --kpi-red: #fdf0ee;
     }
 
-    /* â”€â”€ DARK THEME â”€â”€ */
+    /* ── DARK THEME ── */
     [data-theme="dark"] {
       --ink: #e2e8f0;
       --blue: #60a5fa;
@@ -92,7 +92,7 @@
       -webkit-text-size-adjust: 100%;
     }
 
-    /* â”€â”€ PIN SCREEN â”€â”€ */
+    /* ── PIN SCREEN ── */
     #pinScreen {
       min-height: 100vh;
       display: flex;
@@ -185,41 +185,6 @@
       opacity: .88;
     }
 
-    .pin-cred {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      color: var(--ink);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s, background .3s;
-      -webkit-appearance: none;
-      appearance: none;
-      background: var(--card);
-      margin-bottom: 12px;
-    }
-
-    .pin-cred:focus {
-      border-color: var(--blue2);
-      box-shadow: 0 0 0 4px rgba(36, 113, 163, .12);
-    }
-
-    .pin-help,
-    .pin-session {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      margin: 0 0 14px;
-    }
-
-    .pin-session {
-      display: none;
-      margin-top: -2px;
-      margin-bottom: 14px;
-      font-weight: 600;
-    }
-
     .pin-err {
       color: var(--red);
       font-size: 13px;
@@ -250,12 +215,12 @@
       justify-content: center;
     }
 
-    /* â”€â”€ APP â”€â”€ */
+    /* ── APP ── */
     #app {
       display: none;
     }
 
-    /* â”€â”€ HEADER â”€â”€ */
+    /* ── HEADER ── */
     .header {
       background: linear-gradient(135deg, var(--hdr1) 0%, var(--hdr2) 58%, var(--hdr3) 100%);
       color: #fff;
@@ -335,7 +300,7 @@
       }
     }
 
-    /* â”€â”€ REFRESH BAR â”€â”€ */
+    /* ── REFRESH BAR ── */
     .refresh-bar {
       height: 3px;
       background: var(--border);
@@ -349,7 +314,7 @@
       transition: width 1s linear;
     }
 
-    /* â”€â”€ TOOLBAR â”€â”€ */
+    /* ── TOOLBAR ── */
     .toolbar {
       background: var(--card);
       border-bottom: 1px solid var(--border);
@@ -443,7 +408,7 @@
       min-height: 42px;
     }
 
-    /* â”€â”€ TABS â”€â”€ */
+    /* ── TABS ── */
     .tabs {
       display: flex;
       gap: 1px;
@@ -481,7 +446,7 @@
       border-bottom-color: var(--blue);
     }
 
-    /* â”€â”€ LAYOUT â”€â”€ */
+    /* ── LAYOUT ── */
     .container {
       max-width: 1300px;
       margin: 0 auto;
@@ -496,7 +461,7 @@
       display: block;
     }
 
-    /* â”€â”€ KPI â”€â”€ */
+    /* ── KPI ── */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
@@ -557,7 +522,7 @@
       letter-spacing: .7px;
     }
 
-    /* â”€â”€ CARDS â”€â”€ */
+    /* ── CARDS ── */
     .card {
       background: var(--card);
       border-radius: var(--r);
@@ -591,7 +556,7 @@
       padding: 12px;
     }
 
-    /* â”€â”€ TABLES â”€â”€ */
+    /* ── TABLES ── */
     .tbl-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -630,7 +595,7 @@
       background: var(--tbl-row);
     }
 
-    /* â”€â”€ PILLS / BARS â”€â”€ */
+    /* ── PILLS / BARS ── */
     .pill {
       display: inline-block;
       padding: 2px 9px;
@@ -687,7 +652,7 @@
       background: var(--red);
     }
 
-    /* â”€â”€ HEATMAP â”€â”€ */
+    /* ── HEATMAP ── */
     .heatmap-grid {
       display: grid;
       gap: 3px;
@@ -743,7 +708,7 @@
       font-size: 10px;
     }
 
-    /* â”€â”€ MISC â”€â”€ */
+    /* ── MISC ── */
     .search-box {
       padding: 7px 11px;
       border: 1px solid var(--border);
@@ -829,7 +794,7 @@
       outline: none;
     }
 
-    /* â”€â”€ MISSING BANNER â”€â”€ */
+    /* ── MISSING BANNER ── */
     .missing-banner {
       background: var(--kpi-red);
       border: 1px solid var(--red);
@@ -863,7 +828,7 @@
       font-weight: 600;
     }
 
-    /* â”€â”€ TEACHER APPROVALS TAB â”€â”€ */
+    /* ── TEACHER APPROVALS TAB ── */
     .approval-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -992,7 +957,7 @@
       border-color: var(--blue);
     }
 
-    /* â”€â”€ EDIT MODAL â”€â”€ */
+    /* ── EDIT MODAL ── */
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -1090,7 +1055,7 @@
     }
 
     .mcheck.on .mcheck-dot { background: var(--blue2); border-color: var(--blue2); color: #fff; }
-    .mcheck.on .mcheck-dot::after { content: 'âœ“'; }
+    .mcheck.on .mcheck-dot::after { content: '✓'; }
 
     .modal-save-btn {
       width: 100%;
@@ -1111,7 +1076,7 @@
     .modal-save-btn:hover { opacity: .9; }
     .modal-save-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* â”€â”€ RESPONSIVE â”€â”€ */
+    /* ── RESPONSIVE ── */
     button,
     a,
     select,
@@ -1270,24 +1235,16 @@
 
   <!-- PIN SCREEN -->
   <div id="pinScreen">
-    <button class="pin-theme" id="pinThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">ðŸŒ™</button>
+    <button class="pin-theme" id="pinThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
     <div class="pin-card">
-      <div class="pin-logo">ðŸ“‹</div>
+      <div class="pin-logo">📋</div>
       <h1>JNV Tarikhet</h1>
       <div class="pin-sub">Attendance Management Dashboard</div>
-      <div id="adminAuthFields">
-        <label class="pin-lbl" for="adminEmail">Admin Email</label>
-        <input type="email" class="pin-cred" id="adminEmail" autocomplete="username">
-        <label class="pin-lbl" for="adminPassword">Admin Password</label>
-        <input type="password" class="pin-cred" id="adminPassword" autocomplete="current-password">
-      </div>
-      <div class="pin-session" id="pinSession"></div>
-      <div class="pin-help" id="pinHelp">Sign in with an approved admin account, then enter the dashboard PIN.</div>
-      <label class="pin-lbl" for="pinInput" id="pinLabel">Dashboard PIN</label>
-      <input type="password" class="pin-inp" id="pinInput" maxlength="8" placeholder="â€¢â€¢â€¢â€¢" autocomplete="off">
-      <button class="pin-btn" id="pinBtn">Open Dashboard â†’</button>
-      <div class="pin-err" id="pinErr">âŒ Wrong PIN. Please try again.</div>
-      <div class="pin-foot">Powered by Supabase â€¢ GitHub Pages Edition</div>
+      <label class="pin-lbl" for="pinInput">Admin Access PIN</label>
+      <input type="password" class="pin-inp" id="pinInput" maxlength="8" placeholder="••••" autocomplete="off">
+      <button class="pin-btn" id="pinBtn">Open Dashboard →</button>
+      <div class="pin-err" id="pinErr">❌ Wrong PIN. Please try again.</div>
+      <div class="pin-foot">Powered by Supabase • GitHub Pages Edition</div>
     </div>
   </div>
 
@@ -1295,19 +1252,17 @@
   <div id="app">
     <div class="header">
       <div>
-        <h1>ðŸ“‹ JNV Tarikhet</h1>
+        <h1>📋 JNV Tarikhet</h1>
         <p>Staff Class Attendance Dashboard</p>
       </div>
       <div class="hdr-r">
         <div class="hdr-info">
           <div id="hdrClock"></div>
-          <div id="hdrAdmin" style="font-size:11px;opacity:.8"></div>
           <div><span class="live-dot"></span><span id="countdownLbl" style="font-size:11px">Live</span></div>
         </div>
-        <button class="hdr-theme" id="appThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">ðŸŒ™</button>
-        <button class="lock-btn" onclick="openChangePinModal()" title="Change admin PIN">ðŸ” PIN</button>
-        <button class="lock-btn" onclick="logoutDashboard()" title="Sign out admin">ðŸšª Logout</button>
-        <button class="lock-btn" onclick="lockDashboard()">ðŸ”’ Lock</button>
+        <button class="hdr-theme" id="appThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <button class="lock-btn" onclick="openChangePinModal()" title="Change admin PIN">🔐 PIN</button>
+        <button class="lock-btn" onclick="lockDashboard()">🔒 Lock</button>
       </div>
     </div>
     <div class="refresh-bar">
@@ -1321,26 +1276,26 @@
         <option value="">All Teachers</option>
       </select>
       <button class="btn btn-primary" id="syncBtn" onclick="loadDaily(true)">
-        <span id="syncIcon">â†»</span> Refresh
+        <span id="syncIcon">↻</span> Refresh
       </button>
-      <a href="index.html" class="btn btn-form">ðŸ“ Form</a>
+      <a href="index.html" class="btn btn-form">📝 Form</a>
       <span class="badge" id="lastSync">Not synced</span>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('today',this)">ðŸ“† Today</button>
-      <button class="tab-btn" onclick="switchTab('teachers',this)">ðŸ‘¥ Teachers</button>
-      <button class="tab-btn" onclick="switchTab('classes',this)">ðŸ« Classes</button>
-      <button class="tab-btn" onclick="switchTab('heatmap',this)">ðŸ”¥ Heatmap</button>
-      <button class="tab-btn" onclick="switchTab('errors',this)">âš  Errors</button>
-      <button class="tab-btn" onclick="switchTab('weekly',this);loadWeeklyTab()">ðŸ“Š Weekly</button>
-      <button class="tab-btn" onclick="switchTab('monthly',this);loadMonthlyTab()">ðŸ“… Monthly</button>
-      <button class="tab-btn" id="approvalsTabBtn" onclick="switchTab('approvals',this);loadApprovals()">ðŸ”‘ Approvals <span id="pendingBadge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:3px"></span></button>
+      <button class="tab-btn active" onclick="switchTab('today',this)">📆 Today</button>
+      <button class="tab-btn" onclick="switchTab('teachers',this)">👥 Teachers</button>
+      <button class="tab-btn" onclick="switchTab('classes',this)">🏫 Classes</button>
+      <button class="tab-btn" onclick="switchTab('heatmap',this)">🔥 Heatmap</button>
+      <button class="tab-btn" onclick="switchTab('errors',this)">⚠ Errors</button>
+      <button class="tab-btn" onclick="switchTab('weekly',this);loadWeeklyTab()">📊 Weekly</button>
+      <button class="tab-btn" onclick="switchTab('monthly',this);loadMonthlyTab()">📅 Monthly</button>
+      <button class="tab-btn" id="approvalsTabBtn" onclick="switchTab('approvals',this);loadApprovals()">🔑 Approvals <span id="pendingBadge" style="display:none;background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:3px"></span></button>
     </div>
 
     <div class="container">
       <div class="missing-banner" id="missingBanner">
-        <h4>âš ï¸ Teachers Not Yet Submitted Today</h4>
+        <h4>⚠️ Teachers Not Yet Submitted Today</h4>
         <div class="missing-tags" id="missingTags"></div>
       </div>
       <div class="kpi-grid" id="kpiGrid"></div>
@@ -1350,7 +1305,7 @@
         <div class="card">
           <div class="card-head">
             <h3>Live Submissions</h3>
-            <input class="search-box" placeholder="ðŸ” Search..." oninput="filterTbl('todayTbl',this.value)">
+            <input class="search-box" placeholder="🔍 Search..." oninput="filterTbl('todayTbl',this.value)">
           </div>
           <div class="card-body tbl-wrap" id="todayBody"></div>
         </div>
@@ -1367,7 +1322,7 @@
         <div class="card">
           <div class="card-head">
             <h3>Teacher Performance</h3>
-            <input class="search-box" placeholder="ðŸ” Filter..." oninput="filterTbl('teacherTbl',this.value)">
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('teacherTbl',this.value)">
           </div>
           <div class="card-body tbl-wrap" id="teacherBody"></div>
         </div>
@@ -1387,7 +1342,7 @@
       <div class="tab-pane" id="tab-heatmap">
         <div class="card">
           <div class="card-head">
-            <h3>Teacher Ã— Period Heatmap</h3>
+            <h3>Teacher × Period Heatmap</h3>
           </div>
           <div class="card-body" id="heatmapBody"></div>
         </div>
@@ -1407,12 +1362,12 @@
       <div class="tab-pane" id="tab-weekly">
         <div class="card">
           <div class="card-head">
-            <h3>ðŸ“Š Weekly Report</h3>
+            <h3>📊 Weekly Report</h3>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <input type="date" id="weekStart" class="date-input" onchange="loadWeeklyTab()">
               <span class="date-chip" id="weekDisplay">Week of --</span>
-              <button class="expand-btn" onclick="shiftWeek(-1)">â—€</button>
-              <button class="expand-btn" onclick="shiftWeek(1)">â–¶</button>
+              <button class="expand-btn" onclick="shiftWeek(-1)">◀</button>
+              <button class="expand-btn" onclick="shiftWeek(1)">▶</button>
             </div>
           </div>
           <div class="card-body" id="weeklyKpis"></div>
@@ -1426,11 +1381,11 @@
         <div class="card">
           <div class="card-head">
             <h3>Teacher Summary</h3>
-            <input class="search-box" placeholder="ðŸ” Filter..." oninput="filterTbl('weeklyTbl',this.value)">
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('weeklyTbl',this.value)">
           </div>
           <div class="card-body tbl-wrap" id="weeklyTeacherBody">
             <div class="empty">
-              <div class="empty-icon">ðŸ“Š</div>Select a week above.
+              <div class="empty-icon">📊</div>Select a week above.
             </div>
           </div>
         </div>
@@ -1446,12 +1401,12 @@
       <div class="tab-pane" id="tab-monthly">
         <div class="card">
           <div class="card-head">
-            <h3>ðŸ“… Monthly Report</h3>
+            <h3>📅 Monthly Report</h3>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <input type="month" id="monthSelect" class="date-input" onchange="loadMonthlyTab()">
               <span class="date-chip" id="monthDisplay">----</span>
-              <button class="expand-btn" onclick="shiftMonth(-1)">â—€</button>
-              <button class="expand-btn" onclick="shiftMonth(1)">â–¶</button>
+              <button class="expand-btn" onclick="shiftMonth(-1)">◀</button>
+              <button class="expand-btn" onclick="shiftMonth(1)">▶</button>
             </div>
           </div>
           <div class="card-body" id="monthlyKpis"></div>
@@ -1465,11 +1420,11 @@
         <div class="card">
           <div class="card-head">
             <h3>Teacher Summary</h3>
-            <input class="search-box" placeholder="ðŸ” Filter..." oninput="filterTbl('monthlyTbl',this.value)">
+            <input class="search-box" placeholder="🔍 Filter..." oninput="filterTbl('monthlyTbl',this.value)">
           </div>
           <div class="card-body tbl-wrap" id="monthlyTeacherBody">
             <div class="empty">
-              <div class="empty-icon">ðŸ“…</div>Select a month above.
+              <div class="empty-icon">📅</div>Select a month above.
             </div>
           </div>
         </div>
@@ -1491,17 +1446,17 @@
       <div class="tab-pane" id="tab-approvals">
         <div class="card">
           <div class="card-head">
-            <h3>ðŸ”‘ Teacher Account Approvals</h3>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 12px" onclick="loadApprovals()">â†» Refresh</button>
+            <h3>🔑 Teacher Account Approvals</h3>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 12px" onclick="loadApprovals()">↻ Refresh</button>
           </div>
           <div class="card-body">
             <div class="approval-filter-bar">
               <button class="approval-filter-btn active" id="fAll"   onclick="setApprovalFilter('all',this)">All</button>
-              <button class="approval-filter-btn"        id="fPend"  onclick="setApprovalFilter('pending',this)">â³ Pending</button>
-              <button class="approval-filter-btn"        id="fApprv" onclick="setApprovalFilter('approved',this)">âœ… Approved</button>
+              <button class="approval-filter-btn"        id="fPend"  onclick="setApprovalFilter('pending',this)">⏳ Pending</button>
+              <button class="approval-filter-btn"        id="fApprv" onclick="setApprovalFilter('approved',this)">✅ Approved</button>
             </div>
             <div id="approvalsBody">
-              <div class="empty"><div class="empty-icon">ðŸ”‘</div>Click the Approvals tab to load.</div>
+              <div class="empty"><div class="empty-icon">🔑</div>Click the Approvals tab to load.</div>
             </div>
           </div>
         </div>
@@ -1513,43 +1468,43 @@
   <div id="changePinModal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)closeChangePinModal()">
     <div class="modal-card" style="max-width:360px" onclick="event.stopPropagation()">
       <div class="modal-title">
-        <span>ðŸ” Change Admin PIN</span>
-        <button class="modal-close" onclick="closeChangePinModal()">âœ•</button>
+        <span>🔐 Change Admin PIN</span>
+        <button class="modal-close" onclick="closeChangePinModal()">✕</button>
       </div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
         Enter your current PIN to confirm identity, then set a new PIN.
-        The new PIN hash will be stored in Supabase for authenticated admins only.
+        The new PIN will be saved in your browser.
       </p>
       <div style="margin-bottom:12px">
         <label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Current PIN</label>
-        <input type="password" id="cpCurrent" maxlength="12" placeholder="â€¢â€¢â€¢â€¢"
+        <input type="password" id="cpCurrent" maxlength="12" placeholder="••••"
           style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:1.2rem;letter-spacing:6px;text-align:center;background:var(--card);color:var(--ink);outline:none;font-family:var(--fb);transition:border-color .2s"
           oninput="document.getElementById('cpCurrentErr').textContent=''">
         <div id="cpCurrentErr" style="color:var(--red);font-size:11px;margin-top:4px;min-height:14px"></div>
       </div>
       <div style="margin-bottom:12px">
         <label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">New PIN</label>
-        <input type="password" id="cpNew" maxlength="12" placeholder="â€¢â€¢â€¢â€¢"
+        <input type="password" id="cpNew" maxlength="12" placeholder="••••"
           style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:1.2rem;letter-spacing:6px;text-align:center;background:var(--card);color:var(--ink);outline:none;font-family:var(--fb);transition:border-color .2s"
           oninput="document.getElementById('cpErr').textContent=''">
       </div>
       <div style="margin-bottom:12px">
         <label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Confirm New PIN</label>
-        <input type="password" id="cpConfirm" maxlength="12" placeholder="â€¢â€¢â€¢â€¢"
+        <input type="password" id="cpConfirm" maxlength="12" placeholder="••••"
           style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:1.2rem;letter-spacing:6px;text-align:center;background:var(--card);color:var(--ink);outline:none;font-family:var(--fb);transition:border-color .2s"
           onkeydown="if(event.key==='Enter')saveNewPin()"
           oninput="document.getElementById('cpErr').textContent=''">
       </div>
       <div id="cpErr" style="color:var(--red);font-size:12px;font-weight:600;margin-bottom:8px;min-height:16px"></div>
       <div id="cpSuccess" style="color:var(--ok);font-size:12px;font-weight:600;margin-bottom:8px;min-height:16px;background:var(--green-light,#eafaf1);border-radius:8px;padding:0;display:none"></div>
-      <button class="modal-save-btn" id="cpSaveBtn" onclick="saveNewPin()">ðŸ’¾ Save New PIN</button>
+      <button class="modal-save-btn" id="cpSaveBtn" onclick="saveNewPin()">💾 Save New PIN</button>
     </div>
   </div>
   <div id="editModal" class="modal-backdrop" style="display:none" onclick="closeModal(event)">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div class="modal-title">
-        <span>âœï¸ Edit Teacher Profile</span>
-        <button class="modal-close" onclick="closeModal()">âœ•</button>
+        <span>✏️ Edit Teacher Profile</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Editing: <strong id="modalTeacherName" style="color:var(--blue)"></strong></div>
       <div class="modal-section-lbl">Classes This Teacher Teaches</div>
@@ -1557,27 +1512,32 @@
       <div class="modal-section-lbl">Subjects This Teacher Teaches</div>
       <div class="modal-check-grid" id="modalSubjects"></div>
       <div id="modalError" style="color:var(--red);font-size:12px;margin-top:10px;min-height:16px"></div>
-      <button class="modal-save-btn" id="modalSaveBtn" onclick="saveProfile()">ðŸ’¾ Save Changes</button>
+      <button class="modal-save-btn" id="modalSaveBtn" onclick="saveProfile()">💾 Save Changes</button>
     </div>
   </div>
 
   <!-- Supabase JS (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ═══════════════════════════════════════════════════════════════
     //  STEP 1: Set your Supabase project details
-    //  Get from: supabase.com â†’ your project â†’ Settings â†’ API
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    //  Get from: supabase.com → your project → Settings → API
+    // ═══════════════════════════════════════════════════════════════
     const SUPABASE_URL = 'https://eqxyrunzwsmscifxodbc.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxeHlydW56d3Ntc2NpZnhvZGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MDUwMDQsImV4cCI6MjA5MTQ4MTAwNH0.zT8X7aw_N88wYEHnzp78yoN3J3yY9qVQHE5OeZbNiVM';
-    const INDEX_URL = new URL('index.html', window.location.href).href;
 
-    // â”€â”€ DASHBOARD PIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── DASHBOARD PIN ─────────────────────────────────────────────
     // PIN hash is fetched from Supabase admin_settings table.
-    // The actual PIN is never stored anywhere â€” only its SHA-256 hash.
+    // The actual PIN is never stored anywhere — only its SHA-256 hash.
     let cachedPinHash = null;  // populated on first login attempt
 
-    // â”€â”€ CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Brute-force protection state
+    let pinFailCount = 0;
+    const PIN_MAX_FAILS = 5;
+    const PIN_LOCKOUT_MS = 30_000; // 30 seconds
+    let pinLockedUntil = 0;
+
+    // ── CONFIG ────────────────────────────────────────────────────
     const TEACHERS = [
       "TGT Computer Science", "Librarian", "PET F", "PET M",
       "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
@@ -1594,38 +1554,13 @@
     const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
     const AUTO_REFRESH_SEC = 60;
 
-    // â”€â”€ SUPABASE CLIENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── SUPABASE CLIENT ───────────────────────────────────────────
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    function esc(value) {
-      return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function enc(value) {
-      return encodeURIComponent(String(value == null ? '' : value));
-    }
-
-    function normalizeList(value) {
-      if (Array.isArray(value)) return value;
-      if (typeof value === 'string') {
-        return value
-          .replace(/^\{|\}$/g, '')
-          .split(',')
-          .map(item => item.trim().replace(/^"|"$/g, ''))
-          .filter(Boolean);
-      }
-      return [];
-    }
-
-    // â”€â”€ PIN CRYPTO HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── PIN CRYPTO HELPERS ────────────────────────────────────────
     // Uses the built-in Web Crypto API (SHA-256).
-    // The raw PIN is NEVER stored or logged â€” only its one-way hash.
+    // The raw PIN is NEVER stored or logged — only its one-way hash.
     async function hashPin(pin) {
       const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
       return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -1646,18 +1581,39 @@
       return cachedPinHash;
     }
 
-    // â”€â”€ APP STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── APP STATE ─────────────────────────────────────────────────
     let countdownSec = AUTO_REFRESH_SEC;
     let refreshTimer = null;
-    let adminUser = null;
-    let dashboardUnlocked = false;
-    let currentAdminProfile = null;
+
+    // ── INACTIVITY AUTO-LOCK ──────────────────────────────────────
+    const INACTIVITY_MS = 30 * 60 * 1000; // 30 minutes
+    let inactivityTimer = null;
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(lockDashboard, INACTIVITY_MS);
+    }
+
+    function startInactivityWatch() {
+      ['mousemove', 'keydown', 'click', 'touchstart'].forEach(ev =>
+        document.addEventListener(ev, resetInactivityTimer, { passive: true, capture: true })
+      );
+      resetInactivityTimer();
+    }
+
+    function stopInactivityWatch() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+      ['mousemove', 'keydown', 'click', 'touchstart'].forEach(ev =>
+        document.removeEventListener(ev, resetInactivityTimer, { capture: true })
+      );
+    }
 
 
-    // â”€â”€ DARK MODE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── DARK MODE ─────────────────────────────────────────────────
     function applyTheme(t) {
       document.documentElement.setAttribute('data-theme', t);
-      const icon = t === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
+      const icon = t === 'dark' ? '☀️' : '🌙';
       ['pinThemeBtn', 'appThemeBtn'].forEach(id => {
         const el = document.getElementById(id); if (el) el.textContent = icon;
       });
@@ -1669,7 +1625,7 @@
     }
     applyTheme(localStorage.getItem('theme') || 'light');
 
-    // â”€â”€ CLOCK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── CLOCK ─────────────────────────────────────────────────────
     setInterval(() => {
       const el = document.getElementById('hdrClock');
       if (!el) return;
@@ -1678,7 +1634,7 @@
         '  ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
     }, 1000);
 
-    // â”€â”€ AUTO-REFRESH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── AUTO-REFRESH ──────────────────────────────────────────────
     function startAutoRefresh() {
       stopAutoRefresh();
       countdownSec = AUTO_REFRESH_SEC;
@@ -1695,113 +1651,7 @@
       if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
     }
 
-    function setPinError(message) {
-      const err = document.getElementById('pinErr');
-      if (!message) {
-        err.style.display = 'none';
-        err.textContent = '';
-        return;
-      }
-      err.textContent = message;
-      err.style.display = 'block';
-    }
-
-    function updateAdminUi() {
-      const hasSession = !!adminUser;
-      document.getElementById('adminAuthFields').classList.toggle('hidden', hasSession);
-      const sessionEl = document.getElementById('pinSession');
-      if (hasSession) {
-        const label = currentAdminProfile?.name || adminUser.email || 'Admin';
-        sessionEl.textContent = 'Signed in as ' + label;
-        sessionEl.style.display = 'block';
-        document.getElementById('pinHelp').textContent = 'Admin session found. Enter the dashboard PIN to continue.';
-      } else {
-        sessionEl.style.display = 'none';
-        sessionEl.textContent = '';
-        document.getElementById('pinHelp').textContent = 'Sign in with an approved admin account, then enter the dashboard PIN.';
-      }
-      document.getElementById('hdrAdmin').textContent = hasSession ? 'Admin: ' + (currentAdminProfile?.name || adminUser.email || '') : '';
-    }
-
-    async function fetchAdminSession() {
-      const { data: { session } } = await db.auth.getSession();
-      return session?.user || null;
-    }
-
-    async function loadAdminIdentity(user) {
-      const { data: adminRow, error: adminErr } = await db
-        .from('admin_users')
-        .select('user_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      if (adminErr) throw adminErr;
-      if (!adminRow) return false;
-
-      const { data: profile, error: profileErr } = await db
-        .from('teacher_profiles')
-        .select('id,name,email')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (profileErr && profileErr.code !== 'PGRST116') throw profileErr;
-
-      adminUser = user;
-      currentAdminProfile = profile || { id: user.id, name: user.email || 'Admin', email: user.email || '' };
-      updateAdminUi();
-      return true;
-    }
-
-    async function ensureAdminSession() {
-      if (adminUser) return adminUser;
-
-      const existingUser = await fetchAdminSession();
-      if (existingUser && await loadAdminIdentity(existingUser)) {
-        return existingUser;
-      }
-      if (existingUser) {
-        await db.auth.signOut();
-      }
-
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPassword').value;
-      if (!email) throw new Error('Enter the admin email address.');
-      if (!password) throw new Error('Enter the admin password.');
-
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-
-      const user = data.user || data.session?.user || null;
-      if (!user) throw new Error('Admin session was not created. Please try again.');
-
-      const allowed = await loadAdminIdentity(user);
-      if (!allowed) {
-        await db.auth.signOut();
-        throw new Error('This account does not have dashboard admin access.');
-      }
-      return user;
-    }
-
-    async function restoreAdminSession() {
-      try {
-        const existingUser = await fetchAdminSession();
-        if (!existingUser) {
-          adminUser = null;
-          currentAdminProfile = null;
-          updateAdminUi();
-          return;
-        }
-        const allowed = await loadAdminIdentity(existingUser);
-        if (!allowed) {
-          await db.auth.signOut();
-          setPinError('Admin sign-in required. This account is not approved for the dashboard.');
-        }
-      } catch (error) {
-        await db.auth.signOut();
-        setPinError('Unable to restore the admin session: ' + error.message);
-      }
-      updateAdminUi();
-    }
-
-    // â”€â”€ IST DATE HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── IST DATE HELPERS ──────────────────────────────────────────
     // IST = UTC + 5:30
     function todayIST() {
       const now = new Date();
@@ -1842,7 +1692,7 @@
       document.getElementById('monthDisplay').textContent = formatMonthLabel(document.getElementById('monthSelect').value);
     }
 
-    // â”€â”€ AGGREGATION HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── AGGREGATION HELPERS ───────────────────────────────────────
     const rowSum = r => (r.present || 0) + (r.leave_count || 0) + (r.od || 0) + (r.absent || 0) + (r.tca || 0) + (r.nr || 0) + (r.sick || 0);
     const isTaken = r => String(r.taken).trim().toLowerCase() === 'yes';
 
@@ -1977,7 +1827,7 @@
       };
     }
 
-    // â”€â”€ SUPABASE FETCH (always fresh â€” no cache) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── SUPABASE FETCH (always fresh — no cache) ──────────────────
     async function fetchRows(startISO, endISO, teacherFilter) {
       let q = db.from('attendance').select('*').gte('created_at', startISO).lte('created_at', endISO);
       if (teacherFilter) q = q.eq('teacher', teacherFilter);
@@ -1986,43 +1836,66 @@
       return data || [];
     }
 
-    // â”€â”€ PIN LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── PIN LOGIC ─────────────────────────────────────────────────
     document.getElementById('pinBtn').addEventListener('click', tryPin);
     document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryPin(); });
-    document.getElementById('adminPassword').addEventListener('keydown', e => { if (e.key === 'Enter') tryPin(); });
     setTimeout(() => document.getElementById('pinInput').focus(), 100);
 
     async function tryPin() {
       const inp = document.getElementById('pinInput');
       const btn = document.getElementById('pinBtn');
+      const err = document.getElementById('pinErr');
       const val = inp.value.trim();
       if (!val) return;
 
-      setPinError('');
-      btn.textContent = 'Verifyingâ€¦'; btn.disabled = true;
+      // Brute-force lockout check
+      const now = Date.now();
+      if (now < pinLockedUntil) {
+        const secsLeft = Math.ceil((pinLockedUntil - now) / 1000);
+        err.textContent = `🔒 Too many failed attempts. Try again in ${secsLeft}s.`;
+        err.style.display = 'block';
+        inp.value = '';
+        return;
+      }
+
+      err.style.display = 'none';
+      btn.textContent = 'Verifying…'; btn.disabled = true;
 
       try {
-        await ensureAdminSession();
         const entered = await hashPin(val);
         const stored  = await getPinHash();
         if (entered !== stored) {
+          pinFailCount++;
           inp.value = ''; inp.style.border = '2px solid var(--red)';
-          err.textContent = 'âŒ Wrong PIN. Please try again.'; err.style.display = 'block';
-          btn.textContent = 'Open Dashboard â†’'; btn.disabled = false;
+          if (pinFailCount >= PIN_MAX_FAILS) {
+            pinLockedUntil = Date.now() + PIN_LOCKOUT_MS;
+            pinFailCount = 0;
+            err.textContent = `🔒 Too many failed attempts. Locked for ${PIN_LOCKOUT_MS / 1000}s.`;
+          } else {
+            const remaining = PIN_MAX_FAILS - pinFailCount;
+            err.textContent = `❌ Wrong PIN. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`;
+          }
+          err.style.display = 'block';
+          btn.textContent = 'Open Dashboard →'; btn.disabled = false;
           setTimeout(() => inp.focus(), 50);
           return;
         }
+        // Successful login — reset fail counter
+        pinFailCount = 0;
+        pinLockedUntil = 0;
         inp.style.border = '';
-        btn.textContent = 'Openingâ€¦';
+        btn.textContent = 'Opening…';
         await initApp();
       } catch (e) {
-        err.textContent = 'âŒ ' + e.message; err.style.display = 'block';
+        err.textContent = '❌ ' + e.message; err.style.display = 'block';
       }
-      btn.textContent = 'Open Dashboard â†’'; btn.disabled = false;
+      btn.textContent = 'Open Dashboard →'; btn.disabled = false;
     }
 
     function lockDashboard() {
       stopAutoRefresh();
+      stopInactivityWatch();
+      cachedPinHash = null; // force fresh fetch from DB on next login
       document.getElementById('app').style.display = 'none';
       document.getElementById('pinScreen').style.display = 'flex';
       const inp = document.getElementById('pinInput');
@@ -2031,7 +1904,7 @@
       setTimeout(() => inp.focus(), 50);
     }
 
-    // â”€â”€ CHANGE PIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── CHANGE PIN ──────────────────────────────────────────────
     function openChangePinModal() {
       // Clear all fields and messages
       ['cpCurrent','cpNew','cpConfirm'].forEach(id => {
@@ -2044,7 +1917,7 @@
       const suc = document.getElementById('cpSuccess');
       suc.style.display = 'none'; suc.textContent = '';
       document.getElementById('cpSaveBtn').disabled = false;
-      document.getElementById('cpSaveBtn').textContent = 'ðŸ’¾ Save New PIN';
+      document.getElementById('cpSaveBtn').textContent = '💾 Save New PIN';
       document.getElementById('changePinModal').style.display = 'flex';
       setTimeout(() => document.getElementById('cpCurrent').focus(), 80);
     }
@@ -2068,10 +1941,10 @@
       sucEl.style.display = 'none';
 
       // Basic presence checks before any async work
-      if (!currentVal) { currErrEl.textContent = 'âš ï¸ Enter your current PIN'; document.getElementById('cpCurrent').focus(); return; }
-      if (!newVal)     { errEl.textContent = 'âš ï¸ Enter a new PIN'; document.getElementById('cpNew').focus(); return; }
-      if (newVal.length < 4) { errEl.textContent = 'âš ï¸ PIN must be at least 4 characters'; return; }
-      if (newVal !== confirmVal) { errEl.textContent = 'âŒ PINs do not match'; document.getElementById('cpConfirm').focus(); return; }
+      if (!currentVal) { currErrEl.textContent = '⚠️ Enter your current PIN'; document.getElementById('cpCurrent').focus(); return; }
+      if (!newVal)     { errEl.textContent = '⚠️ Enter a new PIN'; document.getElementById('cpNew').focus(); return; }
+      if (newVal.length < 4) { errEl.textContent = '⚠️ PIN must be at least 4 characters'; return; }
+      if (newVal !== confirmVal) { errEl.textContent = '❌ PINs do not match'; document.getElementById('cpConfirm').focus(); return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Verifying...';
@@ -2082,20 +1955,20 @@
         const storedHash  = await getPinHash(true); // force-refresh from DB
 
         if (currentHash !== storedHash) {
-          currErrEl.textContent = 'âŒ Wrong current PIN';
+          currErrEl.textContent = '❌ Wrong current PIN';
           document.getElementById('cpCurrent').value = '';
           document.getElementById('cpCurrent').focus();
           btn.disabled = false;
-          btn.textContent = 'ðŸ’¾ Save New PIN';
+          btn.textContent = '💾 Save New PIN';
           return;
         }
 
-        // Check new PIN â‰  current PIN
+        // Check new PIN ≠ current PIN
         const newHash = await hashPin(newVal);
         if (newHash === storedHash) {
-          errEl.textContent = 'âš ï¸ New PIN must be different from current PIN';
+          errEl.textContent = '⚠️ New PIN must be different from current PIN';
           btn.disabled = false;
-          btn.textContent = 'ðŸ’¾ Save New PIN';
+          btn.textContent = '💾 Save New PIN';
           return;
         }
 
@@ -2115,20 +1988,20 @@
         cachedPinHash = newHash;
 
         // Show success & auto-close
-        btn.textContent = 'âœ… PIN Changed!';
-        sucEl.textContent = 'ðŸ” PIN updated successfully! Encrypted hash stored securely in the database.';
+        btn.textContent = '✅ PIN Changed!';
+        sucEl.textContent = '🔐 PIN updated successfully! Encrypted hash stored securely in the database.';
         sucEl.style.display = 'block';
         sucEl.style.padding = '8px 12px';
         setTimeout(() => closeChangePinModal(), 2400);
 
       } catch (e) {
-        errEl.textContent = 'âŒ Error: ' + e.message;
+        errEl.textContent = '❌ Error: ' + e.message;
         btn.disabled = false;
-        btn.textContent = 'ðŸ’¾ Save New PIN';
+        btn.textContent = '💾 Save New PIN';
       }
     }
 
-    // â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── INIT ──────────────────────────────────────────────────────
     async function initApp() {
       const today = todayIST();
       document.getElementById('dateSelect').value = today;
@@ -2147,10 +2020,11 @@
       document.getElementById('app').style.display = 'block';
       await loadDaily(true);
       startAutoRefresh();
+      startInactivityWatch();
       checkPendingBadge(); // show pending badge on Approvals tab if any
     }
 
-    // â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── TABS ──────────────────────────────────────────────────────
     function switchTab(id, btn) {
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2165,7 +2039,7 @@
       });
     }
 
-    // â”€â”€ DAILY LOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── DAILY LOAD ────────────────────────────────────────────────
     async function loadDaily(forceRefresh = false) {
       const btn = document.getElementById('syncBtn');
       const icon = document.getElementById('syncIcon');
@@ -2175,7 +2049,7 @@
       btn.disabled = true; icon.innerHTML = '<span class="spinner"></span>';
       document.getElementById('lastSync').textContent = 'Loading...';
       ['todayBody', 'teacherBody', 'classBody', 'heatmapBody', 'errorBody'].forEach(id =>
-        document.getElementById(id).innerHTML = '<div class="empty"><div class="empty-icon">â³</div>Fetching fresh data...</div>');
+        document.getElementById(id).innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Fetching fresh data...</div>');
       if (forceRefresh) { countdownSec = AUTO_REFRESH_SEC; }
       try {
         const [start, end] = istDayRange(date);
@@ -2189,21 +2063,21 @@
         renderHeatmap(d.heatmap, rows);
         renderErrorTable(d.errors);
         renderMissingBanner(d.missing);
-        document.getElementById('lastSync').textContent = 'âœ“ ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('lastSync').textContent = '✓ ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
       } catch (e) {
         ['todayBody', 'teacherBody', 'classBody', 'heatmapBody', 'errorBody'].forEach(id =>
-          document.getElementById(id).innerHTML = `<div class="empty"><div class="empty-icon">âŒ</div><div style="font-size:12px;color:var(--red)">${esc(e.message)}</div></div>`);
-        document.getElementById('lastSync').textContent = 'âœ— Failed';
+          document.getElementById(id).innerHTML = `<div class="empty"><div class="empty-icon">❌</div><div style="font-size:12px;color:var(--red)">${e.message}</div></div>`);
+        document.getElementById('lastSync').textContent = '✗ Failed';
       }
-      btn.disabled = false; icon.textContent = 'â†»';
+      btn.disabled = false; icon.textContent = '↻';
     }
 
-    // â”€â”€ WEEKLY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── WEEKLY ────────────────────────────────────────────────────
     async function loadWeeklyTab() {
       const ws = document.getElementById('weekStart').value;
       if (!ws) return;
       updateDateDisplays();
-      document.getElementById('weeklyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">â³</div>Loading...</div>';
+      document.getElementById('weeklyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
       try {
         const [start, end] = istWeekRange(ws);
         const rows = await fetchRows(start, end, '');
@@ -2213,7 +2087,7 @@
         renderPerfTable(d.perf, 'weeklyTbl', 'weeklyTeacherBody');
         renderClsTable(d.clsData, 'weeklyClassBody');
       } catch (e) {
-        document.getElementById('weeklyTeacherBody').innerHTML = `<div class="empty">âŒ ${esc(e.message)}</div>`;
+        document.getElementById('weeklyTeacherBody').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
       }
     }
     function shiftWeek(dir) {
@@ -2223,12 +2097,12 @@
       updateDateDisplays(); loadWeeklyTab();
     }
 
-    // â”€â”€ MONTHLY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── MONTHLY ───────────────────────────────────────────────────
     async function loadMonthlyTab() {
       const mv = document.getElementById('monthSelect').value;
       if (!mv) return;
       updateDateDisplays();
-      document.getElementById('monthlyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">â³</div>Loading...</div>';
+      document.getElementById('monthlyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
       try {
         const [start, end] = istMonthRange(mv);
         const rows = await fetchRows(start, end, '');
@@ -2239,7 +2113,7 @@
         renderPerfTable(d.perf, 'monthlyTbl', 'monthlyTeacherBody');
         renderClsTable(d.clsData, 'monthlyClassBody');
       } catch (e) {
-        document.getElementById('monthlyTeacherBody').innerHTML = `<div class="empty">âŒ ${esc(e.message)}</div>`;
+        document.getElementById('monthlyTeacherBody').innerHTML = `<div class="empty">❌ ${e.message}</div>`;
       }
     }
     function shiftMonth(dir) {
@@ -2250,7 +2124,7 @@
       updateDateDisplays(); loadMonthlyTab();
     }
 
-    // â”€â”€ RENDER HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── RENDER HELPERS ────────────────────────────────────────────
     function renderMissingBanner(missing) {
       const banner = document.getElementById('missingBanner');
       if (!missing || !missing.length) { banner.style.display = 'none'; return; }
@@ -2266,7 +2140,7 @@
     }
 
     function renderTodayTable(rows) {
-      if (!rows.length) { document.getElementById('todayBody').innerHTML = '<div class="empty"><div class="empty-icon">ðŸ“­</div>No submissions yet for this date.</div>'; return; }
+      if (!rows.length) { document.getElementById('todayBody').innerHTML = '<div class="empty"><div class="empty-icon">📭</div>No submissions yet for this date.</div>'; return; }
       let h = `<table id="todayTbl"><thead><tr>
     <th>#</th><th>Teacher</th><th>Prd</th><th>Class</th><th>Subject</th>
     <th>Taken</th><th>Total</th><th>Present</th><th>Absent</th>
@@ -2274,7 +2148,7 @@
     <th>Math</th><th>Time</th></tr></thead><tbody>`;
       rows.forEach((r, i) => {
         const tp = r.taken ? '<span class="pill pill-ok">Yes</span>' : '<span class="pill pill-warn">No</span>';
-        const mp = !r.taken ? '<span class="pill pill-gray">N/A</span>' : r.mathOk ? '<span class="pill pill-ok">âœ…</span>' : '<span class="pill pill-err">âŒ</span>';
+        const mp = !r.taken ? '<span class="pill pill-gray">N/A</span>' : r.mathOk ? '<span class="pill pill-ok">✅</span>' : '<span class="pill pill-err">❌</span>';
         h += `<tr class="dr"><td>${i + 1}</td><td><b>${r.teacher}</b></td>
       <td style="text-align:center"><b>${r.period}</b></td>
       <td>${r.cls}</td><td>${r.subject}</td><td>${tp}</td>
@@ -2309,14 +2183,14 @@
     function renderTeacherTable(perf) {
       let idx = 0;
       let h = `<div style="margin-bottom:8px">
-    <button class="expand-btn" onclick="expandAll(true)">â–¼ Expand All</button>
-    &nbsp;<button class="expand-btn" onclick="expandAll(false)">â–² Collapse All</button></div>
+    <button class="expand-btn" onclick="expandAll(true)">▼ Expand All</button>
+    &nbsp;<button class="expand-btn" onclick="expandAll(false)">▲ Collapse All</button></div>
     <table id="teacherTbl"><thead><tr>
     <th>Rank</th><th>Teacher</th><th>Taken %</th><th>Taken</th><th>Total</th>
     <th>Errors</th><th>Details</th></tr></thead><tbody>`;
       perf.forEach((p, i) => {
         const pct = p.pct, bc = pct >= 90 ? 'pbar-hi' : pct >= 75 ? 'pbar-mid' : 'pbar-lo';
-        const rank = i === 0 ? 'ðŸ¥‡' : i === 1 ? 'ðŸ¥ˆ' : i === 2 ? 'ðŸ¥‰' : (i + 1);
+        const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
         const uid = idx++;
         let det = '';
         if (p.classes) {
@@ -2331,7 +2205,7 @@
       <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
       <td>${p.taken}</td><td>${p.total}</td>
       <td>${p.mathErrors > 0 ? `<span class="pill pill-err">${p.mathErrors}</span>` : '<span class="pill pill-ok">0</span>'}</td>
-      <td><button class="expand-btn" onclick="toggleDet(this,${uid})">â–¼</button></td></tr>
+      <td><button class="expand-btn" onclick="toggleDet(this,${uid})">▼</button></td></tr>
     <tr class="detail-row" id="dr-${uid}"><td colspan="7">
       <div class="detail-inner"><table><thead><tr>
         <th>Class</th><th>Taken</th><th>P</th><th>A</th><th>L</th><th>OD</th><th>TCA</th><th>NR</th><th>S</th>
@@ -2366,14 +2240,14 @@
         PERIODS.forEach(p => {
           const v = heatmap[t + '||' + p] || 0;
           const cls = v === 0 ? 'hm-0' : v / maxVal < .34 ? 'hm-lo' : v / maxVal < .67 ? 'hm-md' : 'hm-hi';
-          h += `<div class="hm-cell ${cls}" title="${t} â€” P${p}: ${v}">${v || ''}</div>`;
+          h += `<div class="hm-cell ${cls}" title="${t} — P${p}: ${v}">${v || ''}</div>`;
         });
       });
       document.getElementById('heatmapBody').innerHTML = h + '</div></div>';
     }
 
     function renderErrorTable(errors) {
-      if (!errors.length) { document.getElementById('errorBody').innerHTML = '<div class="empty"><div class="empty-icon">âœ…</div>No math errors today.</div>'; return; }
+      if (!errors.length) { document.getElementById('errorBody').innerHTML = '<div class="empty"><div class="empty-icon">✅</div>No math errors today.</div>'; return; }
       let h = `<table><thead><tr><th>Date</th><th>Teacher</th><th>Prd</th>
     <th>Class</th><th>Total</th><th>Sum</th><th>Diff</th></tr></thead><tbody>`;
       errors.forEach(r => {
@@ -2390,11 +2264,11 @@
       if (!row) return;
       const open = row.style.display !== 'table-row';
       row.style.display = open ? 'table-row' : 'none';
-      btn.textContent = open ? 'â–²' : 'â–¼';
+      btn.textContent = open ? '▲' : '▼';
     }
     function expandAll(flag) {
       document.querySelectorAll('.detail-row').forEach(r => r.style.display = flag ? 'table-row' : 'none');
-      document.querySelectorAll('.expand-btn[onclick*="toggleDet"]').forEach(b => b.textContent = flag ? 'â–²' : 'â–¼');
+      document.querySelectorAll('.expand-btn[onclick*="toggleDet"]').forEach(b => b.textContent = flag ? '▲' : '▼');
     }
 
     function renderBars(items, lk, vk, targetId, color) {
@@ -2421,7 +2295,7 @@
     </tr></thead><tbody>`;
       perf.forEach((p, i) => {
         const pct = p.pct, bc = pct >= 90 ? 'pbar-hi' : pct >= 75 ? 'pbar-mid' : 'pbar-lo';
-        const rank = i === 0 ? 'ðŸ¥‡' : i === 1 ? 'ðŸ¥ˆ' : i === 2 ? 'ðŸ¥‰' : (i + 1);
+        const rank = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
         h += `<tr class="dr"><td style="text-align:center">${rank}</td><td><b>${p.name}</b></td>
       <td><div class="pbar ${bc}"><div class="pbar-fill" style="width:${pct}%"></div></div><b>${pct}%</b></td>
       <td>${p.taken}</td><td>${p.total}</td>
@@ -2444,9 +2318,9 @@
       document.getElementById(targetId).innerHTML = h + '</tbody></table>';
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ═══════════════════════════════════════════════════════════════
     //  TEACHER APPROVALS
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ═══════════════════════════════════════════════════════════════
     const ALL_CLASSES = [
       "VI-A","VI-B","VII-A","VII-B","VIII-A","VIII-B",
       "IX-A","IX-B","X-A","X-B","XI-Sci","XI-Hum","XII-Sci","XII-Hum"
@@ -2467,7 +2341,7 @@
 
     async function loadApprovals() {
       document.getElementById('approvalsBody').innerHTML =
-        '<div class="empty"><div class="empty-icon">â³</div>Loading teacher profiles...</div>';
+        '<div class="empty"><div class="empty-icon">⏳</div>Loading teacher profiles...</div>';
       try {
         // Use Supabase service key is not available on frontend;
         // We use the anon key but add a wide-open SELECT policy for admin
@@ -2493,7 +2367,7 @@
         renderApprovals();
       } catch (e) {
         document.getElementById('approvalsBody').innerHTML =
-          `<div class="empty"><div class="empty-icon">âŒ</div><div style="color:var(--red);font-size:12px">Error: ${esc(e.message)}<br><br><b>Note:</b> The dashboard needs a SELECT policy on teacher_profiles for anon role. Run this in Supabase SQL Editor:<br><code style="font-size:10px;background:var(--card2);padding:4px 8px;border-radius:4px;display:block;margin-top:6px">CREATE POLICY "allow_admin_select" ON teacher_profiles FOR SELECT TO anon USING (true);<br>CREATE POLICY "allow_admin_update" ON teacher_profiles FOR UPDATE TO anon USING (true) WITH CHECK (true);</code></div></div>`;
+          `<div class="empty"><div class="empty-icon">❌</div><div style="color:var(--red);font-size:12px">Error: ${e.message}<br><br><b>Note:</b> The dashboard needs a SELECT policy on teacher_profiles for anon role. Run this in Supabase SQL Editor:<br><code style="font-size:10px;background:var(--card2);padding:4px 8px;border-radius:4px;display:block;margin-top:6px">CREATE POLICY "allow_admin_select" ON teacher_profiles FOR SELECT TO anon USING (true);<br>CREATE POLICY "allow_admin_update" ON teacher_profiles FOR UPDATE TO anon USING (true) WITH CHECK (true);</code></div></div>`;
       }
     }
 
@@ -2511,15 +2385,15 @@
 
       if (!profiles.length) {
         document.getElementById('approvalsBody').innerHTML =
-          `<div class="empty"><div class="empty-icon">${approvalFilter === 'pending' ? 'ðŸŽ‰' : 'ðŸ“­'}</div>${approvalFilter === 'pending' ? 'No pending approvals!' : 'No teachers found.'}</div>`;
+          `<div class="empty"><div class="empty-icon">${approvalFilter === 'pending' ? '🎉' : '📭'}</div>${approvalFilter === 'pending' ? 'No pending approvals!' : 'No teachers found.'}</div>`;
         return;
       }
 
       const html = profiles.map(p => {
         const statusClass = p.approved ? 'approved' : 'pending';
         const statusPill = p.approved
-          ? '<span class="pill pill-ok">âœ… Approved</span>'
-          : '<span class="pill pill-warn">â³ Pending</span>';
+          ? '<span class="pill pill-ok">✅ Approved</span>'
+          : '<span class="pill pill-warn">⏳ Pending</span>';
         const classTags = (p.classes || []).map(c =>
           `<span class="tc-tag cls">${c}</span>`).join('');
         const subjectTags = (p.subjects || []).slice(0,4).map(s =>
@@ -2529,18 +2403,18 @@
           {day:'2-digit',month:'short',year:'numeric'});
 
         const actionBtns = p.approved
-          ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this)">ðŸš« Revoke</button>
-             <button class="tc-btn edit"   onclick="openEdit('${p.id}')">âœï¸ Edit</button>
-             <button class="tc-btn reset"  onclick="resetTeacherPassword('${p.email}',this)">ðŸ”‘ Reset Pwd</button>`
-          : `<button class="tc-btn approve" onclick="setApproval('${p.id}',true,this)">âœ… Approve</button>
-             <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this)" style="opacity:.75">ðŸ—‘ Reject</button>
-             <button class="tc-btn edit"    onclick="openEdit('${p.id}')">âœï¸ Edit</button>
-             <button class="tc-btn reset"   onclick="resetTeacherPassword('${p.email}',this)">ðŸ”‘ Reset Pwd</button>`;
+          ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this)">🚫 Revoke</button>
+             <button class="tc-btn edit"   onclick="openEdit('${p.id}')">✏️ Edit</button>
+             <button class="tc-btn reset"  onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`
+          : `<button class="tc-btn approve" onclick="setApproval('${p.id}',true,this)">✅ Approve</button>
+             <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this)" style="opacity:.75">🗑 Reject</button>
+             <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>
+             <button class="tc-btn reset"   onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`;
 
         return `<div class="teacher-card ${statusClass}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
             <div>
-              <div class="tc-name">ðŸ‘¤ ${p.name}</div>
+              <div class="tc-name">👤 ${p.name}</div>
               <div class="tc-email">${p.email}</div>
             </div>
             ${statusPill}
@@ -2582,7 +2456,7 @@
       }
     }
 
-    // â”€â”€ RESET TEACHER PASSWORD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── RESET TEACHER PASSWORD ─────────────────────────────────
     async function resetTeacherPassword(email, btn) {
       if (!confirm(`Send a password reset link to:\n${email}\n\nThe teacher will receive an email with a link to set a new password.`)) return;
 
@@ -2595,13 +2469,13 @@
         });
         if (error) throw error;
 
-        btn.innerHTML = 'âœ… Sent!';
+        btn.innerHTML = '✅ Sent!';
         btn.style.background = 'var(--ok)';
         btn.style.color = '#fff';
         btn.style.borderColor = 'var(--ok)';
         // Reset button appearance after 3 seconds
         setTimeout(() => {
-          btn.innerHTML = 'ðŸ”‘ Reset Pwd';
+          btn.innerHTML = '🔑 Reset Pwd';
           btn.style.background = '';
           btn.style.color = '';
           btn.style.borderColor = '';
@@ -2609,13 +2483,13 @@
         }, 3000);
 
       } catch (e) {
-        alert('âŒ Failed to send reset email: ' + e.message);
-        btn.innerHTML = 'ðŸ”‘ Reset Pwd';
+        alert('❌ Failed to send reset email: ' + e.message);
+        btn.innerHTML = '🔑 Reset Pwd';
         btn.disabled = false;
       }
     }
 
-    // â”€â”€ EDIT MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── EDIT MODAL ──────────────────────────────────────────────
     function openEdit(id) {
       const p = allProfiles.find(x => x.id === id);
       if (!p) return;
@@ -2658,8 +2532,8 @@
       const btn = document.getElementById('modalSaveBtn');
 
       errEl.textContent = '';
-      if (classes.length === 0) { errEl.textContent = 'âš ï¸ Select at least one class'; return; }
-      if (subjects.length === 0) { errEl.textContent = 'âš ï¸ Select at least one subject'; return; }
+      if (classes.length === 0) { errEl.textContent = '⚠️ Select at least one class'; return; }
+      if (subjects.length === 0) { errEl.textContent = '⚠️ Select at least one subject'; return; }
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Saving...';
@@ -2677,13 +2551,13 @@
         editingProfileId = null;
         renderApprovals();
       } catch (e) {
-        errEl.textContent = 'âŒ ' + e.message;
+        errEl.textContent = '❌ ' + e.message;
       }
       btn.disabled = false;
-      btn.textContent = 'ðŸ’¾ Save Changes';
+      btn.textContent = '💾 Save Changes';
     }
 
-    // â”€â”€ CHECK FOR PENDING ON DASHBOARD LOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── CHECK FOR PENDING ON DASHBOARD LOAD ────────────────────
     async function checkPendingBadge() {
       try {
         const { data } = await db
@@ -2698,189 +2572,7 @@
         }
       } catch (_) { /* silently ignore if policy not set */ }
     }
-
-    // Overrides for hardened admin auth + safe rendering.
-    async function tryPin() {
-      const inp = document.getElementById('pinInput');
-      const btn = document.getElementById('pinBtn');
-      const val = inp.value.trim();
-      if (!val) return;
-
-      setPinError('');
-      btn.textContent = 'Verifying...';
-      btn.disabled = true;
-
-      try {
-        await ensureAdminSession();
-        const entered = await hashPin(val);
-        const stored = await getPinHash();
-
-        if (entered !== stored) {
-          inp.value = '';
-          inp.style.border = '2px solid var(--red)';
-          setPinError('Wrong PIN. Please try again.');
-          btn.textContent = 'Open Dashboard ->';
-          btn.disabled = false;
-          setTimeout(() => inp.focus(), 50);
-          return;
-        }
-
-        dashboardUnlocked = true;
-        inp.style.border = '';
-        btn.textContent = 'Opening...';
-        await initApp();
-        updateAdminUi();
-      } catch (e) {
-        setPinError('Error: ' + (e?.message || String(e)));
-      }
-
-      btn.textContent = 'Open Dashboard ->';
-      btn.disabled = false;
-    }
-
-    function lockDashboard() {
-      dashboardUnlocked = false;
-      stopAutoRefresh();
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('pinScreen').style.display = 'flex';
-      const inp = document.getElementById('pinInput');
-      inp.value = '';
-      inp.style.border = '';
-      setPinError('');
-      updateAdminUi();
-      setTimeout(() => inp.focus(), 50);
-    }
-
-    async function logoutDashboard() {
-      stopAutoRefresh();
-      dashboardUnlocked = false;
-      adminUser = null;
-      currentAdminProfile = null;
-      await db.auth.signOut();
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('pinScreen').style.display = 'flex';
-      document.getElementById('pinInput').value = '';
-      document.getElementById('adminPassword').value = '';
-      setPinError('');
-      updateAdminUi();
-      setTimeout(() => document.getElementById('adminEmail').focus(), 50);
-    }
-
-    async function loadApprovals() {
-      document.getElementById('approvalsBody').innerHTML =
-        '<div class="empty"><div class="empty-icon">â³</div>Loading teacher profiles...</div>';
-
-      try {
-        const { data, error } = await db
-          .from('teacher_profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        allProfiles = data || [];
-
-        const pending = allProfiles.filter(p => !p.approved).length;
-        const badge = document.getElementById('pendingBadge');
-        if (pending > 0) {
-          badge.textContent = pending;
-          badge.style.display = 'inline-block';
-        } else {
-          badge.style.display = 'none';
-        }
-
-        renderApprovals();
-      } catch (e) {
-        document.getElementById('approvalsBody').innerHTML =
-          `<div class="empty"><div class="empty-icon">âŒ</div><div style="color:var(--red);font-size:12px">Error: ${esc(e.message)}<br><br>Dashboard approvals now require an authenticated admin user present in <code>admin_users</code>.</div></div>`;
-      }
-    }
-
-    function renderApprovals() {
-      let profiles = allProfiles;
-      if (approvalFilter === 'pending') profiles = profiles.filter(p => !p.approved);
-      if (approvalFilter === 'approved') profiles = profiles.filter(p => p.approved);
-
-      if (!profiles.length) {
-        document.getElementById('approvalsBody').innerHTML =
-          `<div class="empty"><div class="empty-icon">${approvalFilter === 'pending' ? 'ðŸŽ‰' : 'ðŸ“­'}</div>${approvalFilter === 'pending' ? 'No pending approvals!' : 'No teachers found.'}</div>`;
-        return;
-      }
-
-      const html = profiles.map(p => {
-        const classes = normalizeList(p.classes);
-        const subjects = normalizeList(p.subjects);
-        const statusClass = p.approved ? 'approved' : 'pending';
-        const statusPill = p.approved
-          ? '<span class="pill pill-ok">âœ… Approved</span>'
-          : '<span class="pill pill-warn">â³ Pending</span>';
-        const classTags = classes.map(c => `<span class="tc-tag cls">${esc(c)}</span>`).join('');
-        const subjectTags = subjects.slice(0, 4).map(s => `<span class="tc-tag">${esc(s)}</span>`).join('') +
-          (subjects.length > 4 ? `<span class="tc-tag">+${subjects.length - 4} more</span>` : '');
-        const regDate = new Date(p.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-        const encodedId = enc(p.id);
-        const encodedEmail = enc(p.email);
-
-        const actionBtns = p.approved
-          ? `<button class="tc-btn revoke" onclick="setApproval(decodeURIComponent('${encodedId}'),false,this)">ðŸš« Revoke</button>
-             <button class="tc-btn edit" onclick="openEdit(decodeURIComponent('${encodedId}'))">âœï¸ Edit</button>
-             <button class="tc-btn reset" onclick="resetTeacherPassword(decodeURIComponent('${encodedEmail}'),this)">ðŸ”‘ Reset Pwd</button>`
-          : `<button class="tc-btn approve" onclick="setApproval(decodeURIComponent('${encodedId}'),true,this)">âœ… Approve</button>
-             <button class="tc-btn reject" onclick="setApproval(decodeURIComponent('${encodedId}'),false,this)" style="opacity:.75">ðŸ—‘ Reject</button>
-             <button class="tc-btn edit" onclick="openEdit(decodeURIComponent('${encodedId}'))">âœï¸ Edit</button>
-             <button class="tc-btn reset" onclick="resetTeacherPassword(decodeURIComponent('${encodedEmail}'),this)">ðŸ”‘ Reset Pwd</button>`;
-
-        return `<div class="teacher-card ${statusClass}">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
-            <div>
-              <div class="tc-name">ðŸ‘¤ ${esc(p.name)}</div>
-              <div class="tc-email">${esc(p.email)}</div>
-            </div>
-            ${statusPill}
-          </div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Classes</div>
-          <div class="tc-tags">${classTags || '<span style="color:var(--muted);font-size:11px">None assigned</span>'}</div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Subjects</div>
-          <div class="tc-tags">${subjectTags || '<span style="color:var(--muted);font-size:11px">None assigned</span>'}</div>
-          <div class="tc-meta">Registered: ${esc(regDate)}</div>
-          <div class="tc-actions">${actionBtns}</div>
-        </div>`;
-      }).join('');
-
-      document.getElementById('approvalsBody').innerHTML = `<div class="approval-grid">${html}</div>`;
-    }
-
-    async function resetTeacherPassword(email, btn) {
-      if (!confirm(`Send a password reset link to:\n${email}\n\nThe teacher will receive an email with a link to set a new password.`)) return;
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner spinner-dark"></span>';
-
-      try {
-        const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: INDEX_URL });
-        if (error) throw error;
-
-        btn.innerHTML = 'âœ… Sent!';
-        btn.style.background = 'var(--ok)';
-        btn.style.color = '#fff';
-        btn.style.borderColor = 'var(--ok)';
-
-        setTimeout(() => {
-          btn.innerHTML = 'ðŸ”‘ Reset Pwd';
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.style.borderColor = '';
-          btn.disabled = false;
-        }, 3000);
-      } catch (e) {
-        alert('Failed to send reset email: ' + (e?.message || String(e)));
-        btn.innerHTML = 'ðŸ”‘ Reset Pwd';
-        btn.disabled = false;
-      }
-    }
-
-    restoreAdminSession();
   </script>
 </body>
 
 </html>
-

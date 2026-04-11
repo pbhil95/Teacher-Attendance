@@ -1016,9 +1016,24 @@
 <body>
 
   <!-- ══════════════════════════════════════════
+       LOADING SCREEN — Initial App Load
+  ══════════════════════════════════════════ -->
+  <div id="loadingScreen" class="auth-screen" style="flex-direction:column;align-items:center;justify-content:center;">
+    <div id="loadingSpinner" class="spinner" style="width:34px;height:34px;border-width:3px;margin-bottom:16px;"></div>
+    <div style="color:#fff;font-family:var(--fh);font-size:1.3rem;font-weight:700;letter-spacing:1px;text-align:center;">
+      JNV Tarikhet<br>
+      <span id="loadingMsg" style="font-size:14px;font-family:var(--fb);font-weight:500;opacity:0.8;letter-spacing:normal;">Loading your profile...</span>
+    </div>
+    <div id="loadingRetry" style="display:none;margin-top:20px;text-align:center;">
+      <button onclick="retryProfileLoad()" style="padding:10px 28px;background:#fff;color:#1a3a5c;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;margin-right:10px;">↺ Retry</button>
+      <button onclick="signOutAndGoLogin()" style="padding:10px 20px;background:transparent;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.4);border-radius:8px;font-size:13px;cursor:pointer;">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
        AUTH SCREEN — Login / Register
   ══════════════════════════════════════════ -->
-  <div id="authScreen" class="auth-screen">
+  <div id="authScreen" class="auth-screen hidden">
     <button class="auth-theme-btn" id="authThemeBtn" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
 
     <div class="auth-card">
@@ -1365,12 +1380,14 @@
         if (el) el.textContent = icon;
       });
       document.getElementById('themeColor').setAttribute('content', t === 'dark' ? '#0f1117' : '#1a3a5c');
-      localStorage.setItem('theme', t);
+      try { localStorage.setItem('theme', t); } catch(e) {}
     }
     function toggleTheme() {
       applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
-    applyTheme(localStorage.getItem('theme') || 'light');
+    let savedTheme = 'light';
+    try { savedTheme = localStorage.getItem('theme') || 'light'; } catch(e) {}
+    applyTheme(savedTheme);
 
     // ═══════════════════════════════════════════════════════════════
     //  AUTH STATE MANAGEMENT
@@ -1393,23 +1410,103 @@
 
     // Startup session check — getSession() waits for token auto-refresh to complete,
     // so it is the reliable source of truth on page load (including "Submit Another Entry" returns).
-    db.auth.getSession().then(({ data: { session } }) => {
+    db.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Session error:', error);
+        showScreen('auth');
+        return;
+      }
       if (session && session.user) {
         if (!currentProfile && !profileLoading) loadProfile(session.user);
       } else {
         showScreen('auth');
       }
+    }).catch(err => {
+      console.error('Failed to get session:', err);
+      showScreen('auth');
     });
+
+    // ── LOADING SCREEN HELPERS ───────────────────────────────────
+    let lastProfileUser = null;
+
+    // Progressive loading messages — shown at intervals so the user
+    // knows the app is alive, not frozen.
+    let _loadingMsgTimers = [];
+    function startLoadingMessages() {
+      clearLoadingMessages();
+      const msgs = [
+        [8000,  'Still connecting…'],
+        [18000, 'Waking up the server, please wait…'],
+        [35000, null] // show retry UI after 35s
+      ];
+      msgs.forEach(([ms, txt]) => {
+        _loadingMsgTimers.push(setTimeout(() => {
+          // Only update if we're still on the loading screen
+          const ls = document.getElementById('loadingScreen');
+          if (!ls || ls.classList.contains('hidden')) return;
+          if (txt) {
+            document.getElementById('loadingMsg').textContent = txt;
+          } else {
+            // Show retry buttons
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('loadingMsg').textContent = 'Taking longer than expected.';
+            document.getElementById('loadingRetry').style.display = 'block';
+            profileLoading = false; // allow retry to re-enter
+          }
+        }, ms));
+      });
+    }
+    function clearLoadingMessages() {
+      _loadingMsgTimers.forEach(t => clearTimeout(t));
+      _loadingMsgTimers = [];
+    }
+    function resetLoadingScreen() {
+      document.getElementById('loadingSpinner').style.display = '';
+      document.getElementById('loadingMsg').textContent = 'Loading your profile...';
+      document.getElementById('loadingRetry').style.display = 'none';
+    }
+
+    function retryProfileLoad() {
+      if (!lastProfileUser) { signOutAndGoLogin(); return; }
+      resetLoadingScreen();
+      startLoadingMessages();
+      loadProfile(lastProfileUser);
+    }
+
+    async function signOutAndGoLogin() {
+      clearLoadingMessages();
+      await db.auth.signOut();
+      showScreen('auth');
+    }
+
+    // Start the progressive messages immediately on page load
+    // (covers both getSession() hangs and loadProfile() hangs).
+    startLoadingMessages();
 
     async function loadProfile(user) {
       if (profileLoading) return;
+      lastProfileUser = user;
       profileLoading = true;
+      let timedOut = false;
+
+      // Secondary hard-stop: if still running after 40s something is truly broken.
+      const timeoutId = setTimeout(() => {
+        if (!profileLoading) return;
+        timedOut = true;
+        profileLoading = false;
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('loadingMsg').textContent = 'Taking longer than expected.';
+        document.getElementById('loadingRetry').style.display = 'block';
+      }, 40000);
+
       try {
         let { data: profile, error } = await db
           .from('teacher_profiles')
           .select('*')
           .eq('id', user.id)
           .single();
+
+        if (timedOut) return; // timeout already showed retry UI
 
         // If no profile but we have metadata (email confirmation flow — profile created at next login)
         if ((error || !profile) && user.user_metadata && user.user_metadata.name) {
@@ -1455,17 +1552,24 @@
         currentProfile = profile;
         showForm(profile);
       } catch (err) {
+        if (timedOut) return; // timeout already handled the UI
         console.error('Error loading profile:', err);
         showToast('❌ Profile load error: ' + (err.message || String(err)), 6000);
+        showScreen('auth');
         document.getElementById('loginBtn').disabled = false;
         document.getElementById('loginBtn').textContent = '🔐 Sign In';
-        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please try again.';
+        document.getElementById('loginError').textContent = '❌ Failed to load profile. Please sign in again.';
       } finally {
-        profileLoading = false;
+        clearTimeout(timeoutId);
+        clearLoadingMessages(); // stop progressive messages — load finished (success or error)
+        if (!timedOut) profileLoading = false;
       }
     }
 
     function showScreen(name) {
+      const loading = document.getElementById('loadingScreen');
+      if (loading) loading.classList.add('hidden');
+      
       document.getElementById('authScreen').classList.toggle('hidden', name !== 'auth');
       document.getElementById('waitScreen').classList.toggle('hidden', name !== 'wait');
       document.getElementById('mainContent').classList.toggle('hidden', name !== 'form');
@@ -1651,12 +1755,18 @@
     //  LOGOUT
     // ═══════════════════════════════════════════════════════════════
     async function doLogout() {
-      await db.auth.signOut();
-      currentProfile = null;
-      // Reset form fields on logout
+      // Clear any sensitive submission data left in sessionStorage
+      try { sessionStorage.removeItem('lastSubmission'); } catch(e) {}
+
+      // Reset all form fields so data isn't visible if another user logs in
+      const form = document.getElementById('attForm');
+      if (form) form.reset();
       document.getElementById('cls').innerHTML = '<option value="">— Select class —</option>';
       document.getElementById('subject').innerHTML = '<option value="">— Select subject —</option>';
-      showScreen('auth');
+
+      // Sign out — onAuthStateChange SIGNED_OUT will call showScreen('auth')
+      currentProfile = null;
+      await db.auth.signOut();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -1790,7 +1900,6 @@
       btn.innerHTML = '<span class="spinner"></span>Submitting...';
 
       const payload = {
-        teacher_id: currentProfile.id,
         teacher, period, class: cls, subject, taken,
         total: taken === 'Yes' ? getN('total') : 0,
         present: taken === 'Yes' ? getN('present') : 0,
@@ -1815,8 +1924,8 @@
         const msg = err.message || String(err);
         const isAuthErr = /jwt|expired|not authenticated|unauthorized|401|403/i.test(msg);
         if (isAuthErr) {
-          showToast('⚠️ Session expired. Redirecting to sign in...', 3000);
-          setTimeout(() => { currentProfile = null; showScreen('auth'); }, 1500);
+          showToast('⚠️ Session expired. Signing out...', 3000);
+          setTimeout(() => doLogout(), 1500);
         } else {
           showToast('❌ Error: ' + msg, 5000);
         }
