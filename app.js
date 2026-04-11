@@ -1,4 +1,4 @@
-// Constants for Form Population
+// Constants
 const TEACHERS = [
   "TGT Computer Science", "Librarian", "PET F", "PET M",
   "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
@@ -23,70 +23,70 @@ const CLASSES = [
 ];
 const PERIODS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 
-// --- DOM ELEMENTS ---
+// Period chip colors (matching CSS)
+const PERIOD_COLORS = {
+  '1': '#6366F1', '2': '#06B6D4', '3': '#10B981', '4': '#F59E0B',
+  '5': '#F97316', '6': '#EC4899', '7': '#8B5CF6', '8': '#14B8A6'
+};
+
+// Screens
 const ST = {
-  loading: document.getElementById('screen-loading'),
-  auth: document.getElementById('screen-auth'),
-  wait: document.getElementById('screen-wait'),
-  main: document.getElementById('screen-main'),
-  success: document.getElementById('screen-success')
+  loading:     document.getElementById('screen-loading'),
+  auth:        document.getElementById('screen-auth'),
+  wait:        document.getElementById('screen-wait'),
+  main:        document.getElementById('screen-main'),
+  success:     document.getElementById('screen-success'),
+  forceReset:  document.getElementById('screen-force-reset')
 };
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
   populateDropdowns();
   setupEventListeners();
-  
-  // Hook up to Auth State changes
+
   appAuth.onStateChange((user, profile) => {
-    // Hide loading screen immediately on any state change notification post-init
     ST.loading.classList.add('fade-out');
-    setTimeout(() => ST.loading.classList.add('hidden'), 300); // Also hide it from DOM flow
-    
-    // Switch screens based on state
+    setTimeout(() => ST.loading.classList.add('hidden'), 300);
+
     if (!user) {
       showScreen('auth');
     } else if (!profile) {
-       // Edge-case: User is logged in, but their profile couldn't be loaded or table was deleted.
-       document.getElementById('wait-name').textContent = "Profile Data Missing";
-       const p = document.querySelector('#screen-wait p');
-       if (p) p.innerHTML = "Your profile data could not be found. <b>If the database tables were deleted</b>, please run your SQL script again in Supabase.";
-       showScreen('wait');
+      document.getElementById('wait-name').textContent = "Profile Data Missing";
+      const p = document.querySelector('#screen-wait p');
+      if (p) p.innerHTML = "Your profile data could not be found. <b>If the database tables were deleted</b>, please run your SQL script again in Supabase.";
+      showScreen('wait');
     } else if (!profile.approved) {
       document.getElementById('wait-name').textContent = profile.name;
       showScreen('wait');
-    } else if (profile.approved) {
+    } else if (profile.force_password_reset) {
+      // Admin reset password — force new password on login
+      document.getElementById('force-reset-name').textContent = profile.name;
+      showScreen('forceReset');
+    } else {
       setupTeacherForm(profile);
       showScreen('main');
     }
   });
 
-  // Init Auth (checks session)
   appAuth.init();
 });
 
-// --- NAVIGATION & SCREENS ---
+// --- NAVIGATION ---
 function showScreen(screenKey) {
   Object.keys(ST).forEach(k => {
-    if (k !== 'loading') ST[k].classList.add('hidden');
+    if (ST[k] && k !== 'loading') ST[k].classList.add('hidden');
   });
-  ST[screenKey].classList.remove('hidden');
+  if (ST[screenKey]) ST[screenKey].classList.remove('hidden');
 }
 
 function switchAuthTab(type) {
   const isLogin = type === 'login';
-  
-  // Toggle UI active states
-  document.getElementById('tab-login').style.borderBottomColor = isLogin ? 'var(--primary)' : 'transparent';
-  document.getElementById('tab-login').style.color = isLogin ? 'var(--primary)' : 'var(--text-secondary)';
+  document.getElementById('tab-login').style.borderBottomColor    = isLogin  ? 'var(--primary)' : 'transparent';
+  document.getElementById('tab-login').style.color                = isLogin  ? 'var(--primary)' : 'var(--text-secondary)';
   document.getElementById('tab-register').style.borderBottomColor = !isLogin ? 'var(--primary)' : 'transparent';
-  document.getElementById('tab-register').style.color = !isLogin ? 'var(--primary)' : 'var(--text-secondary)';
-  
-  // Toggle forms
+  document.getElementById('tab-register').style.color             = !isLogin ? 'var(--primary)' : 'var(--text-secondary)';
   document.getElementById('form-login').classList.toggle('hidden', !isLogin);
   document.getElementById('form-register').classList.toggle('hidden', isLogin);
-
-  // Clear errors
   document.getElementById('err-login').classList.add('hidden');
   document.getElementById('err-register').classList.add('hidden');
 }
@@ -101,31 +101,29 @@ function populateDropdowns() {
     items.forEach(val => {
       box.innerHTML += `
         <div class="chip">
-          <input type="checkbox" id="chk-${val}" value="${val}">
-          <label for="chk-${val}">${val}</label>
-        </div>
-      `;
+          <input type="checkbox" id="chk-${val.replace(/\s+/g,'_')}" value="${val}">
+          <label for="chk-${val.replace(/\s+/g,'_')}">${val}</label>
+        </div>`;
     });
   };
 
   buildChips('reg-classes', CLASSES);
   buildChips('reg-subjects', SUBJECTS);
 
-  // Build periods
+  // Build period chips with data-p for coloring
   const pBox = document.getElementById('period-chips');
   PERIODS.forEach(p => {
     pBox.innerHTML += `
-      <div class="chip">
+      <div class="chip" data-p="${p}">
         <input type="radio" name="period" id="p${p}" value="${p}" required>
         <label for="p${p}">P${p}</label>
-      </div>
-    `;
+      </div>`;
   });
 }
 
 function setupTeacherForm(profile) {
   document.getElementById('teacher-name-display').textContent = profile.name;
-  
+
   const clsSel = document.getElementById('form-class');
   clsSel.innerHTML = '<option value="">— Select class —</option>';
   (profile.classes || []).forEach(c => clsSel.add(new Option(c, c)));
@@ -134,18 +132,16 @@ function setupTeacherForm(profile) {
   subSel.innerHTML = '<option value="">— Select subject —</option>';
   (profile.subjects || []).forEach(s => subSel.add(new Option(s, s)));
 
-  // Reset form
   document.getElementById('attendance-form').reset();
   toggleCounts(true);
 }
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-  // Theme Toggle — synced with nova-theme key
+  // Theme Toggle
   document.querySelectorAll('.theme-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
-      const cur = document.documentElement.getAttribute('data-theme');
-      const next = cur === 'dark' ? 'light' : 'dark';
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('nova-theme', next);
       document.querySelectorAll('.theme-toggle').forEach(b => b.textContent = next === 'dark' ? '☀' : '🌙');
@@ -161,82 +157,91 @@ function setupEventListeners() {
   });
 
   // Refresh status
-  document.getElementById('btn-refresh-status').addEventListener('click', async () => {
-     ST.loading.classList.remove('fade-out');
-     await appAuth.db.auth.refreshSession();
-     appAuth.init(); // re-evaluates
+  document.getElementById('btn-refresh-status')?.addEventListener('click', async () => {
+    ST.loading.classList.remove('fade-out');
+    await appAuth.db.auth.refreshSession();
+    appAuth.init();
   });
 
   // Login Form
   document.getElementById('form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('log-email').value.trim();
-    const pwd = document.getElementById('log-pwd').value;
-    const btn = document.getElementById('btn-login');
-    const err = document.getElementById('err-login');
-    
+    const pwd   = document.getElementById('log-pwd').value;
+    const btn   = document.getElementById('btn-login');
+    const err   = document.getElementById('err-login');
+
     err.classList.add('hidden');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-sm"></span> Signing In...';
+    btn.innerHTML = '<span class="spinner-sm"></span> Signing In…';
 
     const { error } = await appAuth.login(email, pwd);
     if (error) {
-       err.textContent = error.message;
-       err.classList.remove('hidden');
-       btn.disabled = false;
-       btn.textContent = 'Sign In';
+      err.textContent = error.message;
+      err.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
     }
-    // Success is handled by onAuthStateChange
   });
 
   // Register Form
   document.getElementById('form-register').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value.trim();
-    const pwd = document.getElementById('reg-pwd').value;
+    const name       = document.getElementById('reg-name').value;
+    const email      = document.getElementById('reg-email').value.trim();
+    const pwd        = document.getElementById('reg-pwd').value;
     const pwdConfirm = document.getElementById('reg-pwd-confirm').value;
-    
-    const classes = [...document.querySelectorAll('#reg-classes input:checked')].map(i => i.value);
-    const subjects = [...document.querySelectorAll('#reg-subjects input:checked')].map(i => i.value);
-
-    const btn = document.getElementById('btn-register');
-    const err = document.getElementById('err-register');
+    const classes    = [...document.querySelectorAll('#reg-classes input:checked')].map(i => i.value);
+    const subjects   = [...document.querySelectorAll('#reg-subjects input:checked')].map(i => i.value);
+    const btn        = document.getElementById('btn-register');
+    const err        = document.getElementById('err-register');
     err.classList.add('hidden');
 
-    if (!name) return showError(err, 'Please select a designation');
-    if (pwd !== pwdConfirm) return showError(err, 'Passwords do not match');
-    if (classes.length === 0) return showError(err, 'Select at least one class');
-    if (subjects.length === 0) return showError(err, 'Select at least one subject');
+    if (!name)               return showError(err, 'Please select a designation');
+    if (pwd !== pwdConfirm)  return showError(err, 'Passwords do not match');
+    if (classes.length  < 1) return showError(err, 'Select at least one class');
+    if (subjects.length < 1) return showError(err, 'Select at least one subject');
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-sm"></span> Creating Account...';
+    btn.innerHTML = '<span class="spinner-sm"></span> Creating Account…';
 
-    const { data, error } = await appAuth.register(email, pwd, name, classes, subjects);
+    const { error } = await appAuth.register(email, pwd, name, classes, subjects);
     if (error) {
       showError(err, error.message);
       btn.disabled = false;
       btn.textContent = 'Create Account';
-      return;
     }
-
-    // Success (will await admin approval)
-    // Wait screen handled by onAuthStateChange
   });
 
-  // Form Toggles (Class Taken)
+  // Taken toggle
   document.querySelectorAll('input[name="taken"]').forEach(r => {
-     r.addEventListener('change', () => toggleCounts(r.value === 'Yes'));
+    r.addEventListener('change', () => toggleCounts(r.value === 'Yes'));
   });
 
-  // Math Auto Update
+  // Math auto update
   ['tot','pre','abs','lea','od','tca','nr','sick'].forEach(id => {
-     const el = document.getElementById(`count-${id}`);
-     if(el) el.addEventListener('input', updateMath);
+    const el = document.getElementById(`count-${id}`);
+    if (el) el.addEventListener('input', updateMath);
   });
 
   // Main Form Submit
   document.getElementById('attendance-form').addEventListener('submit', handleAttendanceSubmit);
+
+  // Force Reset Form Submit
+  document.getElementById('form-force-reset')?.addEventListener('submit', handleForceReset);
+
+  // Change Password Form Submit
+  document.getElementById('form-change-pwd')?.addEventListener('submit', handleChangePwd);
+
+  // Password strength on force reset
+  document.getElementById('fr-new-pwd')?.addEventListener('input', (e) => {
+    updatePwdStrength(e.target.value, 'fr-strength-fill', 'fr-strength-label');
+  });
+
+  // Password strength on change pwd modal
+  document.getElementById('cp-new-pwd')?.addEventListener('input', (e) => {
+    updatePwdStrength(e.target.value, 'cp-strength-fill', 'cp-strength-label');
+  });
 }
 
 function showError(el, msg) {
@@ -250,32 +255,30 @@ function toggleCounts(isTaken) {
 }
 
 function getN(id) {
-  return parseInt(document.getElementById(`count-${id}`).value) || 0;
+  return parseInt(document.getElementById(`count-${id}`)?.value) || 0;
 }
 
 function updateMath() {
   const tot = getN('tot');
   const sum = getN('pre') + getN('abs') + getN('lea') + getN('od') + getN('tca') + getN('nr') + getN('sick');
-  
   const checkCard = document.getElementById('math-checker');
   if (!tot && !sum) {
-     checkCard.className = 'alert';
-     checkCard.style.backgroundColor = 'rgba(0,0,0,0.05)';
-     checkCard.style.color = 'var(--text-secondary)';
-     checkCard.style.border = 'none';
-     checkCard.innerHTML = '⊞ Enter counts above — sum must equal Total Students';
+    checkCard.className = 'math-checker';
+    checkCard.style.cssText = '';
+    checkCard.innerHTML = '⊞ Fill counts — the sum must equal Total Students';
   } else if (sum === tot) {
-     checkCard.className = 'alert';
-     checkCard.style.backgroundColor = 'var(--success-bg)';
-     checkCard.style.color = 'var(--success)';
-     checkCard.style.border = '1px solid var(--success)';
-     checkCard.innerHTML = `✅ Sum (${sum}) = Total (${tot}) — Correct!`;
+    checkCard.className = 'math-checker';
+    checkCard.style.backgroundColor = 'var(--emerald-sub)';
+    checkCard.style.color = 'var(--emerald-lt)';
+    checkCard.style.border = '1px solid var(--emerald-border)';
+    checkCard.innerHTML = `✅ Sum (${sum}) = Total (${tot}) — Correct!`;
   } else {
-     checkCard.className = 'alert alert-danger';
-     checkCard.style.backgroundColor = 'var(--danger-bg)';
-     checkCard.style.color = 'var(--danger)';
-     const diff = sum - tot;
-     checkCard.innerHTML = `❌ Sum (${sum}) ≠ Total (${tot}) — Diff: ${diff > 0 ? '+' : ''}${diff}`;
+    checkCard.className = 'math-checker alert-danger';
+    checkCard.style.backgroundColor = 'var(--rose-sub)';
+    checkCard.style.color = 'var(--rose-lt)';
+    checkCard.style.border = '1px solid var(--rose-border)';
+    const diff = sum - tot;
+    checkCard.innerHTML = `❌ Sum (${sum}) ≠ Total (${tot}) — Diff: ${diff > 0 ? '+' : ''}${diff}`;
   }
 }
 
@@ -286,17 +289,134 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
+// Password strength helper
+function updatePwdStrength(pwd, fillId, labelId) {
+  const fill  = document.getElementById(fillId);
+  const label = document.getElementById(labelId);
+  if (!fill || !label) return;
+
+  let score = 0;
+  if (pwd.length >= 8)                       score++;
+  if (/[A-Z]/.test(pwd))                     score++;
+  if (/[0-9]/.test(pwd))                     score++;
+  if (/[^A-Za-z0-9]/.test(pwd))             score++;
+
+  const levels = [
+    { pct: '0%',   color: 'transparent', text: '' },
+    { pct: '25%',  color: 'var(--rose)',   text: 'Weak' },
+    { pct: '50%',  color: 'var(--amber)',  text: 'Fair' },
+    { pct: '75%',  color: 'var(--cyan)',   text: 'Good' },
+    { pct: '100%', color: 'var(--emerald)', text: 'Strong ✓' },
+  ];
+  const lv = levels[score];
+  fill.style.width      = lv.pct;
+  fill.style.background = lv.color;
+  label.textContent     = lv.text;
+  label.style.color     = lv.color;
+}
+
+// --- FORCE RESET FLOW ---
+async function handleForceReset(e) {
+  e.preventDefault();
+  const newPwd  = document.getElementById('fr-new-pwd').value;
+  const confirm = document.getElementById('fr-confirm-pwd').value;
+  const err     = document.getElementById('fr-err');
+  const btn     = document.getElementById('btn-force-reset');
+
+  err.classList.add('hidden');
+
+  if (newPwd.length < 8)   return showError(err, 'Password must be at least 8 characters');
+  if (newPwd !== confirm)  return showError(err, 'Passwords do not match');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
+
+  try {
+    // Update Supabase Auth password
+    const { error: pwdErr } = await appAuth.db.auth.updateUser({ password: newPwd });
+    if (pwdErr) throw pwdErr;
+
+    // Clear the force_password_reset flag
+    const { error: dbErr } = await appAuth.db
+      .from('teacher_profiles')
+      .update({ force_password_reset: false })
+      .eq('id', appAuth.user.id);
+    if (dbErr) throw dbErr;
+
+    // Update local profile cache and go to main
+    if (appAuth.profile) appAuth.profile.force_password_reset = false;
+    showToast('✅ Password updated successfully!');
+    setupTeacherForm(appAuth.profile);
+    showScreen('main');
+  } catch (ex) {
+    showError(err, ex.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Set New Password →';
+}
+
+// --- CHANGE PASSWORD MODAL ---
+function openChangePwdModal() {
+  document.getElementById('cp-new-pwd').value     = '';
+  document.getElementById('cp-confirm-pwd').value = '';
+  const fill = document.getElementById('cp-strength-fill');
+  const lbl  = document.getElementById('cp-strength-label');
+  if (fill) { fill.style.width = '0%'; }
+  if (lbl)  { lbl.textContent = ''; }
+  document.getElementById('cp-err').classList.add('hidden');
+  document.getElementById('cp-success').classList.add('hidden');
+  document.getElementById('modal-change-pwd').style.display = 'flex';
+}
+
+function closeChangePwdModal() {
+  document.getElementById('modal-change-pwd').style.display = 'none';
+}
+
+async function handleChangePwd(e) {
+  e.preventDefault();
+  const newPwd  = document.getElementById('cp-new-pwd').value;
+  const confirm = document.getElementById('cp-confirm-pwd').value;
+  const err     = document.getElementById('cp-err');
+  const success = document.getElementById('cp-success');
+  const btn     = document.getElementById('btn-change-pwd');
+
+  err.classList.add('hidden');
+  success.classList.add('hidden');
+
+  if (newPwd.length < 8)  return showError(err, 'Password must be at least 8 characters');
+  if (newPwd !== confirm)  return showError(err, 'Passwords do not match');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Updating…';
+
+  try {
+    const { error } = await appAuth.db.auth.updateUser({ password: newPwd });
+    if (error) throw error;
+    success.textContent = '✅ Password changed successfully!';
+    success.classList.remove('hidden');
+    document.getElementById('cp-new-pwd').value     = '';
+    document.getElementById('cp-confirm-pwd').value = '';
+    setTimeout(closeChangePwdModal, 2000);
+  } catch (ex) {
+    showError(err, ex.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔒 Update Password';
+}
+
+// --- ATTENDANCE FORM ---
 async function handleAttendanceSubmit(e) {
   e.preventDefault();
-  
-  const period = document.querySelector('input[name="period"]:checked')?.value;
-  const cls = document.getElementById('form-class').value;
-  const subject = document.getElementById('form-subject').value;
-  const taken = document.querySelector('input[name="taken"]:checked')?.value;
 
-  if (!period || !cls || !subject || !taken) {
+  const period  = document.querySelector('input[name="period"]:checked')?.value;
+  const cls     = document.getElementById('form-class').value;
+  const subject = document.getElementById('form-subject').value;
+  const taken   = document.querySelector('input[name="taken"]:checked')?.value;
+
+  if (!period || !cls || !subject || !taken)
     return showToast('⚠️ Please fill out all required fields.');
-  }
 
   if (taken === 'Yes') {
     const tot = getN('tot');
@@ -307,35 +427,34 @@ async function handleAttendanceSubmit(e) {
 
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span> Submitting...';
+  btn.innerHTML = '<span class="spinner-sm"></span> Submitting…';
 
   const payload = {
-    teacher: appAuth.profile.name,
+    teacher:      appAuth.profile.name,
     period,
-    class: cls,
+    class:        cls,
     subject,
     taken,
-    total: taken === 'Yes' ? getN('tot') : 0,
-    present: taken === 'Yes' ? getN('pre') : 0,
-    leave_count: taken === 'Yes' ? getN('lea') : 0,
-    od: taken === 'Yes' ? getN('od') : 0,
-    absent: taken === 'Yes' ? getN('abs') : 0,
-    tca: taken === 'Yes' ? getN('tca') : 0,
-    nr: taken === 'Yes' ? getN('nr') : 0,
-    sick: taken === 'Yes' ? getN('sick') : 0,
-    reason: document.getElementById('form-reason').value,
-    remarks: document.getElementById('form-remarks').value.trim()
+    total:        taken === 'Yes' ? getN('tot') : 0,
+    present:      taken === 'Yes' ? getN('pre') : 0,
+    leave_count:  taken === 'Yes' ? getN('lea') : 0,
+    od:           taken === 'Yes' ? getN('od')  : 0,
+    absent:       taken === 'Yes' ? getN('abs') : 0,
+    tca:          taken === 'Yes' ? getN('tca') : 0,
+    nr:           taken === 'Yes' ? getN('nr')  : 0,
+    sick:         taken === 'Yes' ? getN('sick'): 0,
+    reason:       document.getElementById('form-reason').value,
+    remarks:      document.getElementById('form-remarks').value.trim()
   };
 
   const { error } = await appAuth.db.from('attendance').insert([payload]);
-  
+
   btn.disabled = false;
   btn.innerHTML = 'Submit Attendance &rarr;';
 
   if (error) {
     showToast('❌ Error submitting: ' + error.message);
   } else {
-    // Build detail rows for success screen
     const rows = [
       ['Teacher', payload.teacher],
       ['Period',  'Period ' + period],
@@ -347,13 +466,13 @@ async function handleAttendanceSubmit(e) {
     ];
     if (payload.reason) rows.push(['Reason', payload.reason]);
 
-    let html = rows.map(([l,v]) =>
+    const html = rows.map(([l,v]) =>
       `<div class="detail-row-item"><div class="detail-label">${l}</div><div class="detail-val">${v}</div></div>`
     ).join('');
 
     document.getElementById('suc-details').innerHTML = html;
     showScreen('success');
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }
 }
 
@@ -362,5 +481,5 @@ function submitAnother() {
   document.querySelectorAll('input[name="period"]').forEach(r => r.checked = false);
   toggleCounts(true);
   showScreen('main');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }

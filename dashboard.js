@@ -883,14 +883,17 @@
         const regDate = new Date(p.created_at).toLocaleDateString('en-IN',
           {day:'2-digit',month:'short',year:'numeric'});
 
+        const resetFlag = p.force_password_reset
+          ? ' style="background:var(--amber-sub);border-color:var(--amber-border);color:var(--amber-lt);" title="Reset already pending"'
+          : '';
         const actionBtns = p.approved
           ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this)">🚫 Revoke</button>
              <button class="tc-btn edit"   onclick="openEdit('${p.id}')">✏️ Edit</button>
-             <button class="tc-btn reset"  onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`
+             <button class="tc-btn reset"${resetFlag} onclick="resetTeacherPassword('${p.id}',this)">🔑 Reset Pwd${p.force_password_reset ? ' ⚠' : ''}</button>`
           : `<button class="tc-btn approve" onclick="setApproval('${p.id}',true,this)">✅ Approve</button>
              <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this)" style="opacity:.75">🗑 Reject</button>
              <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>
-             <button class="tc-btn reset"   onclick="resetTeacherPassword('${p.email}',this)">🔑 Reset Pwd</button>`;
+             <button class="tc-btn reset"${resetFlag} onclick="resetTeacherPassword('${p.id}',this)">🔑 Reset Pwd${p.force_password_reset ? ' ⚠' : ''}</button>`;
 
         return `<div class="teacher-card ${statusClass}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -938,23 +941,34 @@
     }
 
     // ── RESET TEACHER PASSWORD ─────────────────────────────────
-    async function resetTeacherPassword(email, btn) {
-      if (!confirm(`Send a password reset link to:\n${email}\n\nThe teacher will receive an email with a link to set a new password.`)) return;
+    // Sets force_password_reset = true in teacher_profiles.
+    // On next login, teacher is shown a "Set New Password" screen
+    // and must choose a new password before they can access the form.
+    async function resetTeacherPassword(teacherId, btn) {
+      if (!confirm(
+        'Force this teacher to set a new password on their next login?\n\n' +
+        'They will be prompted immediately after signing in.'
+      )) return;
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner spinner-dark"></span>';
 
       try {
-        const { error } = await db.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/index.html'
-        });
+        const { error } = await db
+          .from('teacher_profiles')
+          .update({ force_password_reset: true })
+          .eq('id', teacherId);
         if (error) throw error;
 
-        btn.innerHTML = '✅ Sent!';
+        // Update local state
+        const p = allProfiles.find(x => x.id === teacherId);
+        if (p) p.force_password_reset = true;
+
+        btn.innerHTML = '✅ Reset Flagged!';
         btn.style.background = 'var(--ok)';
         btn.style.color = '#fff';
         btn.style.borderColor = 'var(--ok)';
-        // Reset button appearance after 3 seconds
+        showToast('✅ Password reset flagged. Teacher will be prompted on next login.');
         setTimeout(() => {
           btn.innerHTML = '🔑 Reset Pwd';
           btn.style.background = '';
@@ -964,7 +978,7 @@
         }, 3000);
 
       } catch (e) {
-        alert('❌ Failed to send reset email: ' + e.message);
+        alert('❌ Failed to set reset flag: ' + e.message);
         btn.innerHTML = '🔑 Reset Pwd';
         btn.disabled = false;
       }

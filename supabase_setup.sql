@@ -40,13 +40,11 @@ DROP POLICY IF EXISTS "allow_auth_insert"  ON attendance;
 DROP POLICY IF EXISTS "allow_anon_select"  ON attendance;
 DROP POLICY IF EXISTS "allow_auth_select"  ON attendance;
 
--- Only authenticated teachers can INSERT
 CREATE POLICY "allow_auth_insert"
   ON attendance FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() IS NOT NULL);
 
--- Dashboard (anon) + authenticated users can SELECT
 CREATE POLICY "allow_anon_select"
   ON attendance FOR SELECT
   TO anon
@@ -59,17 +57,21 @@ CREATE POLICY "allow_auth_select"
 
 -- ────────────────────────────────────────────────────────────────
 --  TABLE 2: teacher_profiles
---  Must be created BEFORE any policies that reference it.
 -- ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS teacher_profiles (
-  id         UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  name       TEXT        NOT NULL,
-  email      TEXT        NOT NULL,
-  classes    TEXT[]      NOT NULL DEFAULT '{}',
-  subjects   TEXT[]      NOT NULL DEFAULT '{}',
-  approved   BOOLEAN     NOT NULL DEFAULT FALSE
+  id                    UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  name                  TEXT        NOT NULL,
+  email                 TEXT        NOT NULL,
+  classes               TEXT[]      NOT NULL DEFAULT '{}',
+  subjects              TEXT[]      NOT NULL DEFAULT '{}',
+  approved              BOOLEAN     NOT NULL DEFAULT FALSE,
+  force_password_reset  BOOLEAN     NOT NULL DEFAULT FALSE
 );
+
+-- Add force_password_reset if upgrading existing installs
+ALTER TABLE teacher_profiles
+  ADD COLUMN IF NOT EXISTS force_password_reset BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE teacher_profiles ENABLE ROW LEVEL SECURITY;
 
@@ -80,7 +82,6 @@ DROP POLICY IF EXISTS "teacher_self_update" ON teacher_profiles;
 DROP POLICY IF EXISTS "allow_admin_select"  ON teacher_profiles;
 DROP POLICY IF EXISTS "allow_admin_update"  ON teacher_profiles;
 
--- Teachers manage their own profile
 CREATE POLICY "teacher_self_insert"
   ON teacher_profiles FOR INSERT
   TO authenticated
@@ -97,7 +98,6 @@ CREATE POLICY "teacher_self_update"
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
--- Admin dashboard (anon + PIN) can read & update all profiles
 CREATE POLICY "allow_admin_select"
   ON teacher_profiles FOR SELECT
   TO anon
@@ -111,8 +111,6 @@ CREATE POLICY "allow_admin_update"
 
 -- ────────────────────────────────────────────────────────────────
 --  TABLE 3: admin_settings
---  Stores the SHA-256 hash of the admin dashboard PIN.
---  Default PIN = 1234  →  hash below is SHA-256('1234')
 -- ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS admin_settings (
   key        TEXT        PRIMARY KEY,
@@ -120,7 +118,6 @@ CREATE TABLE IF NOT EXISTS admin_settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Seed default PIN hash (safe to re-run — ON CONFLICT skips if row exists)
 INSERT INTO admin_settings (key, value)
 VALUES (
   'pin_hash',
@@ -130,30 +127,22 @@ ON CONFLICT (key) DO NOTHING;
 
 ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;
 
--- admin_settings policies
 DROP POLICY IF EXISTS "admin_settings_read"   ON admin_settings;
 DROP POLICY IF EXISTS "admin_settings_update" ON admin_settings;
 DROP POLICY IF EXISTS "admin_settings_insert" ON admin_settings;
 
 CREATE POLICY "admin_settings_read"
-  ON admin_settings FOR SELECT
-  TO anon
-  USING (true);
+  ON admin_settings FOR SELECT TO anon USING (true);
 
 CREATE POLICY "admin_settings_update"
-  ON admin_settings FOR UPDATE
-  TO anon
-  USING (true)
-  WITH CHECK (true);
+  ON admin_settings FOR UPDATE TO anon USING (true) WITH CHECK (true);
 
 CREATE POLICY "admin_settings_insert"
-  ON admin_settings FOR INSERT
-  TO anon
-  WITH CHECK (true);
+  ON admin_settings FOR INSERT TO anon WITH CHECK (true);
 
 -- ────────────────────────────────────────────────────────────────
---  QUICK VERIFICATION (runs after setup — safe to remove later)
+--  QUICK VERIFICATION
 -- ────────────────────────────────────────────────────────────────
-SELECT id, name, email, approved, created_at
+SELECT id, name, email, approved, force_password_reset, created_at
 FROM teacher_profiles
 ORDER BY created_at DESC;
