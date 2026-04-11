@@ -160,6 +160,9 @@ tbody tr:hover{background:#f7f9fc;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .date-input{padding:7px 10px;border:1px solid var(--border);border-radius:6px;
   font-size:13px;background:#f7f8fa;color:var(--ink);min-height:42px;}
+.date-chip{display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #d0eaf5;
+  border-radius:6px;background:#eef5fb;color:var(--blue);font-size:12px;font-weight:600;
+  white-space:nowrap;min-height:42px;}
 
 /* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,36,52,.55);
@@ -248,6 +251,7 @@ body { overscroll-behavior: none; }
 
   /* Weekly/Monthly pickers */
   .date-input { min-height: 38px; font-size: 12px; padding: 6px 8px; }
+  .date-chip { min-height: 38px; font-size: 11px; padding: 6px 8px; }
   .expand-btn { min-height: 34px; padding: 4px 8px; font-size: 11px; }
 
   /* Modal */
@@ -302,10 +306,11 @@ body { overscroll-behavior: none; }
 
 <div class="toolbar">
   <input type="date" id="dateSelect" onchange="loadDaily()">
+  <span class="date-chip" id="dateDisplay">--/--/----</span>
   <select id="teacherFilter" onchange="loadDaily()">
     <option value="">All Teachers</option>
   </select>
-  <button class="btn btn-primary" id="syncBtn" onclick="loadDaily()">
+  <button class="btn btn-primary" id="syncBtn" onclick="loadDaily(true)">
     <span id="syncIcon">↻</span> Refresh
   </button>
   <button class="btn btn-teal" onclick="doExportCSV()">⬇ CSV</button>
@@ -385,6 +390,7 @@ body { overscroll-behavior: none; }
         <h3>📊 Weekly Report</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input type="date" id="weekStart" class="date-input" onchange="loadWeeklyTab()">
+          <span class="date-chip" id="weekDisplay">Week of --/--/----</span>
           <button class="expand-btn" onclick="shiftWeek(-1)">◀</button>
           <button class="expand-btn" onclick="shiftWeek(1)">▶</button>
         </div>
@@ -412,6 +418,7 @@ body { overscroll-behavior: none; }
         <h3>📅 Monthly Report</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input type="month" id="monthSelect" class="date-input" onchange="loadMonthlyTab()">
+          <span class="date-chip" id="monthDisplay">----</span>
           <button class="expand-btn" onclick="shiftMonth(-1)">◀</button>
           <button class="expand-btn" onclick="shiftMonth(1)">▶</button>
         </div>
@@ -481,6 +488,9 @@ const API_URL = 'https://script.google.com/macros/s/AKfycby9XJtadC1lZo6vmp7TWRnO
 let PIN = '';
 let META = { teachers:[], classes:[], periods:[], school:'JNV Tarikhet' };
 let LINKS = { sheetUrl:'', formFillUrl:'', formEditUrl:'' };
+const CLIENT_CACHE_TTL_MS = 30000;
+const RESPONSE_CACHE = new Map();
+const INFLIGHT_REQUESTS = new Map();
 
 // ════════════════════════════════════════════════════════════
 //  STATIC DATA — populated without server round-trip
@@ -510,7 +520,7 @@ document.getElementById('appTitle').textContent = '📋 JNV Tarikhet';
 //  corsproxy.io adds Access-Control-Allow-Origin: * header
 //  so the browser allows cross-origin requests to GAS.
 // ════════════════════════════════════════════════════════════
-async function api(params) {
+async function apiRaw(params) {
   if (!params.pin) params.pin = PIN;
 
   if (!API_URL || API_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
@@ -518,7 +528,8 @@ async function api(params) {
   }
 
   const qs  = Object.entries(params)
-    .map(([k,v]) => k + '=' + encodeURIComponent(v == null ? '' : v))
+    .filter(([,v]) => v !== undefined && v !== null && v !== '')
+    .map(([k,v]) => k + '=' + encodeURIComponent(v))
     .join('&');
 
   // Use CORS proxy to allow cross-origin fetch to GAS
@@ -551,6 +562,40 @@ async function api(params) {
 
   if (json.error) throw new Error(json.error);
   return json;
+}
+
+async function api(params, opts = {}) {
+  if (!params.pin) params.pin = PIN;
+  const useCache = opts.useCache !== false;
+  const force = opts.force === true;
+  const cacheKey = JSON.stringify(params);
+
+  if (useCache && !force) {
+    const cached = RESPONSE_CACHE.get(cacheKey);
+    if (cached && (Date.now() - cached.ts) < CLIENT_CACHE_TTL_MS) {
+      return cached.data;
+    }
+    if (INFLIGHT_REQUESTS.has(cacheKey)) {
+      return INFLIGHT_REQUESTS.get(cacheKey);
+    }
+  }
+
+  const request = apiRaw({ ...params });
+  if (useCache && !force) {
+    INFLIGHT_REQUESTS.set(cacheKey, request);
+  }
+
+  try {
+    const data = await request;
+    if (useCache) {
+      RESPONSE_CACHE.set(cacheKey, { ts: Date.now(), data });
+    }
+    return data;
+  } finally {
+    if (useCache) {
+      INFLIGHT_REQUESTS.delete(cacheKey);
+    }
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -612,6 +657,7 @@ async function initApp() {
   document.getElementById('weekStart').value = fmtDate(mon);
   const mm = String(now.getMonth()+1).padStart(2,'0');
   document.getElementById('monthSelect').value = now.getFullYear()+'-'+mm;
+  updateDateDisplays();
 
   // Populate dropdown with CONFIG teachers immediately (no server needed)
   const sel = document.getElementById('teacherFilter');
@@ -665,6 +711,29 @@ function todayLocal() {
     String(ist.getUTCMonth()+1).padStart(2,'0')+'-'+
     String(ist.getUTCDate()).padStart(2,'0');
 }
+function formatDateLabel(isoDate) {
+  const parts = (isoDate || '').split('-').map(Number);
+  if (parts.length !== 3 || parts.some(n => !n)) return '--/--/----';
+  const [y,m,d] = parts;
+  return String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;
+}
+function formatMonthLabel(monthValue) {
+  const parts = (monthValue || '').split('-').map(Number);
+  if (parts.length !== 2 || parts.some(n => !n)) return '----';
+  const [y,m] = parts;
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', {
+    month: 'long',
+    year: 'numeric'
+  });
+}
+function updateDateDisplays() {
+  const dateValue = document.getElementById('dateSelect').value;
+  const weekValue = document.getElementById('weekStart').value;
+  const monthValue = document.getElementById('monthSelect').value;
+  document.getElementById('dateDisplay').textContent = formatDateLabel(dateValue);
+  document.getElementById('weekDisplay').textContent = 'Week of ' + formatDateLabel(weekValue);
+  document.getElementById('monthDisplay').textContent = formatMonthLabel(monthValue);
+}
 
 // ════════════════════════════════════════════════════════════
 //  TABS
@@ -686,11 +755,12 @@ function filterTbl(tblId, q) {
 // ════════════════════════════════════════════════════════════
 //  DAILY DATA
 // ════════════════════════════════════════════════════════════
-async function loadDaily() {
+async function loadDaily(forceRefresh = false) {
   const btn  = document.getElementById('syncBtn');
   const icon = document.getElementById('syncIcon');
   const date = document.getElementById('dateSelect').value;
   const teacher = document.getElementById('teacherFilter').value;
+  updateDateDisplays();
   btn.disabled = true;
   icon.innerHTML = '<span class="spinner"></span>';
   document.getElementById('lastSync').textContent = 'Loading...';
@@ -700,7 +770,10 @@ async function loadDaily() {
       '<div class="empty"><div class="empty-icon">⏳</div>Fetching data from server...</div>';
   });
   try {
-    const d = await api({ action:'daily', date, teacher });
+    const d = await api(
+      { action:'daily', date, teacher, fresh: forceRefresh ? '1' : '' },
+      { force: forceRefresh }
+    );
     renderKpis(d.kpis, 'kpiGrid');
     renderTodayTable(d.submissions);
     renderPeriodBars(d.periodCounts);
@@ -879,6 +952,7 @@ function expandAll(flag) {
 async function loadWeeklyTab() {
   const ws = document.getElementById('weekStart').value;
   if (!ws) return;
+  updateDateDisplays();
   document.getElementById('weeklyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
   try {
     const d = await api({ action:'weekly', weekStart:ws });
@@ -894,6 +968,7 @@ function shiftWeek(dir) {
   const d = new Date(document.getElementById('weekStart').value);
   d.setDate(d.getDate()+dir*7);
   document.getElementById('weekStart').value = fmtDate(d);
+  updateDateDisplays();
   loadWeeklyTab();
 }
 
@@ -903,6 +978,7 @@ function shiftWeek(dir) {
 async function loadMonthlyTab() {
   const mv = document.getElementById('monthSelect').value;
   if (!mv) return;
+  updateDateDisplays();
   document.getElementById('monthlyTeacherBody').innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>Loading...</div>';
   try {
     const d = await api({ action:'monthly', month:mv });
@@ -920,6 +996,7 @@ function shiftMonth(dir) {
   const [y,m] = val.split('-').map(Number);
   const d = new Date(y, m-1+dir, 1);
   document.getElementById('monthSelect').value = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  updateDateDisplays();
   loadMonthlyTab();
 }
 
@@ -980,7 +1057,7 @@ async function doExportCSV() {
   const date    = document.getElementById('dateSelect').value;
   const teacher = document.getElementById('teacherFilter').value;
   try {
-    const r = await api({ action:'exportCSV', date, teacher });
+    const r = await api({ action:'exportCSV', date, teacher }, { useCache:false, force:true });
     alert(r.msg + (r.url ? '\n' + r.url : ''));
   } catch(e) { alert('Export failed: '+e.message); }
 }
