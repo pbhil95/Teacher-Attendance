@@ -1,4 +1,4 @@
-// Constants
+﻿// Constants
 const TEACHERS = [
   "TGT Computer Science", "Librarian", "PET F", "PET M",
   "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) {
       // Reset login button in case we were mid-login when sign-out happened
       const btnLogin = document.getElementById('btn-login');
-      if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In →'; }
+      if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In'; }
       showScreen('auth');
     } else if (!profile) {
       document.getElementById('wait-name').textContent = "Profile Data Missing";
