@@ -42,15 +42,39 @@ const ST = {
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-  populateDropdowns();
-  setupEventListeners();
+  if (window._log) window._log('DOMContentLoaded fired');
+
+  // Verify critical elements exist
+  if (window._log) {
+    window._log('ST.loading=' + (ST.loading ? 'OK' : 'NULL!'));
+    window._log('ST.auth='   + (ST.auth    ? 'OK' : 'NULL!'));
+    window._log('ST.main='   + (ST.main    ? 'OK' : 'NULL!'));
+    window._log('ST.myActivity=' + (ST.myActivity ? 'OK' : 'NULL!'));
+    window._log('appAuth exists=' + (typeof appAuth !== 'undefined'));
+  }
+
+  try {
+    if (window._log) window._log('populateDropdowns() starting...');
+    populateDropdowns();
+    if (window._log) window._log('populateDropdowns() OK');
+  } catch(e) {
+    if (window._err) window._err('populateDropdowns CRASH: ' + e.message);
+  }
+
+  try {
+    if (window._log) window._log('setupEventListeners() starting...');
+    setupEventListeners();
+    if (window._log) window._log('setupEventListeners() OK');
+  } catch(e) {
+    if (window._err) window._err('setupEventListeners CRASH: ' + e.message);
+  }
 
   appAuth.onStateChange((user, profile) => {
+    if (window._log) window._log('onStateChange CB fired. user=' + (user ? user.email : 'null'));
     ST.loading.classList.add('fade-out');
     setTimeout(() => ST.loading.classList.add('hidden'), 300);
 
     if (!user) {
-      // Reset login button in case we were mid-login when sign-out happened
       const btnLogin = document.getElementById('btn-login');
       if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In'; }
       showScreen('auth');
@@ -69,27 +93,66 @@ document.addEventListener('DOMContentLoaded', () => {
       setupTeacherForm(profile);
       showScreen('main');
     }
+    if (window._log) window._log('onStateChange CB done.');
   });
 
+  if (window._log) window._log('Calling appAuth.init()...');
   appAuth.init();
+  if (window._log) window._log('appAuth.init() call returned (async, still running).');
 
-  // Safety net: if loading screen still visible after 8s, something went wrong.
-  // Force show the auth screen so the user is never permanently stuck.
+  // Safety net: force-show auth screen if spinner still shows after 6s
   setTimeout(() => {
     if (ST.loading && !ST.loading.classList.contains('hidden')) {
-      console.warn('[App] Loading timeout — forcing auth screen.');
+      if (window._log) window._log('TIMEOUT: loading still visible after 6s — forcing auth.');
       ST.loading.classList.add('hidden');
       showScreen('auth');
     }
-  }, 8000);
+  }, 6000);
+
+  // Inject the floating debug button (visible for 5 min after page load)
+  setTimeout(() => {
+    const dbgBtn = document.createElement('button');
+    dbgBtn.id = 'dbg-btn';
+    dbgBtn.textContent = '🪲 Debug Log';
+    dbgBtn.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:99999;padding:8px 14px;background:#1e1b4b;color:#a5b4fc;border:1px solid #6366F1;border-radius:20px;font-size:0.78rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.5);';
+    dbgBtn.onclick = showDebugLog;
+    document.body.appendChild(dbgBtn);
+  }, 1000);
 });
+
+// Show debug overlay with full log
+function showDebugLog() {
+  const logs = (window._DBG || []).concat(
+    (localStorage.getItem('jnv_dbg') || '').split('\n').filter(Boolean)
+  );
+  const unique = [...new Set(logs)];
+  const text = unique.join('\n') || 'No log entries captured yet.';
+
+  let overlay = document.getElementById('dbg-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'dbg-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#050508;color:#a5b4fc;font-family:monospace;font-size:0.72rem;padding:16px;overflow:auto;white-space:pre-wrap;line-height:1.6;';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML =
+    '<div style="display:flex;gap:10px;margin-bottom:12px;position:sticky;top:0;background:#050508;padding-bottom:8px;">' +
+    '<button onclick="this.closest(\'#dbg-overlay\').remove()" style="padding:6px 14px;background:#6366F1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✕ Close</button>' +
+    '<button onclick="navigator.clipboard.writeText(document.getElementById(\'dbg-text\').textContent)" style="padding:6px 14px;background:#10B981;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">📋 Copy All</button>' +
+    '<button onclick="localStorage.removeItem(\'jnv_dbg\');document.getElementById(\'dbg-overlay\').remove();" style="padding:6px 14px;background:#EF4444;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">🗑 Clear</button>' +
+    '</div>' +
+    '<pre id="dbg-text" style="margin:0;">' + text + '</pre>';
+  overlay.style.display = 'block';
+}
 
 // --- NAVIGATION ---
 function showScreen(screenKey) {
+  if (window._log) window._log('showScreen(' + screenKey + ')');
   Object.keys(ST).forEach(k => {
     if (ST[k] && k !== 'loading') ST[k].classList.add('hidden');
   });
   if (ST[screenKey]) ST[screenKey].classList.remove('hidden');
+  else if (window._err) window._err('showScreen: ST.' + screenKey + ' is NULL!');
 }
 
 function switchAuthTab(type) {

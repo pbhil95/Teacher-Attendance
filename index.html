@@ -2,6 +2,38 @@
 <html lang="en" data-theme="light">
 
 <head>
+  <!-- DEBUG LOGGER: captures all JS errors & auth steps -->
+  <script>
+    (function(){
+      window._DBG = [];
+      window._DBG_T0 = Date.now();
+      function log(lvl, msg) {
+        var t = ((Date.now() - window._DBG_T0)/1000).toFixed(3) + 's';
+        var entry = '[' + t + '] ' + lvl + ': ' + msg;
+        window._DBG.push(entry);
+        // Also persist to localStorage for recovery
+        try { localStorage.setItem('jnv_dbg', window._DBG.slice(-80).join('\n')); } catch(e){}
+      }
+      window._log = function(msg) { log('LOG', msg); };
+      window._err = function(msg) { log('ERR', msg); };
+
+      // Capture ALL unhandled JS errors
+      window.addEventListener('error', function(e) {
+        log('CRASH', (e.message||'?') + ' | file:' + (e.filename||'').split('/').pop() + ' line:' + e.lineno);
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        log('PROMISE', e.reason && e.reason.message ? e.reason.message : String(e.reason));
+      });
+
+      // Redirect console.error/warn to also capture
+      var _ce = console.error, _cw = console.warn;
+      console.error = function() { log('CON.ERR', Array.from(arguments).join(' ')); _ce.apply(console,arguments); };
+      console.warn  = function() { log('CON.WARN', Array.from(arguments).join(' ')); _cw.apply(console,arguments); };
+
+      log('LOG','=== JNV DEBUG LOG STARTED ===');
+      log('LOG','UA: ' + navigator.userAgent.substring(0,80));
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="JNV Tarikhet – Staff Attendance Portal. Secure, fast, mobile-friendly.">
