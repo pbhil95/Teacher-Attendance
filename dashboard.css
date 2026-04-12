@@ -54,7 +54,7 @@
   z-index: 150;
   overflow-x: auto;
   scrollbar-width: none;
-  flex-wrap: no-wrap;
+  flex-wrap: nowrap;
 }
 .toolbar::-webkit-scrollbar { display: none; }
 
@@ -79,7 +79,11 @@
   min-height: 38px;
   white-space: nowrap;
   border-radius: var(--r-md);
+  flex-shrink: 0;
 }
+
+/* Ensure all toolbar children don't shrink to 0 */
+.toolbar > * { flex-shrink: 0; }
 
 #lastSync {
   margin-left: auto;

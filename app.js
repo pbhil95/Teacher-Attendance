@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => ST.loading.classList.add('hidden'), 300);
 
     if (!user) {
+      // Reset login button in case we were mid-login when sign-out happened
+      const btnLogin = document.getElementById('btn-login');
+      if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In →'; }
       showScreen('auth');
     } else if (!profile) {
       document.getElementById('wait-name').textContent = "Profile Data Missing";
