@@ -45,7 +45,7 @@
           if (typeof caches !== 'undefined') {
             caches.keys().then(function(keys) {
               keys.forEach(function(k) {
-                if (k !== 'jnv-att-v3') {
+                if (k !== 'jnv-att-v5') {
                   caches.delete(k);
                   log('LOG','Deleted stale cache: ' + k);
                 } else {

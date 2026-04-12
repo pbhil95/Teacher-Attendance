@@ -261,11 +261,24 @@ function setupEventListeners() {
     });
   });
 
-  // Logout
+  // Logout — force-clear session even if Supabase signOut silently fails
   document.querySelectorAll('.btn-logout').forEach(btn => {
     btn.addEventListener('click', async () => {
-      ST.loading.classList.remove('fade-out');
-      await appAuth.logout();
+      btn.disabled = true;
+      ST.loading.classList.remove('fade-out', 'hidden');
+      try {
+        await appAuth.logout();
+      } catch (e) {
+        console.warn('signOut error:', e);
+      }
+      // Force clear state and redirect to auth screen regardless
+      appAuth.user = null;
+      appAuth.profile = null;
+      appAuth.recoveryMode = false;
+      showScreen('auth');
+      ST.loading.classList.add('fade-out');
+      setTimeout(() => ST.loading.classList.add('hidden'), 300);
+      btn.disabled = false;
     });
   });
 
