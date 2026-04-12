@@ -1722,6 +1722,33 @@ h6 {
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════════ */
+/* ── Desktop / wide screen layout ── */
+@media (min-width: 900px) {
+  .glass-container {
+    max-width: 860px;
+    padding: 36px 32px 80px;
+  }
+
+  #attendance-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  #attendance-form .submit-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .teacher-banner {
+    padding: 18px 28px;
+  }
+
+  .auth-card {
+    padding: 48px 52px;
+  }
+}
+
 @media (max-width: 640px) {
   .auth-card {
     padding: 28px 20px;

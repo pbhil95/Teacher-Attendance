@@ -3,6 +3,11 @@
  * Sidebar layout · Premium dark · Neon accents
  */
 
+/* ── Override heading font for dashboard — use clean sans-serif ── */
+:root {
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
 /* ── Legacy alias variables for dashboard.js inline styles ── */
 :root {
   --ok:     var(--emerald);
