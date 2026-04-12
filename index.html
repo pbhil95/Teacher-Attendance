@@ -17,6 +17,7 @@
 
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     body {
       background: var(--bg-base);
@@ -270,6 +271,35 @@
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
+  <!-- PWA Install Banner -->
+  <div id="pwa-banner" style="
+    display:none; position:fixed; bottom:0; left:0; right:0; z-index:9999;
+    background:linear-gradient(135deg,#6366F1,#8B5CF6);
+    padding:14px 20px; box-shadow:0 -4px 24px rgba(99,102,241,0.4);
+    align-items:center; gap:14px; animation:slideUpBanner 0.4s ease;
+  ">
+    <img src="icon-192.png" style="width:44px;height:44px;border-radius:10px;flex-shrink:0;" alt="app icon">
+    <div style="flex:1;">
+      <div style="font-weight:800;color:#fff;font-size:0.92rem;">Install JNV Att</div>
+      <div id="pwa-banner-sub" style="font-size:0.74rem;color:rgba(255,255,255,0.8);margin-top:2px;">Add to your home screen for quick access</div>
+    </div>
+    <button id="pwa-install-btn" style="
+      background:#fff;color:#6366F1;border:none;border-radius:20px;
+      padding:9px 18px;font-weight:800;font-size:0.85rem;cursor:pointer;
+      white-space:nowrap;flex-shrink:0;
+    ">Install</button>
+    <button onclick="dismissPwaBanner()" style="
+      background:none;border:none;color:rgba(255,255,255,0.7);
+      font-size:1.3rem;cursor:pointer;padding:4px;flex-shrink:0;line-height:1;
+    ">×</button>
+  </div>
+  <style>
+    @keyframes slideUpBanner {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+  </style>
+
   <!-- LOADING -->
   <div id="screen-loading" class="fullscreen-overlay">
     <div style="display:flex;flex-direction:column;align-items:center;">
@@ -378,9 +408,6 @@
         <div class="auth-footer-note" style="margin-top:16px;">Already registered? <strong
             onclick="switchAuthTab('login')" style="cursor:pointer;color:var(--indigo-lt);">Sign in</strong></div>
       </form>
-      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--bd2);text-align:center;">
-        <a href="dashboard.html" class="btn btn-outline" style="width:auto;padding:10px 24px;font-size:0.88rem;display:inline-flex;">📊 Open Admin Dashboard</a>
-      </div>
     </div>
   </div>
 
@@ -465,7 +492,7 @@
           <div class="teacher-name" id="teacher-name-display">—</div>
         </div>
         <div class="teacher-banner-actions">
-          <a href="dashboard.html" class="teacher-dash-link">📊 Dashboard</a>
+          <button class="teacher-pwd-btn" onclick="openMyReports()" type="button" style="background:rgba(16,185,129,0.22);border-color:rgba(16,185,129,0.5);">📊 My Reports</button>
           <button class="teacher-pwd-btn" onclick="openChangePwdModal()" type="button">🔑 Change Pwd</button>
         </div>
       </div>
@@ -636,8 +663,142 @@
             .catch(err => console.warn('[PWA] SW failed:', err));
         });
       }
+
+      // ── PWA Install Banner logic ──────────────────────────────
+      let deferredPrompt = null;
+      const banner = document.getElementById('pwa-banner');
+      const installBtn = document.getElementById('pwa-install-btn');
+
+      // Hide banner if already installed (running standalone)
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+      const dismissed = sessionStorage.getItem('pwa-dismissed');
+
+      // Android Chrome: capture the install prompt
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (!isStandalone && !dismissed) {
+          banner.style.display = 'flex';
+        }
+      });
+
+      // When user taps Install
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          deferredPrompt = null;
+          banner.style.display = 'none';
+        }
+      });
+
+      // iOS Safari: show different message (no prompt API)
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isInSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      if (isIOS && isInSafari && !isStandalone && !dismissed) {
+        document.getElementById('pwa-banner-sub').textContent =
+          'Tap   ✂️  → "Add to Home Screen" to install';
+        installBtn.style.display = 'none';
+        banner.style.display = 'flex';
+      }
+
+      function dismissPwaBanner() {
+        document.getElementById('pwa-banner').style.display = 'none';
+        sessionStorage.setItem('pwa-dismissed', '1');
+      }
     })();
   </script>
-</body>
 
+  <!-- MY REPORTS SCREEN -->
+  <div id="screen-my-activity" class="hidden">
+    <header class="app-header">
+      <div class="header-branding" style="flex-direction:row;align-items:center;gap:12px;">
+        <button onclick="showScreen('main')" style="background:none;border:none;color:var(--t2);cursor:pointer;font-size:1.4rem;padding:4px 8px;border-radius:var(--r-sm);transition:all 0.2s;" title="Back"
+          onmouseover="this.style.background='var(--indigo-sub)'" onmouseout="this.style.background='none'">←</button>
+        <div>
+          <h1 class="header-title" style="font-size:1rem;"><span class="logo-icon">📊</span> My Reports</h1>
+          <div class="header-subtitle">Your Attendance Activity</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" title="Toggle theme">🌙</button>
+        <button class="icon-btn btn-logout" title="Sign Out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="glass-container">
+
+      <!-- Filter Card -->
+      <div class="glass-card">
+        <div class="card-header"><span class="card-icon">📅</span><h2 class="card-title">Filter Period</h2></div>
+        <div class="card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+            <button class="my-quick-btn active" onclick="setMyRange('week',this)">This Week</button>
+            <button class="my-quick-btn" onclick="setMyRange('month',this)">This Month</button>
+            <button class="my-quick-btn" onclick="setMyRange('30',this)">Last 30 Days</button>
+            <button class="my-quick-btn" onclick="setMyRange('all',this)">All Time</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+            <div>
+              <label class="form-label">From</label>
+              <input type="date" id="my-from" class="form-input" style="width:auto;padding:8px 12px;">
+            </div>
+            <div>
+              <label class="form-label">To</label>
+              <input type="date" id="my-to" class="form-input" style="width:auto;padding:8px 12px;">
+            </div>
+            <button class="btn btn-primary" style="width:auto;padding:9px 22px;" onclick="loadMyActivity()">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div id="my-kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
+
+      <!-- Records Table -->
+      <div class="glass-card">
+        <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;"><span class="card-icon">📎</span><h2 class="card-title">My Submissions</h2></div>
+          <button onclick="exportMyExcel()" style="
+            display:inline-flex;align-items:center;gap:7px;
+            padding:8px 18px;border-radius:var(--r-full);
+            background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.4);
+            color:var(--emerald-lt);font-weight:700;font-size:0.82rem;
+            cursor:pointer;font-family:var(--font-body);transition:all 0.2s;
+          ">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Excel
+          </button>
+        </div>
+        <div id="my-records-body" style="overflow-x:auto;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    .my-quick-btn {
+      padding:6px 16px; border-radius:var(--r-full);
+      border:1px solid var(--bd2); background:var(--bg-raised);
+      color:var(--t2); font-size:0.8rem; font-weight:700;
+      cursor:pointer; transition:all 0.2s; font-family:var(--font-body);
+    }
+    .my-quick-btn:hover { border-color:var(--indigo-border); color:var(--indigo-lt); }
+    .my-quick-btn.active {
+      background:linear-gradient(135deg,var(--indigo),var(--violet));
+      border-color:transparent; color:#fff;
+    }
+    .my-kpi {
+      padding:18px 16px; border-radius:var(--r-lg);
+      background:var(--bg-card); border:1px solid var(--glass-bd);
+      box-shadow:var(--sh-sm);
+    }
+    .my-kpi-val { font-family:var(--font-heading); font-size:2rem; font-weight:800; color:var(--t1); line-height:1; margin-bottom:6px; }
+    .my-kpi-lbl { font-size:0.62rem; color:var(--t3); text-transform:uppercase; font-weight:700; letter-spacing:1.2px; }
+  </style>
+
+</body>
 </html>

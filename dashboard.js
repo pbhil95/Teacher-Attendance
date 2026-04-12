@@ -1171,3 +1171,86 @@
       el.style.display = 'block';
       setTimeout(() => { el.style.display = 'none'; }, 3500);
     }
+    // ---------------------------------------------------------------
+    //  ADMIN EXPORT TO EXCEL (multi-sheet)
+    // ---------------------------------------------------------------
+
+    async function exportDashboardExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('?? Excel library not loaded yet. Please wait and try again.');
+        return;
+      }
+      const date    = document.getElementById('dateSelect').value;
+      const teacher = document.getElementById('teacherFilter').value;
+      if (!date) { alert('?? Please select a date first.'); return; }
+
+      const [start, end] = istDayRange(date);
+      let rows;
+      try { rows = await fetchRows(start, end, teacher); }
+      catch (e) { alert('? Failed to fetch data: ' + e.message); return; }
+
+      const d = aggregateDaily(rows, teacher);
+      const label = formatDateLabel(date);
+      const wb = XLSX.utils.book_new();
+
+      // Sheet 1: All Records
+      const allHeader = [
+        ['JNV Tarikhet — Attendance Records', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ['Date:', label, '', 'Filter:', teacher || 'All Teachers', '', 'Exported:', new Date().toLocaleString('en-IN')],
+        [],
+        ['#','Teacher','Period','Class','Subject','Taken','Total','Present','Absent','On Leave','OD','TCA','NR','Sick','Time','Remarks']
+      ];
+      const allRows = rows.map((r, i) => [
+        i+1, r.teacher, 'P'+r.period, r.class, r.subject,
+        String(r.taken).toLowerCase()==='yes'?'Yes':'No',
+        r.total||0, r.present||0, r.absent||0,
+        r.leave_count||0, r.od||0, r.tca||0, r.nr||0, r.sick||0,
+        new Date(r.created_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),
+        r.remarks||''
+      ]);
+      const ws1 = XLSX.utils.aoa_to_sheet([...allHeader, ...allRows]);
+      ws1['!cols'] = [4,22,6,8,16,7,7,8,8,9,6,6,6,6,8,20].map(w=>({wch:w}));
+      ws1['!merges'] = [{s:{r:0,c:0},e:{r:0,c:14}}];
+      XLSX.utils.book_append_sheet(wb, ws1, 'All Records');
+
+      // Sheet 2: Teacher Summary
+      const ws2 = XLSX.utils.aoa_to_sheet([
+        ['Teacher Performance Summary — '+label], [],
+        ['Rank','Teacher','Taken %','Classes Taken','Total Periods','Absent Students','Math Errors'],
+        ...d.perf.map((p,i)=>[i+1, p.name, p.pct+'%', p.taken, p.total, p.absent, p.mathErrors])
+      ]);
+      ws2['!cols'] = [5,24,10,14,14,16,12].map(w=>({wch:w}));
+      XLSX.utils.book_append_sheet(wb, ws2, 'Teacher Summary');
+
+      // Sheet 3: Class Summary
+      const ws3 = XLSX.utils.aoa_to_sheet([
+        ['Class Attendance Summary — '+label], [],
+        ['Class','Periods','Avg %','Total Students','Present','Absent','On Leave'],
+        ...d.clsData.map(c=>[c.cls, c.count, c.pct+'%', c.total, c.present, c.absent, c.leave])
+      ]);
+      ws3['!cols'] = [10,10,10,14,10,10,12].map(w=>({wch:w}));
+      XLSX.utils.book_append_sheet(wb, ws3, 'Class Summary');
+
+      // Sheet 4: Missing Teachers
+      const ws4 = XLSX.utils.aoa_to_sheet([
+        ['Teachers Not Submitted — '+label], [],
+        ['#','Teacher Name'],
+        ...d.missing.map((t,i)=>[i+1, t])
+      ]);
+      ws4['!cols'] = [5,26].map(w=>({wch:w}));
+      XLSX.utils.book_append_sheet(wb, ws4, 'Missing Teachers');
+
+      // Sheet 5: Math Errors (only if any)
+      if (d.errors.length) {
+        const ws5 = XLSX.utils.aoa_to_sheet([
+          ['Math Errors — '+label], [],
+          ['Date','Teacher','Period','Class','Total Declared','Sum of Parts','Difference'],
+          ...d.errors.map(e=>[e.date, e.teacher, 'P'+e.period, e.cls, e.total, e.sum, e.diff])
+        ]);
+        ws5['!cols'] = [12,22,8,10,14,14,12].map(w=>({wch:w}));
+        XLSX.utils.book_append_sheet(wb, ws5, 'Math Errors');
+      }
+
+      const safeTeacher = teacher ? '_'+teacher.replace(/\s+/g,'_') : '';
+      XLSX.writeFile(wb, `JNV_Tarikhet_Attendance_${date}${safeTeacher}.xlsx`);
+    }

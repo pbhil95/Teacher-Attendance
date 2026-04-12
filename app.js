@@ -36,7 +36,8 @@ const ST = {
   wait:        document.getElementById('screen-wait'),
   main:        document.getElementById('screen-main'),
   success:     document.getElementById('screen-success'),
-  forceReset:  document.getElementById('screen-force-reset')
+  forceReset:  document.getElementById('screen-force-reset'),
+  myActivity:  document.getElementById('screen-my-activity')
 };
 
 // --- INITIALIZATION ---
@@ -526,4 +527,185 @@ function submitAnother() {
   toggleCounts(true);
   showScreen('main');
   window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MY REPORTS — Teacher Personal Dashboard
+// ═══════════════════════════════════════════════════════════
+
+let _myRecordsCache = [];
+
+function todayStr() {
+  const now = new Date();
+  const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+  return ist.toISOString().split('T')[0];
+}
+
+function openMyReports() {
+  // Default to "This Week" on open
+  setMyRange('week', document.querySelector('.my-quick-btn'));
+  showScreen('myActivity');
+  window.scrollTo(0, 0);
+}
+
+function setMyRange(type, btn) {
+  document.querySelectorAll('.my-quick-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const today = todayStr();
+  let from = today, to = today;
+
+  if (type === 'week') {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (d.getDay() === 0 ? 6 : d.getDay() - 1));
+    from = d.toISOString().split('T')[0];
+  } else if (type === 'month') {
+    from = today.slice(0, 7) + '-01';
+  } else if (type === '30') {
+    const d = new Date(today);
+    d.setDate(d.getDate() - 29);
+    from = d.toISOString().split('T')[0];
+  } else if (type === 'all') {
+    from = '2024-01-01';
+  }
+
+  document.getElementById('my-from').value = from;
+  document.getElementById('my-to').value = to;
+  loadMyActivity();
+}
+
+async function loadMyActivity() {
+  const from = document.getElementById('my-from').value;
+  const to   = document.getElementById('my-to').value;
+  if (!from || !to) return;
+
+  const kpiGrid = document.getElementById('my-kpi-grid');
+  const tableEl = document.getElementById('my-records-body');
+  kpiGrid.innerHTML = '<div style="color:var(--t3);font-size:0.85rem;">Loading…</div>';
+  tableEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);">⏳ Fetching your records…</div>';
+
+  try {
+    const { data, error } = await appAuth.db
+      .from('attendance')
+      .select('*')
+      .eq('teacher', appAuth.profile.name)
+      .gte('created_at', from + 'T00:00:00+05:30')
+      .lte('created_at', to   + 'T23:59:59+05:30')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    _myRecordsCache = data || [];
+    renderMyKpis(_myRecordsCache);
+    renderMyTable(_myRecordsCache);
+  } catch (e) {
+    kpiGrid.innerHTML = '';
+    tableEl.innerHTML = `<div style="padding:24px;text-align:center;color:var(--rose-lt);">❌ ${e.message}</div>`;
+  }
+}
+
+function renderMyKpis(rows) {
+  const taken    = rows.filter(r => String(r.taken).toLowerCase() === 'yes');
+  const notTaken = rows.filter(r => String(r.taken).toLowerCase() !== 'yes');
+  const totalP   = taken.reduce((a, r) => a + (r.present || 0), 0);
+  const totalS   = taken.reduce((a, r) => a + (r.total   || 0), 0);
+  const avgPct   = totalS ? Math.round(totalP / totalS * 100) : 0;
+  const periods  = [...new Set(rows.map(r => r.period))].length;
+
+  const kpis = [
+    { val: rows.length,     lbl: 'Total Submitted', color: 'var(--indigo-lt)' },
+    { val: taken.length,    lbl: 'Classes Taken',   color: 'var(--emerald-lt)' },
+    { val: notTaken.length, lbl: 'Not Taken',       color: 'var(--rose-lt)' },
+    { val: avgPct + '%',    lbl: 'Avg Attendance',  color: 'var(--cyan-lt)' },
+    { val: periods,         lbl: 'Periods Covered', color: 'var(--amber-lt)' },
+  ];
+
+  document.getElementById('my-kpi-grid').innerHTML = kpis.map(k => `
+    <div class="my-kpi">
+      <div class="my-kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="my-kpi-lbl">${k.lbl}</div>
+    </div>`).join('');
+}
+
+function renderMyTable(rows) {
+  const el = document.getElementById('my-records-body');
+  if (!rows.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t3);">📭 No submissions found for this period.</div>';
+    return;
+  }
+  let h = `<table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
+    <thead><tr style="background:var(--bg-raised);">
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">#</th>
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Date</th>
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Period</th>
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Class</th>
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Subject</th>
+      <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Status</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Total</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Present</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Absent</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach((r, i) => {
+    const dt  = new Date(r.created_at);
+    const date = dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    const time = dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    const isTaken = String(r.taken).toLowerCase() === 'yes';
+    const statusHtml = isTaken
+      ? '<span style="background:var(--emerald-sub);color:var(--emerald-lt);border:1px solid var(--emerald-border);padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">✓ Taken</span>'
+      : '<span style="background:var(--rose-sub);color:var(--rose-lt);border:1px solid var(--rose-border);padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">✗ Not Taken</span>';
+    const bg = i % 2 === 0 ? '' : 'background:var(--bg-raised);';
+    h += `<tr style="${bg}border-bottom:1px solid var(--bd);">
+      <td style="padding:10px 12px;color:var(--t3);">${i + 1}</td>
+      <td style="padding:10px 12px;white-space:nowrap;"><div style="font-weight:600;color:var(--t1);">${date}</div><div style="font-size:0.7rem;color:var(--t3);">${time}</div></td>
+      <td style="padding:10px 12px;font-weight:700;color:var(--indigo-lt);">P${r.period}</td>
+      <td style="padding:10px 12px;font-weight:600;color:var(--t1);">${r.class}</td>
+      <td style="padding:10px 12px;color:var(--t2);">${r.subject}</td>
+      <td style="padding:10px 12px;">${statusHtml}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;">${r.total || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;color:var(--emerald-lt);font-weight:600;">${r.present || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;color:var(--rose-lt);font-weight:600;">${r.absent || '—'}</td>
+    </tr>`;
+  });
+
+  el.innerHTML = h + '</tbody></table>';
+}
+
+function exportMyExcel() {
+  if (!_myRecordsCache.length) { showToast('⚠️ No data to export.'); return; }
+  if (typeof XLSX === 'undefined') { showToast('⚠️ Excel library not loaded yet.'); return; }
+
+  const from  = document.getElementById('my-from').value;
+  const to    = document.getElementById('my-to').value;
+  const name  = appAuth.profile?.name || 'Teacher';
+
+  // Build rows for export
+  const sheetData = [
+    ['#', 'Date', 'Time', 'Period', 'Class', 'Subject', 'Status', 'Total', 'Present', 'Absent', 'On Leave', 'On OD', 'TCA', 'NR', 'Sick', 'Remarks']
+  ];
+  _myRecordsCache.forEach((r, i) => {
+    const dt = new Date(r.created_at);
+    sheetData.push([
+      i + 1,
+      dt.toLocaleDateString('en-IN'),
+      dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      'P' + r.period,
+      r.class,
+      r.subject,
+      String(r.taken).toLowerCase() === 'yes' ? 'Taken' : 'Not Taken',
+      r.total || 0, r.present || 0, r.absent || 0,
+      r.leave_count || 0, r.od || 0, r.tca || 0, r.nr || 0, r.sick || 0,
+      r.remarks || ''
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  // Column widths
+  ws['!cols'] = [4,14,8,6,8,16,10,6,7,7,8,6,5,5,5,20].map(w => ({ wch: w }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'My Attendance');
+
+  const fileName = `JNV_${name.replace(/\s+/g,'_')}_${from}_to_${to}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  showToast('✅ Excel exported successfully!');
 }
