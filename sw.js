@@ -3,7 +3,7 @@
  * Strategy: Cache-first for static assets, Network-first for API/auth
  */
 
-const CACHE_NAME = 'jnv-att-v2';
+const CACHE_NAME = 'jnv-att-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -75,7 +75,23 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For our own static files — cache first, network fallback
+  // For HTML pages — network first so users always get the latest version
+  if (url.origin === self.location.origin && (
+    url.pathname.endsWith('.html') || url.pathname.endsWith('/')
+  )) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request)) // offline: fall back to cache
+    );
+    return;
+  }
+
+  // For other static files (JS/CSS/images) — cache first, network fallback
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(event.request).then(cached => {
