@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 
 <head>
@@ -32,6 +32,30 @@
 
       log('LOG','=== JNV DEBUG LOG STARTED ===');
       log('LOG','UA: ' + navigator.userAgent.substring(0,80));
+
+      // Force clear stale SW cache on every load
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) {
+            log('LOG','SW found scope:' + r.scope + ' state:' + (r.active ? r.active.state : 'none'));
+          });
+          // Clear all old caches immediately
+          if (typeof caches !== 'undefined') {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(k) {
+                if (k !== 'jnv-att-v2') {
+                  caches.delete(k);
+                  log('LOG','Deleted stale cache: ' + k);
+                } else {
+                  log('LOG','Current cache OK: ' + k);
+                }
+              });
+            });
+          }
+        });
+      } else {
+        log('LOG','ServiceWorker not supported');
+      }
     })();
   </script>
   <meta charset="UTF-8">
@@ -48,8 +72,11 @@
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>window._log&&window._log("HEAD: About to load Supabase CDN...");</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onerror="window._err&&window._err('supabase.min.js LOAD FAILED')"></script>
+  <script>window._log&&window._log("HEAD: Supabase CDN loaded. supabase="+typeof supabase+". About to load xlsx...");</script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer onerror="window._err&&window._err('xlsx.full.min.js LOAD FAILED')"></script>
+  <script>window._log&&window._log("HEAD: xlsx loaded. XLSX="+typeof XLSX+". Head scripts done.");</script>
   <style>
     body {
       background: var(--bg-base);
@@ -808,8 +835,11 @@
     }
     .my-kpi-val { font-family:var(--font-heading); font-size:2rem; font-weight:800; color:var(--t1); line-height:1; margin-bottom:6px; }
     .my-kpi-lbl { font-size:0.62rem; color:var(--t3); text-transform:uppercase; font-weight:700; letter-spacing:1.2px; }
-  <script src="auth.js"></script>
-  <script src="app.js"></script>
+  <script>window._log&&window._log("BODY: About to load auth.js...");</script>
+  <script src="auth.js" onerror="window._err&&window._err('auth.js LOAD FAILED')"></script>
+  <script>window._log&&window._log("BODY: auth.js loaded. appAuth="+typeof appAuth+". About to load app.js...");</script>
+  <script src="app.js" onerror="window._err&&window._err('app.js LOAD FAILED')"></script>
+  <script>window._log&&window._log("BODY: app.js loaded. showScreen="+typeof showScreen);</script>
   <script>
     (function () {
       const t = localStorage.getItem('nova-theme') || 'light';

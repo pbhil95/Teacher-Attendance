@@ -74,7 +74,11 @@ window.appAuth = {
 
     try {
       _L('Calling db.auth.getSession()...');
-      const { data: { session }, error } = await db.auth.getSession();
+      const sessionPromise = db.auth.getSession();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('getSession timeout after 8s')), 8000)
+      );
+      const { data: { session }, error } = await Promise.race([sessionPromise, timeoutPromise]);
       if (error) _E('getSession error: ' + error.message);
       _L('getSession() returned. session=' + (session ? 'EXISTS (user:' + session.user.email + ')' : 'NULL'));
 
