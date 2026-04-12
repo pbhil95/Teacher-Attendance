@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (!profile.approved) {
       document.getElementById('wait-name').textContent = profile.name;
       showScreen('wait');
-    } else if (profile.force_password_reset) {
-      // Admin reset password — force new password on login
+    } else if (profile.force_password_reset || appAuth.recoveryMode) {
+      // Admin reset password or User forgot password — force new password
       document.getElementById('force-reset-name').textContent = profile.name;
       showScreen('forceReset');
     } else {
@@ -80,15 +80,27 @@ function showScreen(screenKey) {
 }
 
 function switchAuthTab(type) {
-  const isLogin = type === 'login';
-  document.getElementById('tab-login').style.borderBottomColor    = isLogin  ? 'var(--primary)' : 'transparent';
-  document.getElementById('tab-login').style.color                = isLogin  ? 'var(--primary)' : 'var(--text-secondary)';
-  document.getElementById('tab-register').style.borderBottomColor = !isLogin ? 'var(--primary)' : 'transparent';
-  document.getElementById('tab-register').style.color             = !isLogin ? 'var(--primary)' : 'var(--text-secondary)';
-  document.getElementById('form-login').classList.toggle('hidden', !isLogin);
-  document.getElementById('form-register').classList.toggle('hidden', isLogin);
-  document.getElementById('err-login').classList.add('hidden');
-  document.getElementById('err-register').classList.add('hidden');
+  document.getElementById('tab-login').classList.toggle('active', type === 'login');
+  document.getElementById('tab-register').classList.toggle('active', type === 'register');
+  
+  const frmLogin = document.getElementById('form-login');
+  const frmReg = document.getElementById('form-register');
+  const frmForgot = document.getElementById('form-forgot');
+  
+  if (frmLogin) frmLogin.classList.toggle('hidden', type !== 'login');
+  if (frmReg) frmReg.classList.toggle('hidden', type !== 'register');
+  if (frmForgot) frmForgot.classList.toggle('hidden', type !== 'forgot');
+  
+  if (type === 'forgot') {
+    document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  const errL = document.getElementById('err-login');
+  const errR = document.getElementById('err-register');
+  const errF = document.getElementById('err-forgot');
+  if (errL) errL.classList.add('hidden');
+  if (errR) errR.classList.add('hidden');
+  if (errF) errF.classList.add('hidden');
 }
 
 // --- POPULATE DROPDOWNS ---
@@ -181,6 +193,34 @@ function setupEventListeners() {
       err.classList.remove('hidden');
       btn.disabled = false;
       btn.textContent = 'Sign In';
+    }
+  });
+
+  // Forgot Password Form
+  document.getElementById('form-forgot')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value.trim();
+    const btn   = document.getElementById('btn-forgot');
+    const err   = document.getElementById('err-forgot');
+    const succ  = document.getElementById('succ-forgot');
+
+    err.classList.add('hidden');
+    succ.classList.add('hidden');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span> Sending Link…';
+
+    const { error } = await appAuth.resetPassword(email);
+    if (error) {
+      err.textContent = error.message;
+      err.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Send Reset Link →';
+    } else {
+      succ.textContent = 'Reset link sent! Check your email inbox (and spam folder).';
+      succ.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Send Reset Link →';
+      document.getElementById('forgot-email').value = '';
     }
   });
 
@@ -345,6 +385,7 @@ async function handleForceReset(e) {
 
     // Update local profile cache and go to main
     if (appAuth.profile) appAuth.profile.force_password_reset = false;
+    appAuth.recoveryMode = false;
     showToast('✅ Password updated successfully!');
     setupTeacherForm(appAuth.profile);
     showScreen('main');

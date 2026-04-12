@@ -968,7 +968,7 @@
         btn.style.background = 'var(--ok)';
         btn.style.color = '#fff';
         btn.style.borderColor = 'var(--ok)';
-        showToast('✅ Password reset flagged. Teacher will be prompted on next login.');
+        alert('✅ Password reset flagged. Teacher will be prompted on next login.');
         setTimeout(() => {
           btn.innerHTML = '🔑 Reset Pwd';
           btn.style.background = '';

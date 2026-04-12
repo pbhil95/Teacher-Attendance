@@ -43,7 +43,8 @@ window.appAuth = {
         this.user = null;
         this.profile = null;
         this._notify();
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'PASSWORD_RECOVERY') {
+        if (event === 'PASSWORD_RECOVERY') this.recoveryMode = true;
         await this._handleSession(session);
       }
     });
@@ -91,6 +92,14 @@ window.appAuth = {
       options: {
         data: { name, classes, subjects }
       }
+    });
+  },
+
+  async resetPassword(email) {
+    // Determine current URL for redirect back without query params
+    const redirectTo = window.location.origin + window.location.pathname;
+    return await db.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectTo,
     });
   },
 
