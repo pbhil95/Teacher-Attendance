@@ -109,15 +109,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 6000);
 
-  // Inject the floating debug button (visible for 5 min after page load)
-  setTimeout(() => {
-    const dbgBtn = document.createElement('button');
-    dbgBtn.id = 'dbg-btn';
-    dbgBtn.textContent = '🪲 Debug Log';
-    dbgBtn.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:99999;padding:8px 14px;background:#1e1b4b;color:#a5b4fc;border:1px solid #6366F1;border-radius:20px;font-size:0.78rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.5);';
-    dbgBtn.onclick = showDebugLog;
-    document.body.appendChild(dbgBtn);
-  }, 1000);
+  // Inject the floating debug button only in debug mode
+  if (window._debugOn) {
+    setTimeout(() => {
+      const dbgBtn = document.createElement('button');
+      dbgBtn.id = 'dbg-btn';
+      dbgBtn.textContent = '🪲 Debug Log';
+      dbgBtn.style.cssText = 'position:fixed;bottom:80px;right:16px;z-index:99999;padding:8px 14px;background:#1e1b4b;color:#a5b4fc;border:1px solid #6366F1;border-radius:20px;font-size:0.78rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.5);';
+      dbgBtn.onclick = showDebugLog;
+      document.body.appendChild(dbgBtn);
+    }, 1000);
+  }
 });
 
 // Show debug overlay with full log
