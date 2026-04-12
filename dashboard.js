@@ -168,7 +168,6 @@
       return new Date(p[0], p[1] - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     }
     function updateDateDisplays() {
-      document.getElementById('dateDisplay').textContent = formatDateLabel(document.getElementById('dateSelect').value);
       document.getElementById('weekDisplay').textContent = 'Week of ' + formatDateLabel(document.getElementById('weekStart').value);
       document.getElementById('monthDisplay').textContent = formatMonthLabel(document.getElementById('monthSelect').value);
     }
@@ -1195,7 +1194,7 @@
 
       // Sheet 1: All Records
       const allHeader = [
-        ['JNV Tarikhet — Attendance Records', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ['JNV Tarikhet ï¿½ Attendance Records', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
         ['Date:', label, '', 'Filter:', teacher || 'All Teachers', '', 'Exported:', new Date().toLocaleString('en-IN')],
         [],
         ['#','Teacher','Period','Class','Subject','Taken','Total','Present','Absent','On Leave','OD','TCA','NR','Sick','Time','Remarks']
@@ -1215,7 +1214,7 @@
 
       // Sheet 2: Teacher Summary
       const ws2 = XLSX.utils.aoa_to_sheet([
-        ['Teacher Performance Summary — '+label], [],
+        ['Teacher Performance Summary ï¿½ '+label], [],
         ['Rank','Teacher','Taken %','Classes Taken','Total Periods','Absent Students','Math Errors'],
         ...d.perf.map((p,i)=>[i+1, p.name, p.pct+'%', p.taken, p.total, p.absent, p.mathErrors])
       ]);
@@ -1224,7 +1223,7 @@
 
       // Sheet 3: Class Summary
       const ws3 = XLSX.utils.aoa_to_sheet([
-        ['Class Attendance Summary — '+label], [],
+        ['Class Attendance Summary ï¿½ '+label], [],
         ['Class','Periods','Avg %','Total Students','Present','Absent','On Leave'],
         ...d.clsData.map(c=>[c.cls, c.count, c.pct+'%', c.total, c.present, c.absent, c.leave])
       ]);
@@ -1233,7 +1232,7 @@
 
       // Sheet 4: Missing Teachers
       const ws4 = XLSX.utils.aoa_to_sheet([
-        ['Teachers Not Submitted — '+label], [],
+        ['Teachers Not Submitted ï¿½ '+label], [],
         ['#','Teacher Name'],
         ...d.missing.map((t,i)=>[i+1, t])
       ]);
@@ -1243,7 +1242,7 @@
       // Sheet 5: Math Errors (only if any)
       if (d.errors.length) {
         const ws5 = XLSX.utils.aoa_to_sheet([
-          ['Math Errors — '+label], [],
+          ['Math Errors ï¿½ '+label], [],
           ['Date','Teacher','Period','Class','Total Declared','Sum of Parts','Difference'],
           ...d.errors.map(e=>[e.date, e.teacher, 'P'+e.period, e.cls, e.total, e.sum, e.diff])
         ]);

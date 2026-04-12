@@ -102,17 +102,7 @@
   font-weight: 600;
 }
 
-#dateDisplay {
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 5px 14px;
-  border-radius: var(--r-full);
-  background: var(--indigo-sub);
-  color: var(--indigo-lt);
-  border: 1px solid var(--indigo-border);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
+/* Date picker in toolbar uses native <input type="date"> with .form-input styling */
 
 /* ══════════════════════════════════════════
    TAB NAVIGATION

@@ -773,11 +773,11 @@
           <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
             <div>
               <label class="form-label">From</label>
-              <input type="text" id="my-from" class="form-input" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" style="width:130px;padding:8px 12px;">
+              <input type="date" id="my-from" class="form-input" style="width:150px;padding:8px 12px;" onchange="loadMyActivity()">
             </div>
             <div>
               <label class="form-label">To</label>
-              <input type="text" id="my-to" class="form-input" inputmode="numeric" placeholder="DD/MM/YYYY" maxlength="10" style="width:130px;padding:8px 12px;">
+              <input type="date" id="my-to" class="form-input" style="width:150px;padding:8px 12px;" onchange="loadMyActivity()">
             </div>
             <button class="btn btn-primary" style="width:auto;padding:9px 22px;" onclick="loadMyActivity()">Apply</button>
           </div>

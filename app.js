@@ -249,11 +249,7 @@ function setupTeacherForm(profile) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-  // Date inputs — auto-format as dd/mm/yyyy
-  const fromEl = document.getElementById('my-from');
-  const toEl   = document.getElementById('my-to');
-  if (fromEl) autoFormatDateInput(fromEl);
-  if (toEl)   autoFormatDateInput(toEl);
+  // Date inputs are now native type="date" — no auto-formatting needed
 
   // Theme Toggle
   document.querySelectorAll('.theme-toggle').forEach(btn => {
@@ -670,14 +666,14 @@ function setMyRange(type, btn) {
     from = '2024-01-01';
   }
 
-  document.getElementById('my-from').value = isoToDisplay(from);
-  document.getElementById('my-to').value = isoToDisplay(to);
+  document.getElementById('my-from').value = from;
+  document.getElementById('my-to').value = to;
   loadMyActivity();
 }
 
 async function loadMyActivity() {
-  const from = displayToIso(document.getElementById('my-from').value);
-  const to   = displayToIso(document.getElementById('my-to').value);
+  const from = document.getElementById('my-from').value;
+  const to   = document.getElementById('my-to').value;
   if (!from || !to) return;
 
   const kpiGrid = document.getElementById('my-kpi-grid');
@@ -775,8 +771,8 @@ function exportMyExcel() {
   if (!_myRecordsCache.length) { showToast('⚠️ No data to export.'); return; }
   if (typeof XLSX === 'undefined') { showToast('⚠️ Excel library not loaded yet.'); return; }
 
-  const from  = displayToIso(document.getElementById('my-from').value);
-  const to    = displayToIso(document.getElementById('my-to').value);
+  const from  = document.getElementById('my-from').value;
+  const to    = document.getElementById('my-to').value;
   const name  = appAuth.profile?.name || 'Teacher';
 
   // Build rows for export

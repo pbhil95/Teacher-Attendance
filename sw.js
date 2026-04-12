@@ -3,7 +3,7 @@
  * Strategy: Cache-first for static assets, Network-first for API/auth
  */
 
-const CACHE_NAME = 'jnv-att-v4';
+const CACHE_NAME = 'jnv-att-v5';
 const STATIC_ASSETS = [
   './',
   './index.html',
