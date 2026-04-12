@@ -9,12 +9,14 @@ window.appAuth = {
   user: null,
   profile: null,
   initialized: false,
+  recoveryMode: false,
   _listeners: [],
+  _initDone: false,  // guard against duplicate init calls
 
-  // Register UI listeners for auth state changes
+  // Register a UI listener for auth state changes
   onStateChange(callback) {
     this._listeners.push(callback);
-    // If already initialized, immediately trigger the callback
+    // If already initialized, immediately invoke with current state
     if (this.initialized) callback(this.user, this.profile);
   },
 
@@ -22,63 +24,88 @@ window.appAuth = {
     this._listeners.forEach(cb => cb(this.user, this.profile));
   },
 
+  // Fetch profile from DB; optionally create it from Supabase user_metadata
+  async _loadProfile(user) {
+    let { data: profile, error } = await db
+      .from('teacher_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    // Auto-create profile on first login if metadata is present
+    if ((error || !profile) && user.user_metadata?.name) {
+      const uMeta = user.user_metadata;
+      const { data: newProfile } = await db
+        .from('teacher_profiles')
+        .insert([{
+          id: user.id,
+          name: uMeta.name,
+          email: user.email,
+          classes: uMeta.classes || [],
+          subjects: uMeta.subjects || [],
+          approved: false
+        }])
+        .select()
+        .single();
+      profile = newProfile;
+    }
+    return profile || null;
+  },
+
   async init() {
+    if (this._initDone) return;
+    this._initDone = true;
+
     try {
-      // Get current session synchronously/async on load
-      const { data: { session }, error } = await db.auth.getSession();
-      if (error) console.error("Session error:", error);
-      await this._handleSession(session || null);
+      const { data: { session } } = await db.auth.getSession();
+
+      if (session) {
+        this.user = session.user;
+        this.profile = await this._loadProfile(session.user);
+      } else {
+        this.user = null;
+        this.profile = null;
+      }
     } catch (err) {
-      console.error("Supabase Init Error:", err);
+      console.error('[Auth] init error:', err);
       this.user = null;
       this.profile = null;
     }
-    
+
+    // Mark ready and notify UI exactly ONCE
     this.initialized = true;
     this._notify();
 
-    // Listen to continuous changes
+    // Now watch for future auth changes (post-init only)
     db.auth.onAuthStateChange(async (event, session) => {
+      // Skip INITIAL_SESSION — already handled above via getSession()
+      if (event === 'INITIAL_SESSION') return;
+
       if (event === 'SIGNED_OUT') {
         this.user = null;
         this.profile = null;
+        this.recoveryMode = false;
         this._notify();
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'PASSWORD_RECOVERY') {
-        if (event === 'PASSWORD_RECOVERY') this.recoveryMode = true;
-        await this._handleSession(session);
+
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (!session) return;
+        try {
+          this.user = session.user;
+          this.profile = await this._loadProfile(session.user);
+        } catch (err) {
+          console.error('[Auth] onAuthStateChange error:', err);
+        }
+        this._notify();
+
+      } else if (event === 'PASSWORD_RECOVERY') {
+        this.recoveryMode = true;
+        if (session) {
+          this.user = session.user;
+          this.profile = await this._loadProfile(session.user);
+        }
+        this._notify();
       }
     });
-  },
-
-  async _handleSession(session) {
-    if (!session) {
-      this.user = null;
-      this.profile = null;
-      if (this.initialized) this._notify();
-      return;
-    }
-    
-    this.user = session.user;
-    
-    // Fetch user profile from DB
-    let { data: profile, error } = await db.from('teacher_profiles').select('*').eq('id', this.user.id).single();
-    
-    // If no profile yet, but we are logged in, we create it from registration metadata
-    if ((error || !profile) && this.user.user_metadata?.name) {
-       const uMeta = this.user.user_metadata;
-       const { data: newProfile } = await db.from('teacher_profiles').insert([{
-           id: this.user.id,
-           name: uMeta.name,
-           email: this.user.email,
-           classes: uMeta.classes || [],
-           subjects: uMeta.subjects || [],
-           approved: false
-       }]).select().single();
-       profile = newProfile;
-    }
-
-    this.profile = profile || null;
-    this._notify();
   },
 
   async login(email, password) {
@@ -89,18 +116,13 @@ window.appAuth = {
     return await db.auth.signUp({
       email,
       password,
-      options: {
-        data: { name, classes, subjects }
-      }
+      options: { data: { name, classes, subjects } }
     });
   },
 
   async resetPassword(email) {
-    // Determine current URL for redirect back without query params
     const redirectTo = window.location.origin + window.location.pathname;
-    return await db.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectTo,
-    });
+    return await db.auth.resetPasswordForEmail(email, { redirectTo });
   },
 
   async logout() {

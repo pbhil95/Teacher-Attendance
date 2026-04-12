@@ -1,4 +1,4 @@
-﻿// Constants
+// Constants
 const TEACHERS = [
   "TGT Computer Science", "Librarian", "PET F", "PET M",
   "PGT Biology", "PGT Chemistry", "PGT Economics", "PGT English",
@@ -55,15 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In'; }
       showScreen('auth');
     } else if (!profile) {
-      document.getElementById('wait-name').textContent = "Profile Data Missing";
+      document.getElementById('wait-name').textContent = 'Profile Data Missing';
       const p = document.querySelector('#screen-wait p');
-      if (p) p.innerHTML = "Your profile data could not be found. <b>If the database tables were deleted</b>, please run your SQL script again in Supabase.";
+      if (p) p.innerHTML = 'Your profile data could not be found. <b>If the database tables were deleted</b>, please run your SQL script again in Supabase.';
       showScreen('wait');
     } else if (!profile.approved) {
       document.getElementById('wait-name').textContent = profile.name;
       showScreen('wait');
     } else if (profile.force_password_reset || appAuth.recoveryMode) {
-      // Admin reset password or User forgot password — force new password
       document.getElementById('force-reset-name').textContent = profile.name;
       showScreen('forceReset');
     } else {
@@ -73,6 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   appAuth.init();
+
+  // Safety net: if loading screen still visible after 8s, something went wrong.
+  // Force show the auth screen so the user is never permanently stuck.
+  setTimeout(() => {
+    if (ST.loading && !ST.loading.classList.contains('hidden')) {
+      console.warn('[App] Loading timeout — forcing auth screen.');
+      ST.loading.classList.add('hidden');
+      showScreen('auth');
+    }
+  }, 8000);
 });
 
 // --- NAVIGATION ---
