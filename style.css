@@ -445,6 +445,37 @@ h6 {
   opacity: 0.6;
 }
 
+[data-theme="light"] thead th {
+  background: rgba(238, 240, 255, 0.8);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE ADJUSTMENTS
+══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .app-header { padding: 0 12px; }
+  .header-subtitle { display: none; }
+  .header-clock { display: none; }
+  .header-right-info { margin-right: 0; }
+  .header-title { font-size: 1rem; }
+  
+  .icon-btn { width: 34px; height: 34px; }
+  
+  .teacher-banner {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .teacher-name {
+    white-space: normal;
+    word-break: break-word;
+  }
+  .teacher-banner-actions {
+    width: 100%;
+    margin-top: 4px;
+    justify-content: flex-start;
+  }
+}
+
 [data-theme="light"] .app-header {
   background: rgba(238, 240, 255, 0.96);
 }
@@ -903,58 +934,58 @@ h6 {
 
 /* ── Period-specific chip colors ── */
 .chip[data-p="1"] input:checked+label {
-  background: var(--p1-sub);
+  background: var(--p1);
   border-color: var(--p1);
-  color: var(--indigo-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p1-sub);
 }
 
 .chip[data-p="2"] input:checked+label {
-  background: var(--p2-sub);
+  background: var(--p2);
   border-color: var(--p2);
-  color: var(--cyan-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p2-sub);
 }
 
 .chip[data-p="3"] input:checked+label {
-  background: var(--p3-sub);
+  background: var(--p3);
   border-color: var(--p3);
-  color: var(--emerald-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p3-sub);
 }
 
 .chip[data-p="4"] input:checked+label {
-  background: var(--p4-sub);
+  background: var(--p4);
   border-color: var(--p4);
-  color: var(--amber-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p4-sub);
 }
 
 .chip[data-p="5"] input:checked+label {
-  background: var(--p5-sub);
+  background: var(--p5);
   border-color: var(--p5);
-  color: var(--orange-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p5-sub);
 }
 
 .chip[data-p="6"] input:checked+label {
-  background: var(--p6-sub);
+  background: var(--p6);
   border-color: var(--p6);
-  color: var(--pink-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p6-sub);
 }
 
 .chip[data-p="7"] input:checked+label {
-  background: var(--p7-sub);
+  background: var(--p7);
   border-color: var(--p7);
-  color: var(--violet-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p7-sub);
 }
 
 .chip[data-p="8"] input:checked+label {
-  background: var(--p8-sub);
+  background: var(--p8);
   border-color: var(--p8);
-  color: var(--teal-lt);
+  color: #FFFFFF;
   box-shadow: 0 2px 10px var(--p8-sub);
 }
 

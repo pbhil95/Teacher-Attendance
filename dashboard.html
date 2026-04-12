@@ -119,8 +119,10 @@
 
     <!-- Toolbar -->
     <div class="toolbar">
-      <input type="date" id="dateSelect" class="form-input" onchange="loadDaily()">
-      <div id="dateDisplay"></div>
+      <div style="position: relative; display: inline-flex; align-items: center;">
+        <div id="dateDisplay"></div>
+        <input type="date" id="dateSelect" style="opacity: 0; position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer;" onchange="loadDaily()">
+      </div>
 
       <select id="teacherFilter" class="form-select" onchange="loadDaily()">
         <option value="">All Teachers</option>
