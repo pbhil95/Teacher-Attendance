@@ -1067,4 +1067,107 @@
         }
       } catch (_) { /* silently ignore if policy not set */ }
     }
-  
+
+    // ═══════════════════════════════════════════════════════════════
+    //  SHARE FORM MODAL
+    // ═══════════════════════════════════════════════════════════════
+
+    function getFormUrl() {
+      // Construct the URL to index.html relative to the current page
+      const loc = window.location;
+      const base = loc.origin + loc.pathname.replace(/dashboard\.html.*/, '');
+      return base + 'index.html';
+    }
+
+    function openShareModal() {
+      const url = getFormUrl();
+      document.getElementById('shareUrl').textContent = url;
+      document.getElementById('shareSuccessMsg').style.display = 'none';
+      document.getElementById('copyBtn').textContent = '📋 Copy';
+      document.getElementById('shareModal').style.display = 'flex';
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').style.display = 'none';
+    }
+
+    async function copyFormLink() {
+      const url = getFormUrl();
+      const btn = document.getElementById('copyBtn');
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.textContent = '✅ Copied!';
+        btn.style.background = 'var(--emerald-sub)';
+        btn.style.borderColor = 'var(--emerald-border)';
+        btn.style.color = 'var(--emerald-lt)';
+        setTimeout(() => {
+          btn.textContent = '📋 Copy';
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 2500);
+      } catch (_) {
+        // Fallback for older mobile browsers
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => { btn.textContent = '📋 Copy'; }, 2500);
+      }
+    }
+
+    function shareViaWhatsApp() {
+      const url = getFormUrl();
+      const msg = encodeURIComponent(
+        '📋 *JNV Tarikhet — Staff Attendance*\n\nPlease use the link below to submit your class attendance:\n' + url
+      );
+      window.open('https://wa.me/?text=' + msg, '_blank');
+    }
+
+    function shareViaEmail() {
+      const url = getFormUrl();
+      const subject = encodeURIComponent('JNV Tarikhet — Attendance Form Link');
+      const body = encodeURIComponent(
+        'Dear Teacher,\n\nPlease use the link below to submit your attendance:\n\n' + url +
+        '\n\nKindly log in with your registered email and password to access the form.\n\nRegards,\nJNV Tarikhet Administration'
+      );
+      window.open('mailto:?subject=' + subject + '&body=' + body, '_self');
+    }
+
+    function shareViaSMS() {
+      const url = getFormUrl();
+      const msg = encodeURIComponent('JNV Tarikhet Attendance Form: ' + url);
+      // sms: works on Android and iOS
+      window.open('sms:?body=' + msg, '_self');
+    }
+
+    async function shareViaNative() {
+      const url = getFormUrl();
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'JNV Tarikhet — Attendance Form',
+            text: '📋 Submit your class attendance via this link:',
+            url: url
+          });
+        } catch (e) {
+          if (e.name !== 'AbortError') {
+            showShareSuccess('Could not share: ' + e.message);
+          }
+        }
+      } else {
+        // Fallback: copy and inform
+        await copyFormLink();
+        showShareSuccess('🔗 Link copied — paste it in any app to share!');
+      }
+    }
+
+    function showShareSuccess(msg) {
+      const el = document.getElementById('shareSuccessMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 3500);
+    }
