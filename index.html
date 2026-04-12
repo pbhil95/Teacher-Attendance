@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 
 <head>
@@ -643,72 +643,6 @@
 
   <div id="global-toast" class="toast"></div>
 
-  <script src="auth.js"></script>
-  <script src="app.js"></script>
-  <script>
-    (function () {
-      const t = localStorage.getItem('nova-theme') || 'light';
-      document.documentElement.setAttribute('data-theme', t);
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.theme-toggle').forEach(btn => {
-          btn.textContent = t === 'dark' ? '☀' : '🌙';
-        });
-      });
-
-      // Register Service Worker for PWA
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('[PWA] SW registered:', reg.scope))
-            .catch(err => console.warn('[PWA] SW failed:', err));
-        });
-      }
-
-      // ── PWA Install Banner logic ──────────────────────────────
-      let deferredPrompt = null;
-      const banner = document.getElementById('pwa-banner');
-      const installBtn = document.getElementById('pwa-install-btn');
-
-      // Hide banner if already installed (running standalone)
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-        || window.navigator.standalone === true;
-      const dismissed = sessionStorage.getItem('pwa-dismissed');
-
-      // Android Chrome: capture the install prompt
-      window.addEventListener('beforeinstallprompt', e => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if (!isStandalone && !dismissed) {
-          banner.style.display = 'flex';
-        }
-      });
-
-      // When user taps Install
-      installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          deferredPrompt = null;
-          banner.style.display = 'none';
-        }
-      });
-
-      // iOS Safari: show different message (no prompt API)
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      const isInSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      if (isIOS && isInSafari && !isStandalone && !dismissed) {
-        document.getElementById('pwa-banner-sub').textContent =
-          'Tap   ✂️  → "Add to Home Screen" to install';
-        installBtn.style.display = 'none';
-        banner.style.display = 'flex';
-      }
-
-      function dismissPwaBanner() {
-        document.getElementById('pwa-banner').style.display = 'none';
-        sessionStorage.setItem('pwa-dismissed', '1');
-      }
-    })();
-  </script>
 
   <!-- MY REPORTS SCREEN -->
   <div id="screen-my-activity" class="hidden">
@@ -798,7 +732,80 @@
     }
     .my-kpi-val { font-family:var(--font-heading); font-size:2rem; font-weight:800; color:var(--t1); line-height:1; margin-bottom:6px; }
     .my-kpi-lbl { font-size:0.62rem; color:var(--t3); text-transform:uppercase; font-weight:700; letter-spacing:1.2px; }
-  </style>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      const t = localStorage.getItem('nova-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.theme-toggle').forEach(btn => {
+          btn.textContent = t === 'dark' ? '\u2609' : '\uD83C\uDF19';
+        });
+      });
+
+      // Register Service Worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('[PWA] SW registered:', reg.scope))
+            .catch(err => console.warn('[PWA] SW failed:', err));
+        });
+      }
+
+      // PWA Install Banner
+      let deferredPrompt = null;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      const dismissed = sessionStorage.getItem('pwa-dismissed');
+
+      function showBanner(iosMode) {
+        if (isStandalone || dismissed) return;
+        const banner = document.getElementById('pwa-banner');
+        if (!banner) return;
+        if (iosMode) {
+          const sub = document.getElementById('pwa-banner-sub');
+          const btn = document.getElementById('pwa-install-btn');
+          if (sub) sub.textContent = 'Tap Share then "Add to Home Screen"';
+          if (btn) btn.style.display = 'none';
+        }
+        banner.style.display = 'flex';
+      }
+
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showBanner(false);
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (!installBtn) return;
+        installBtn.addEventListener('click', async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.getElementById('pwa-banner').style.display = 'none';
+          } else {
+            alert('To install:\n\nAndroid: Menu (\u22EE) then "Add to Home Screen"\niPhone: Share then "Add to Home Screen"');
+          }
+        });
+      });
+
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isAndroid = /android/i.test(navigator.userAgent);
+
+      if (isIOS && isSafari && !isStandalone && !dismissed) { setTimeout(() => showBanner(true), 1500); }
+      if (isAndroid && !isStandalone && !dismissed) { setTimeout(() => showBanner(false), 2000); }
+
+      function dismissPwaBanner() {
+        document.getElementById('pwa-banner').style.display = 'none';
+        sessionStorage.setItem('pwa-dismissed', '1');
+      }
+      window.dismissPwaBanner = dismissPwaBanner;
+    })();
+  </script>
 
 </body>
 </html>
