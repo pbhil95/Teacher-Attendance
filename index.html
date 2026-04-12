@@ -341,7 +341,7 @@
 
   <!-- LOADING -->
   <div id="screen-loading" class="fullscreen-overlay">
-    <div style="display:flex;flex-direction:column;align-items:center;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
       <div class="pin-logo-wrap" style="margin-bottom:0;">
         <div class="pin-logo-ring">
           <div class="pin-logo-ring-inner">📋</div>
@@ -350,8 +350,45 @@
       <div class="loading-brand">JNV Tarikhet</div>
       <div class="loading-sub">Attendance Portal</div>
       <div class="spinner" style="margin-top:8px;margin-bottom:0;"></div>
+      <!-- Debug button: always visible below spinner -->
+      <button id="dbg-btn-static"
+        onclick="showDebugLogInline()"
+        style="margin-top:28px;padding:8px 18px;background:rgba(99,102,241,0.15);
+               border:1px solid rgba(99,102,241,0.5);border-radius:20px;
+               color:#a5b4fc;font-size:0.75rem;font-weight:700;cursor:pointer;
+               font-family:monospace;letter-spacing:0.5px;">
+        🪲 Show Debug Log
+      </button>
+      <div style="font-size:0.6rem;color:rgba(165,180,252,0.5);margin-top:6px;">Tap above if stuck &gt;5 seconds</div>
     </div>
   </div>
+
+  <!-- Inline debug overlay — works even if app.js fails to load -->
+  <div id="dbg-overlay" style="display:none;position:fixed;inset:0;z-index:9999999;background:#050508;
+       color:#a5b4fc;font-family:monospace;font-size:0.72rem;padding:16px;overflow:auto;white-space:pre-wrap;line-height:1.6;">
+    <div style="display:flex;gap:8px;margin-bottom:10px;position:sticky;top:0;background:#050508;padding-bottom:8px;">
+      <button onclick="document.getElementById('dbg-overlay').style.display='none'"
+        style="padding:6px 14px;background:#6366F1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✕ Close</button>
+      <button onclick="try{navigator.clipboard.writeText(document.getElementById('dbg-text').textContent)}catch(e){}"
+        style="padding:6px 14px;background:#10B981;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">📋 Copy</button>
+      <button onclick="localStorage.removeItem('jnv_dbg');document.getElementById('dbg-overlay').style.display='none'"
+        style="padding:6px 14px;background:#EF4444;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">🗑 Clear</button>
+    </div>
+    <pre id="dbg-text" style="margin:0;"></pre>
+  </div>
+
+  <script>
+    function showDebugLogInline() {
+      var logs = (window._DBG || []).slice();
+      var stored = localStorage.getItem('jnv_dbg') || '';
+      if (stored) logs = logs.concat(stored.split('\n'));
+      var seen = {}, unique = [];
+      logs.forEach(function(l){ if(l && !seen[l]){ seen[l]=1; unique.push(l); } });
+      var text = unique.join('\n') || '[No log entries yet — JS may not have run at all]\nBrowser: ' + navigator.userAgent;
+      document.getElementById('dbg-text').textContent = text;
+      document.getElementById('dbg-overlay').style.display = 'block';
+    }
+  </script>
 
   <!-- AUTH -->
   <div id="screen-auth" class="fullscreen-overlay hidden">
