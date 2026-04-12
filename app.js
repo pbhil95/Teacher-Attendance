@@ -1,3 +1,24 @@
+// ── Date format helpers (display: dd/mm/yyyy, internal: yyyy-mm-dd) ──
+function isoToDisplay(iso) {
+  if (!iso || iso.length !== 10) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function displayToIso(disp) {
+  if (!disp || disp.length !== 10) return '';
+  const [d, m, y] = disp.split('/');
+  if (!d || !m || !y || y.length !== 4) return '';
+  return `${y}-${m}-${d}`;
+}
+function autoFormatDateInput(el) {
+  el.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 8);
+    if (v.length > 4) v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+    else if (v.length > 2) v = v.slice(0, 2) + '/' + v.slice(2);
+    this.value = v;
+  });
+}
+
 // Constants
 const TEACHERS = [
   "TGT Computer Science", "Librarian", "PET F", "PET M",
@@ -228,6 +249,12 @@ function setupTeacherForm(profile) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+  // Date inputs — auto-format as dd/mm/yyyy
+  const fromEl = document.getElementById('my-from');
+  const toEl   = document.getElementById('my-to');
+  if (fromEl) autoFormatDateInput(fromEl);
+  if (toEl)   autoFormatDateInput(toEl);
+
   // Theme Toggle
   document.querySelectorAll('.theme-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -643,14 +670,14 @@ function setMyRange(type, btn) {
     from = '2024-01-01';
   }
 
-  document.getElementById('my-from').value = from;
-  document.getElementById('my-to').value = to;
+  document.getElementById('my-from').value = isoToDisplay(from);
+  document.getElementById('my-to').value = isoToDisplay(to);
   loadMyActivity();
 }
 
 async function loadMyActivity() {
-  const from = document.getElementById('my-from').value;
-  const to   = document.getElementById('my-to').value;
+  const from = displayToIso(document.getElementById('my-from').value);
+  const to   = displayToIso(document.getElementById('my-to').value);
   if (!from || !to) return;
 
   const kpiGrid = document.getElementById('my-kpi-grid');
@@ -748,8 +775,8 @@ function exportMyExcel() {
   if (!_myRecordsCache.length) { showToast('⚠️ No data to export.'); return; }
   if (typeof XLSX === 'undefined') { showToast('⚠️ Excel library not loaded yet.'); return; }
 
-  const from  = document.getElementById('my-from').value;
-  const to    = document.getElementById('my-to').value;
+  const from  = displayToIso(document.getElementById('my-from').value);
+  const to    = displayToIso(document.getElementById('my-to').value);
   const name  = appAuth.profile?.name || 'Teacher';
 
   // Build rows for export
