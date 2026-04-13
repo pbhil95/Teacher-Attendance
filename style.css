@@ -1938,17 +1938,36 @@ h6 {
 
 /* ── Teacher designation in banner ── */
 .teacher-designation {
-  font-size: 0.78rem;
-  opacity: 0.78;
-  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 10px 3px 8px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
   white-space: nowrap;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.teacher-designation::before {
+  content: '🎓';
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
 @media (max-width: 480px) {
   .teacher-designation {
+    font-size: 0.68rem;
+    padding: 3px 8px 3px 7px;
     white-space: normal;
-    font-size: 0.72rem;
   }
 }

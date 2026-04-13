@@ -952,16 +952,26 @@
         // Send approval email to teacher
         if (approved && p) {
           if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              to_email:    p.email,
-              to_name:     p.name,
-              teacher_email: p.email,   // extra alias some templates use
-              teacher_name:  p.name
-            }).then(() => {
+            try {
+              await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_email:      p.email,
+                to_name:       p.name,
+                teacher_email: p.email,
+                teacher_name:  p.name
+              });
               showShareSuccess('✅ Approval email sent to ' + p.email);
-            }).catch(err => {
-              alert('⚠️ Account approved, but email failed to send.\n\nError: ' + (err?.text || err?.message || JSON.stringify(err)) + '\n\nCheck your EmailJS Service ID, Template ID, and that "To Email" in the template is set to {{to_email}}');
-            });
+            } catch (err) {
+              alert('⚠️ Account approved, but email failed.\n\nError: ' + (err?.text || err?.message || JSON.stringify(err)) + '\n\nCheck EmailJS: Service ID, Template ID, and set "To Email" to {{to_email}}');
+            }
+          } else {
+            // Fallback: open mailto if EmailJS not available
+            const subject = encodeURIComponent('JNV Tarikhet — Your Account Has Been Approved');
+            const body = encodeURIComponent(
+              'Dear ' + p.name + ',\n\n' +
+              'Your account has been approved. You can now sign in and submit attendance.\n\n' +
+              'Regards,\nJNV Tarikhet Administration'
+            );
+            window.open('mailto:' + p.email + '?subject=' + subject + '&body=' + body, '_blank');
           }
         }
       } catch (e) {

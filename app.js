@@ -296,38 +296,48 @@ function setupEventListeners() {
     const btn = document.getElementById('btn-refresh-status');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Checking…';
+
+    // Safety: force-reset button after 8s no matter what
+    const safetyTimer = setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '🔄 Check Status';
+    }, 8000);
+
     try {
-      const { data: { session } } = await appAuth.db.auth.getSession();
-      if (session) {
-        // Only query the approved field — avoids triggering full _notify() re-render
-        const { data: row } = await appAuth.db
-          .from('teacher_profiles')
-          .select('approved')
-          .eq('id', session.user.id)
-          .single();
-        if (row?.approved) {
-          // Now approved — do full profile load and transition to main screen
-          appAuth.profile = await appAuth._loadProfile(session.user);
-          appAuth._notify();
-          return; // screen changes, no need to reset button
-        }
-        // Still pending — just give visual feedback
-        btn.disabled = false;
-        btn.textContent = '🔄 Check Status';
-        const desc = document.querySelector('#screen-wait .wait-desc');
-        if (desc) {
-          desc.style.color = 'var(--rose-lt)';
-          desc.textContent = 'Still pending approval. Try again later.';
-          setTimeout(() => {
-            desc.style.color = '';
-            desc.textContent = 'Your account is created. An administrator needs to approve your profile before you can submit attendance records.';
-          }, 3000);
-        }
-      } else {
-        btn.disabled = false;
-        btn.textContent = '🔄 Check Status';
+      // Directly query teacher_profiles for approval status
+      const userId = appAuth.user?.id;
+      if (!userId) throw new Error('no user');
+
+      const { data: row, error } = await appAuth.db
+        .from('teacher_profiles')
+        .select('approved')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (row?.approved) {
+        clearTimeout(safetyTimer);
+        // Approved! Reload profile and go to main screen
+        appAuth.profile = await appAuth._loadProfile(appAuth.user);
+        appAuth._notify();
+        return;
+      }
+
+      // Still pending
+      const desc = document.querySelector('#screen-wait .wait-desc');
+      if (desc) {
+        desc.style.color = 'var(--rose-lt)';
+        desc.textContent = 'Still pending approval. Try again later.';
+        setTimeout(() => {
+          desc.style.color = '';
+          desc.textContent = 'Your account is created. An administrator needs to approve your profile before you can submit attendance records.';
+        }, 3000);
       }
     } catch (e) {
+      // silently handle
+    } finally {
+      clearTimeout(safetyTimer);
       btn.disabled = false;
       btn.textContent = '🔄 Check Status';
     }
