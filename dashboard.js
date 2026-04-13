@@ -953,9 +953,15 @@
         if (approved && p) {
           if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-              to_email: p.email,
-              to_name:  p.name
-            }).catch(() => {/* silent — don't block UI on email failure */});
+              to_email:    p.email,
+              to_name:     p.name,
+              teacher_email: p.email,   // extra alias some templates use
+              teacher_name:  p.name
+            }).then(() => {
+              showShareSuccess('✅ Approval email sent to ' + p.email);
+            }).catch(err => {
+              alert('⚠️ Account approved, but email failed to send.\n\nError: ' + (err?.text || err?.message || JSON.stringify(err)) + '\n\nCheck your EmailJS Service ID, Template ID, and that "To Email" in the template is set to {{to_email}}');
+            });
           }
         }
       } catch (e) {

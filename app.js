@@ -210,10 +210,11 @@ function populateDropdowns() {
   const buildChips = (containerId, items) => {
     const box = document.getElementById(containerId);
     items.forEach(val => {
+      const uid = `${containerId}-chk-${val.replace(/\s+/g,'_')}`;
       box.innerHTML += `
         <div class="chip">
-          <input type="checkbox" id="chk-${val.replace(/\s+/g,'_')}" value="${val}">
-          <label for="chk-${val.replace(/\s+/g,'_')}">${val}</label>
+          <input type="checkbox" id="${uid}" value="${val}">
+          <label for="${uid}">${val}</label>
         </div>`;
     });
   };
@@ -298,12 +299,38 @@ function setupEventListeners() {
     try {
       const { data: { session } } = await appAuth.db.auth.getSession();
       if (session) {
-        appAuth.profile = await appAuth._loadProfile(session.user);
-        appAuth._notify();
+        // Only query the approved field — avoids triggering full _notify() re-render
+        const { data: row } = await appAuth.db
+          .from('teacher_profiles')
+          .select('approved')
+          .eq('id', session.user.id)
+          .single();
+        if (row?.approved) {
+          // Now approved — do full profile load and transition to main screen
+          appAuth.profile = await appAuth._loadProfile(session.user);
+          appAuth._notify();
+          return; // screen changes, no need to reset button
+        }
+        // Still pending — just give visual feedback
+        btn.disabled = false;
+        btn.textContent = '🔄 Check Status';
+        const desc = document.querySelector('#screen-wait .wait-desc');
+        if (desc) {
+          desc.style.color = 'var(--rose-lt)';
+          desc.textContent = 'Still pending approval. Try again later.';
+          setTimeout(() => {
+            desc.style.color = '';
+            desc.textContent = 'Your account is created. An administrator needs to approve your profile before you can submit attendance records.';
+          }, 3000);
+        }
+      } else {
+        btn.disabled = false;
+        btn.textContent = '🔄 Check Status';
       }
-    } catch (e) { /* silent */ }
-    btn.disabled = false;
-    btn.textContent = '🔄 Check Status';
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = '🔄 Check Status';
+    }
   });
 
   // Login Form
