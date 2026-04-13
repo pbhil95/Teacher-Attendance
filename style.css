@@ -1783,13 +1783,14 @@ h6 {
   }
 
   .teacher-banner-actions {
-    gap: 4px;
+    gap: 5px;
+    flex-wrap: wrap;
   }
 
   .teacher-dash-link,
   .teacher-pwd-btn {
-    padding: 6px 11px;
-    font-size: 0.7rem;
+    padding: 7px 10px;
+    font-size: 0.72rem;
   }
 }
 
@@ -1810,5 +1811,144 @@ h6 {
 
   .force-reset-card {
     padding: 28px 20px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE — COMPREHENSIVE OPTIMIZATIONS
+══════════════════════════════════════════════════════════ */
+
+/* ── iOS: prevent input auto-zoom (needs font-size ≥ 16px) ── */
+@media (max-width: 768px) {
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px;
+  }
+}
+
+/* ── Safe-area insets (iPhone home bar / notch) ── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .glass-container {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .fullscreen-overlay {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Modal → bottom-sheet on mobile ── */
+@media (max-width: 540px) {
+  .modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-content {
+    padding: 24px 20px 28px;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    max-height: 92dvh;
+    max-width: 100%;
+    /* slide up from bottom */
+    animation: slideUpSheet 0.3s var(--spring);
+  }
+  .modal-content::before {
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+  }
+  /* drag handle indicator */
+  .modal-content::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--bd2);
+    border-radius: 999px;
+    margin: -12px auto 16px;
+    order: -1;
+  }
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Teacher banner: 3 buttons equal-width grid on small phones ── */
+@media (max-width: 480px) {
+  .teacher-banner-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .teacher-pwd-btn,
+  .teacher-dash-link {
+    text-align: center;
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 0.68rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ── Wait card ── */
+@media (max-width: 480px) {
+  .wait-card {
+    padding: 32px 20px;
+    border-radius: var(--r-xl);
+  }
+  .wait-icon { font-size: 2.8rem; }
+  .wait-title { font-size: 1.3rem; }
+}
+
+/* ── Auth card: ensure it scrolls on short screens (registration) ── */
+@media (max-height: 700px) {
+  .fullscreen-overlay {
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+  .auth-card {
+    margin: 0 auto 24px;
+  }
+}
+
+/* ── Chip touch targets: minimum 44px height ── */
+@media (max-width: 768px) {
+  .chip label {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Period chips slightly larger tap area */
+  #period-chips .chip label {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+/* ── Counts grid: 2-col always on phones ── */
+@media (max-width: 540px) {
+  .counts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* ── Teacher designation in banner ── */
+.teacher-designation {
+  font-size: 0.78rem;
+  opacity: 0.78;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 480px) {
+  .teacher-designation {
+    white-space: normal;
+    font-size: 0.72rem;
   }
 }

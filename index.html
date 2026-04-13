@@ -595,6 +595,7 @@
         </div>
         <div class="teacher-banner-actions">
           <button class="teacher-pwd-btn" onclick="openMyReports()" type="button" style="background:rgba(16,185,129,0.22);border-color:rgba(16,185,129,0.5);">📊 My Reports</button>
+          <button class="teacher-pwd-btn" onclick="openEditProfileModal()" type="button" style="background:rgba(99,102,241,0.22);border-color:rgba(99,102,241,0.5);">✏️ Edit Profile</button>
           <button class="teacher-pwd-btn" onclick="openChangePwdModal()" type="button">🔑 Change Pwd</button>
         </div>
       </div>
@@ -704,6 +705,42 @@
       <div class="success-actions">
         <button class="btn btn-primary" onclick="submitAnother()">➕ Submit Another Entry</button>
       </div>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="modal-edit-profile" class="modal-backdrop" style="display:none;"
+    onclick="if(event.target===this)closeEditProfileModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">✏️ Edit My Profile</div>
+        <button class="modal-close" type="button" onclick="closeEditProfileModal()">✕</button>
+      </div>
+      <form id="form-edit-profile">
+        <div class="form-group">
+          <label class="form-label" for="ep-name">Full Name <span class="req">*</span></label>
+          <input type="text" id="ep-name" class="form-input" placeholder="e.g. Ramesh Kumar" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ep-designation">Designation <span class="req">*</span></label>
+          <select id="ep-designation" class="form-select" required>
+            <option value="">— Select —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Classes You Teach <span class="req">*</span></label>
+          <div id="ep-classes" class="chip-group"
+            style="max-height:120px;overflow-y:auto;border:1px solid var(--input-border);padding:10px;border-radius:var(--r-md);background:var(--input-bg);gap:6px;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subjects You Teach <span class="req">*</span></label>
+          <div id="ep-subjects" class="chip-group"
+            style="max-height:120px;overflow-y:auto;border:1px solid var(--input-border);padding:10px;border-radius:var(--r-md);background:var(--input-bg);gap:6px;"></div>
+        </div>
+        <div class="alert alert-danger hidden" id="ep-err" style="margin-bottom:12px;"></div>
+        <div class="alert alert-success hidden" id="ep-success" style="margin-bottom:12px;"></div>
+        <button class="btn btn-primary" type="submit" id="btn-save-profile">💾 Save Changes</button>
+      </form>
     </div>
   </div>
 

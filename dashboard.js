@@ -1,5 +1,21 @@
 
     // ═══════════════════════════════════════════════════════════════
+    //  EMAILJS CONFIG — for automatic approval emails
+    //  Setup: https://www.emailjs.com  (free, 200 emails/month)
+    //  1. Sign up → Email Services → connect Gmail/Outlook → copy Service ID
+    //  2. Email Templates → create template → copy Template ID
+    //     Template variables to use: {{to_email}}, {{to_name}}
+    //  3. Account → General → copy Public Key
+    // ═══════════════════════════════════════════════════════════════
+    const EMAILJS_PUBLIC_KEY  = 'U9zPnVXLtEzAkZ54k';   // ← paste here
+    const EMAILJS_SERVICE_ID  = 'service_jnvTarikhet';   // ← paste here
+    const EMAILJS_TEMPLATE_ID = 'template_mb8oyv6';  // ← paste here
+
+    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     //  STEP 1: Set your Supabase project details
     //  Get from: supabase.com → your project → Settings → API
     // ═══════════════════════════════════════════════════════════════
@@ -933,6 +949,15 @@
         badge.textContent = pending;
         badge.style.display = pending > 0 ? 'inline-block' : 'none';
         renderApprovals();
+        // Send approval email to teacher
+        if (approved && p) {
+          if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+              to_email: p.email,
+              to_name:  p.name
+            }).catch(() => {/* silent — don't block UI on email failure */});
+          }
+        }
       } catch (e) {
         alert('Error: ' + e.message);
         btn.disabled = false;

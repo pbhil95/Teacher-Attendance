@@ -221,6 +221,12 @@ function populateDropdowns() {
   buildChips('reg-classes', CLASSES);
   buildChips('reg-subjects', SUBJECTS);
 
+  // Edit Profile modal dropdowns
+  const epDesig = document.getElementById('ep-designation');
+  TEACHERS.forEach(t => epDesig.add(new Option(t, t)));
+  buildChips('ep-classes', CLASSES);
+  buildChips('ep-subjects', SUBJECTS);
+
   // Build period chips with data-p for coloring
   const pBox = document.getElementById('period-chips');
   PERIODS.forEach(p => {
@@ -286,9 +292,18 @@ function setupEventListeners() {
 
   // Refresh status
   document.getElementById('btn-refresh-status')?.addEventListener('click', async () => {
-    ST.loading.classList.remove('fade-out');
-    await appAuth.db.auth.refreshSession();
-    appAuth.init();
+    const btn = document.getElementById('btn-refresh-status');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span> Checking…';
+    try {
+      const { data: { session } } = await appAuth.db.auth.getSession();
+      if (session) {
+        appAuth.profile = await appAuth._loadProfile(session.user);
+        appAuth._notify();
+      }
+    } catch (e) { /* silent */ }
+    btn.disabled = false;
+    btn.textContent = '🔄 Check Status';
   });
 
   // Login Form
@@ -384,6 +399,9 @@ function setupEventListeners() {
 
   // Main Form Submit
   document.getElementById('attendance-form').addEventListener('submit', handleAttendanceSubmit);
+
+  // Edit Profile Form Submit
+  document.getElementById('form-edit-profile')?.addEventListener('submit', handleEditProfile);
 
   // Force Reset Form Submit
   document.getElementById('form-force-reset')?.addEventListener('submit', handleForceReset);
@@ -563,6 +581,74 @@ async function handleChangePwd(e) {
 
   btn.disabled = false;
   btn.textContent = '🔒 Update Password';
+}
+
+// --- EDIT PROFILE MODAL ---
+function openEditProfileModal() {
+  const p = appAuth.profile;
+  if (!p) return;
+  document.getElementById('ep-name').value = p.name || '';
+  const desigSel = document.getElementById('ep-designation');
+  desigSel.value = p.designation || '';
+  // Pre-check classes
+  document.querySelectorAll('#ep-classes input[type=checkbox]').forEach(cb => {
+    cb.checked = (p.classes || []).includes(cb.value);
+  });
+  // Pre-check subjects
+  document.querySelectorAll('#ep-subjects input[type=checkbox]').forEach(cb => {
+    cb.checked = (p.subjects || []).includes(cb.value);
+  });
+  document.getElementById('ep-err').classList.add('hidden');
+  document.getElementById('ep-success').classList.add('hidden');
+  document.getElementById('modal-edit-profile').style.display = 'flex';
+}
+
+function closeEditProfileModal() {
+  document.getElementById('modal-edit-profile').style.display = 'none';
+}
+
+async function handleEditProfile(e) {
+  e.preventDefault();
+  const name        = document.getElementById('ep-name').value.trim();
+  const designation = document.getElementById('ep-designation').value;
+  const classes     = [...document.querySelectorAll('#ep-classes input:checked')].map(i => i.value);
+  const subjects    = [...document.querySelectorAll('#ep-subjects input:checked')].map(i => i.value);
+  const err         = document.getElementById('ep-err');
+  const success     = document.getElementById('ep-success');
+  const btn         = document.getElementById('btn-save-profile');
+
+  err.classList.add('hidden');
+  success.classList.add('hidden');
+
+  if (!name)               return showError(err, 'Please enter your full name');
+  if (!designation)        return showError(err, 'Please select a designation');
+  if (classes.length  < 1) return showError(err, 'Select at least one class');
+  if (subjects.length < 1) return showError(err, 'Select at least one subject');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
+
+  try {
+    const { error } = await appAuth.db
+      .from('teacher_profiles')
+      .update({ name, designation, classes, subjects })
+      .eq('id', appAuth.user.id);
+    if (error) throw error;
+    // Update local profile
+    appAuth.profile.name        = name;
+    appAuth.profile.designation = designation;
+    appAuth.profile.classes     = classes;
+    appAuth.profile.subjects    = subjects;
+    // Refresh banner & form dropdowns
+    setupTeacherForm(appAuth.profile);
+    success.textContent = '✅ Profile updated successfully!';
+    success.classList.remove('hidden');
+    setTimeout(closeEditProfileModal, 1800);
+  } catch (ex) {
+    showError(err, ex.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '💾 Save Changes';
 }
 
 // --- ATTENDANCE FORM ---
