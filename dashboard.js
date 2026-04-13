@@ -902,13 +902,21 @@ function renderApprovals() {
       ? ' style="background:var(--amber-sub);border-color:var(--amber-border);color:var(--amber-lt);" title="Reset already pending"'
       : '';
     const actionBtns = p.approved
-      ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this)">🚫 Revoke</button>
+      ? `<button class="tc-btn revoke" onclick="setApproval('${p.id}',false,this,false)">🚫 Revoke</button>
              <button class="tc-btn edit"   onclick="openEdit('${p.id}')">✏️ Edit</button>
              <button class="tc-btn reset"${resetFlag} onclick="resetTeacherPassword('${p.id}',this)">🔑 Reset Pwd${p.force_password_reset ? ' ⚠' : ''}</button>`
-      : `<button class="tc-btn approve" onclick="setApproval('${p.id}',true,this)">✅ Approve</button>
-             <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this)" style="opacity:.75">🗑 Reject</button>
-             <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>
-             <button class="tc-btn reset"${resetFlag} onclick="resetTeacherPassword('${p.id}',this)">🔑 Reset Pwd${p.force_password_reset ? ' ⚠' : ''}</button>`;
+      : `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:100%;">
+               <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--emerald-sub);border:1px solid var(--emerald-border);border-radius:var(--r-md);cursor:pointer;" onclick="this.querySelector('input').click()" id="email-chk-wrap-${p.id}">
+                 <input type="checkbox" id="email-chk-${p.id}" checked onclick="event.stopPropagation()" style="width:16px;height:16px;accent-color:var(--emerald);cursor:pointer;flex-shrink:0;">
+                 <label for="email-chk-${p.id}" style="font-size:0.78rem;font-weight:700;color:var(--emerald-lt);cursor:pointer;white-space:nowrap;">📧 Send approval email</label>
+               </div>
+               <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                 <button class="tc-btn approve" onclick="setApproval('${p.id}',true,this,document.getElementById('email-chk-${p.id}').checked)">✅ Approve</button>
+                 <button class="tc-btn reject"  onclick="setApproval('${p.id}',false,this,false)" style="opacity:.75">🗑 Reject</button>
+                 <button class="tc-btn edit"    onclick="openEdit('${p.id}')">✏️ Edit</button>
+                 <button class="tc-btn reset"${resetFlag} onclick="resetTeacherPassword('${p.id}',this)">🔑 Reset Pwd${p.force_password_reset ? ' ⚠' : ''}</button>
+               </div>
+             </div>`;
 
     return `<div class="teacher-card ${statusClass}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
@@ -931,7 +939,7 @@ function renderApprovals() {
     `<div class="approval-grid">${html}</div>`;
 }
 
-async function setApproval(id, approved, btn) {
+async function setApproval(id, approved, btn, sendEmail = true) {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner spinner-dark"></span>';
   try {
@@ -949,8 +957,8 @@ async function setApproval(id, approved, btn) {
     badge.textContent = pending;
     badge.style.display = pending > 0 ? 'inline-block' : 'none';
     renderApprovals();
-    // Send approval email to teacher
-    if (approved && p) {
+    // Send approval email to teacher only if approved AND sendEmail checkbox was checked
+    if (approved && sendEmail && p) {
       if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
         try {
           await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
@@ -973,6 +981,8 @@ async function setApproval(id, approved, btn) {
         );
         window.open('mailto:' + p.email + '?subject=' + subject + '&body=' + body, '_blank');
       }
+    } else if (approved && !sendEmail) {
+      showShareSuccess('✅ ' + (p?.name || 'Teacher') + ' approved (no email sent).');
     }
   } catch (e) {
     alert('Error: ' + e.message);
