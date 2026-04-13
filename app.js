@@ -296,35 +296,32 @@ function setupEventListeners() {
     const btn = document.getElementById('btn-refresh-status');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Checking…';
-
-    // Safety: force-reset button after 8s no matter what
-    const safetyTimer = setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = '🔄 Check Status';
-    }, 8000);
+    let approved = false;
 
     try {
-      // Directly query teacher_profiles for approval status
       const userId = appAuth.user?.id;
       if (!userId) throw new Error('no user');
 
-      const { data: row, error } = await appAuth.db
+      const { data: row } = await appAuth.db
         .from('teacher_profiles')
-        .select('approved')
+        .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
-
-      if (row?.approved) {
-        clearTimeout(safetyTimer);
-        // Approved! Reload profile and go to main screen
-        appAuth.profile = await appAuth._loadProfile(appAuth.user);
-        appAuth._notify();
-        return;
+      if (row && row.approved) {
+        approved = true;
+        // Directly update profile and switch screen — no _notify()
+        appAuth.profile = row;
+        setupTeacherForm(row);
+        showScreen('main');
       }
+    } catch (e) {
+      if (window._log) window._log('Check status error: ' + e.message);
+    }
 
-      // Still pending
+    if (!approved) {
+      btn.disabled = false;
+      btn.textContent = '🔄 Check Status';
       const desc = document.querySelector('#screen-wait .wait-desc');
       if (desc) {
         desc.style.color = 'var(--rose-lt)';
@@ -334,12 +331,6 @@ function setupEventListeners() {
           desc.textContent = 'Your account is created. An administrator needs to approve your profile before you can submit attendance records.';
         }, 3000);
       }
-    } catch (e) {
-      // silently handle
-    } finally {
-      clearTimeout(safetyTimer);
-      btn.disabled = false;
-      btn.textContent = '🔄 Check Status';
     }
   });
 
