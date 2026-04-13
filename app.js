@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => ST.loading.classList.add('hidden'), 300);
 
     if (!user) {
+      if (window._stopApprovalWatcher) window._stopApprovalWatcher();
       const btnLogin = document.getElementById('btn-login');
       if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Sign In'; }
       showScreen('auth');
@@ -107,10 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (!profile.approved) {
       document.getElementById('wait-name').textContent = profile.name;
       showScreen('wait');
+      // Start listening for real-time approval — teacher is auto-redirected when admin approves
+      if (window._startApprovalWatcher) window._startApprovalWatcher();
     } else if (profile.force_password_reset || appAuth.recoveryMode) {
+      if (window._stopApprovalWatcher) window._stopApprovalWatcher();
       document.getElementById('force-reset-name').textContent = profile.name;
       showScreen('forceReset');
     } else {
+      if (window._stopApprovalWatcher) window._stopApprovalWatcher();
       setupTeacherForm(profile);
       showScreen('main');
     }
@@ -310,9 +315,13 @@ function setupEventListeners() {
 
       if (row && row.approved) {
         approved = true;
-        // Directly update profile and switch screen — no _notify()
+        // Reset button first, then redirect
+        btn.disabled = false;
+        btn.textContent = '🔄 Check Status';
+        // Update profile and switch screen
         appAuth.profile = row;
         setupTeacherForm(row);
+        showToast('✅ Account approved! Redirecting…');
         showScreen('main');
       }
     } catch (e) {
@@ -333,6 +342,46 @@ function setupEventListeners() {
       }
     }
   });
+
+  // ── Auto-detect approval via Supabase real-time ──────────────────────────
+  // Start listening for approval changes when the wait screen becomes active.
+  // This lets the teacher be redirected automatically without clicking.
+  window._startApprovalWatcher = function () {
+    if (window._approvalChannel) return; // already watching
+    const userId = appAuth.user?.id;
+    if (!userId) return;
+
+    if (window._log) window._log('Starting real-time approval watcher for: ' + userId);
+
+    window._approvalChannel = appAuth.db
+      .channel('approval-watch-' + userId)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'teacher_profiles',
+        filter: `id=eq.${userId}`
+      }, (payload) => {
+        if (window._log) window._log('Real-time update received: ' + JSON.stringify(payload.new));
+        if (payload.new && payload.new.approved) {
+          window._stopApprovalWatcher();
+          appAuth.profile = payload.new;
+          setupTeacherForm(payload.new);
+          showToast('✅ Your account has been approved! Welcome!');
+          showScreen('main');
+        }
+      })
+      .subscribe((status) => {
+        if (window._log) window._log('Approval channel status: ' + status);
+      });
+  };
+
+  window._stopApprovalWatcher = function () {
+    if (window._approvalChannel) {
+      appAuth.db.removeChannel(window._approvalChannel);
+      window._approvalChannel = null;
+      if (window._log) window._log('Approval watcher stopped.');
+    }
+  };
 
   // Login Form
   document.getElementById('form-login').addEventListener('submit', async (e) => {
