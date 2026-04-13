@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS teacher_profiles (
   id                    UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   name                  TEXT        NOT NULL,
+  designation           TEXT        NOT NULL DEFAULT '',
   email                 TEXT        NOT NULL,
   classes               TEXT[]      NOT NULL DEFAULT '{}',
   subjects              TEXT[]      NOT NULL DEFAULT '{}',
@@ -69,9 +70,11 @@ CREATE TABLE IF NOT EXISTS teacher_profiles (
   force_password_reset  BOOLEAN     NOT NULL DEFAULT FALSE
 );
 
--- Add force_password_reset if upgrading existing installs
+-- Add columns if upgrading existing installs
 ALTER TABLE teacher_profiles
   ADD COLUMN IF NOT EXISTS force_password_reset BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE teacher_profiles
+  ADD COLUMN IF NOT EXISTS designation TEXT NOT NULL DEFAULT '';
 
 ALTER TABLE teacher_profiles ENABLE ROW LEVEL SECURITY;
 

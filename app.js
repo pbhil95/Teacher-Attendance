@@ -204,7 +204,7 @@ function switchAuthTab(type) {
 
 // --- POPULATE DROPDOWNS ---
 function populateDropdowns() {
-  const regName = document.getElementById('reg-name');
+  const regName = document.getElementById('reg-designation');
   TEACHERS.forEach(t => regName.add(new Option(t, t)));
 
   const buildChips = (containerId, items) => {
@@ -234,6 +234,8 @@ function populateDropdowns() {
 
 function setupTeacherForm(profile) {
   document.getElementById('teacher-name-display').textContent = profile.name;
+  const desigEl = document.getElementById('teacher-designation-display');
+  if (desigEl) desigEl.textContent = profile.designation || '';
 
   const clsSel = document.getElementById('form-class');
   clsSel.innerHTML = '<option value="">— Select class —</option>';
@@ -341,17 +343,19 @@ function setupEventListeners() {
   // Register Form
   document.getElementById('form-register').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name       = document.getElementById('reg-name').value;
-    const email      = document.getElementById('reg-email').value.trim();
-    const pwd        = document.getElementById('reg-pwd').value;
-    const pwdConfirm = document.getElementById('reg-pwd-confirm').value;
-    const classes    = [...document.querySelectorAll('#reg-classes input:checked')].map(i => i.value);
-    const subjects   = [...document.querySelectorAll('#reg-subjects input:checked')].map(i => i.value);
-    const btn        = document.getElementById('btn-register');
-    const err        = document.getElementById('err-register');
+    const teacherName  = document.getElementById('reg-teacher-name').value.trim();
+    const designation  = document.getElementById('reg-designation').value;
+    const email        = document.getElementById('reg-email').value.trim();
+    const pwd          = document.getElementById('reg-pwd').value;
+    const pwdConfirm   = document.getElementById('reg-pwd-confirm').value;
+    const classes      = [...document.querySelectorAll('#reg-classes input:checked')].map(i => i.value);
+    const subjects     = [...document.querySelectorAll('#reg-subjects input:checked')].map(i => i.value);
+    const btn          = document.getElementById('btn-register');
+    const err          = document.getElementById('err-register');
     err.classList.add('hidden');
 
-    if (!name)               return showError(err, 'Please select a designation');
+    if (!teacherName)        return showError(err, 'Please enter your full name');
+    if (!designation)        return showError(err, 'Please select a designation');
     if (pwd !== pwdConfirm)  return showError(err, 'Passwords do not match');
     if (classes.length  < 1) return showError(err, 'Select at least one class');
     if (subjects.length < 1) return showError(err, 'Select at least one subject');
@@ -359,7 +363,7 @@ function setupEventListeners() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Creating Account…';
 
-    const { error } = await appAuth.register(email, pwd, name, classes, subjects);
+    const { error } = await appAuth.register(email, pwd, teacherName, designation, classes, subjects);
     if (error) {
       showError(err, error.message);
       btn.disabled = false;

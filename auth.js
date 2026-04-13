@@ -53,6 +53,7 @@ window.appAuth = {
         .insert([{
           id: user.id,
           name: uMeta.name,
+          designation: uMeta.designation || '',
           email: user.email,
           classes: uMeta.classes || [],
           subjects: uMeta.subjects || [],
@@ -133,11 +134,11 @@ window.appAuth = {
     return await db.auth.signInWithPassword({ email, password });
   },
 
-  async register(email, password, name, classes, subjects) {
+  async register(email, password, name, designation, classes, subjects) {
     return await db.auth.signUp({
       email,
       password,
-      options: { data: { name, classes, subjects } }
+      options: { data: { name, designation, classes, subjects } }
     });
   },
 
