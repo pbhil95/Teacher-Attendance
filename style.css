@@ -1757,14 +1757,7 @@ h6 {
     max-width: 1000px;
     padding: 36px 32px 80px;
   }
-}
 
-@media (min-width: 1000px) {
-  .app-header {
-    padding-left: calc(50vw - 500px + 24px);
-    padding-right: calc(50vw - 500px + 24px);
-  }
-}
   #attendance-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1775,6 +1768,14 @@ h6 {
   #attendance-form .submit-wrap {
     grid-column: 1 / -1;
   }
+}
+
+@media (min-width: 1000px) {
+  .app-header {
+    padding-left: calc(50vw - 500px + 24px);
+    padding-right: calc(50vw - 500px + 24px);
+  }
+}
 
   .teacher-banner {
     padding: 18px 28px;
