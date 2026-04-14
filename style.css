@@ -674,7 +674,7 @@ h6 {
 
 /* Main container */
 .glass-container {
-  max-width: 660px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 24px 16px 80px;
   display: flex;
@@ -1754,7 +1754,7 @@ h6 {
 /* ── Desktop / wide screen layout ── */
 @media (min-width: 900px) {
   .glass-container {
-    max-width: 860px;
+    max-width: 1000px;
     padding: 36px 32px 80px;
   }
 
