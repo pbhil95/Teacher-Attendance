@@ -948,7 +948,23 @@ function renderMyKpis(rows) {
     { val: taken.length,    lbl: 'Classes Taken',   color: 'var(--emerald-lt)' },
     { val: notTaken.length, lbl: 'Not Taken',       color: 'var(--rose-lt)' },
     { val: avgPct + '%',    lbl: 'Avg Attendance',  color: 'var(--cyan-lt)' },
-    { val: periods,             let h = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
+    { val: periods,         lbl: 'Periods Covered', color: 'var(--amber-lt)' },
+  ];
+
+  document.getElementById('my-kpi-grid').innerHTML = kpis.map(k => `
+    <div class="my-kpi">
+      <div class="my-kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="my-kpi-lbl">${k.lbl}</div>
+    </div>`).join('');
+}
+
+function renderMyTable(rows) {
+  const el = document.getElementById('my-records-body');
+  if (!rows.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t3);">📭 No submissions found for this period.</div>';
+    return;
+  }
+  let h = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
     <thead><tr style="background:var(--bg-raised);">
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">#</th>
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Date</th>
