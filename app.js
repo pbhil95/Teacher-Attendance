@@ -238,7 +238,7 @@ function populateDropdowns() {
   PERIODS.forEach(p => {
     pBox.innerHTML += `
       <div class="chip" data-p="${p}">
-        <input type="radio" name="period" id="p${p}" value="${p}" required>
+        <input type="radio" name="period" id="p${p}" value="${p}">
         <label for="p${p}">P${p}</label>
       </div>`;
   });
@@ -948,23 +948,7 @@ function renderMyKpis(rows) {
     { val: taken.length,    lbl: 'Classes Taken',   color: 'var(--emerald-lt)' },
     { val: notTaken.length, lbl: 'Not Taken',       color: 'var(--rose-lt)' },
     { val: avgPct + '%',    lbl: 'Avg Attendance',  color: 'var(--cyan-lt)' },
-    { val: periods,         lbl: 'Periods Covered', color: 'var(--amber-lt)' },
-  ];
-
-  document.getElementById('my-kpi-grid').innerHTML = kpis.map(k => `
-    <div class="my-kpi">
-      <div class="my-kpi-val" style="color:${k.color}">${k.val}</div>
-      <div class="my-kpi-lbl">${k.lbl}</div>
-    </div>`).join('');
-}
-
-function renderMyTable(rows) {
-  const el = document.getElementById('my-records-body');
-  if (!rows.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--t3);">📭 No submissions found for this period.</div>';
-    return;
-  }
-  let h = `<table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
+    { val: periods,             let h = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
     <thead><tr style="background:var(--bg-raised);">
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">#</th>
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Date</th>
@@ -973,8 +957,13 @@ function renderMyTable(rows) {
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Subject</th>
       <th style="padding:10px 12px;text-align:left;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Status</th>
       <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Total</th>
-      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Present</th>
-      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Absent</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Pre</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Abs</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Lev</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">OD</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">TCA</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">NR</th>
+      <th style="padding:10px 12px;text-align:center;font-size:0.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Sick</th>
     </tr></thead><tbody>`;
 
   rows.forEach((r, i) => {
@@ -993,9 +982,14 @@ function renderMyTable(rows) {
       <td style="padding:10px 12px;font-weight:600;color:var(--t1);">${r.class}</td>
       <td style="padding:10px 12px;color:var(--t2);">${r.subject}</td>
       <td style="padding:10px 12px;">${statusHtml}</td>
-      <td style="padding:10px 12px;text-align:center;font-weight:600;">${r.total || '—'}</td>
-      <td style="padding:10px 12px;text-align:center;color:var(--emerald-lt);font-weight:600;">${r.present || '—'}</td>
-      <td style="padding:10px 12px;text-align:center;color:var(--rose-lt);font-weight:600;">${r.absent || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700;color:var(--indigo-lt);">${r.total || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700;color:var(--emerald-lt);">${r.present || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700;color:var(--rose-lt);">${r.absent || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;color:var(--cyan-lt);">${r.leave_count || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;color:var(--violet-lt);">${r.od || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;color:var(--amber-lt);">${r.tca || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;color:var(--pink-lt);">${r.nr || '—'}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:600;color:var(--orange-lt);">${r.sick || '—'}</td>
     </tr>`;
   });
 
