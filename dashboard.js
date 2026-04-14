@@ -372,6 +372,9 @@ async function tryPin() {
         err.textContent = `❌ Wrong PIN. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`;
       }
       err.style.display = 'block';
+      err.classList.remove('shake-error');
+      void err.offsetWidth;
+      err.classList.add('shake-error');
       btn.textContent = 'Open Dashboard →'; btn.disabled = false;
       setTimeout(() => inp.focus(), 50);
       return;
@@ -437,10 +440,12 @@ async function saveNewPin() {
   sucEl.style.display = 'none';
 
   // Basic presence checks before any async work
-  if (!currentVal) { currErrEl.textContent = '⚠️ Enter your current PIN'; document.getElementById('cpCurrent').focus(); return; }
-  if (!newVal) { errEl.textContent = '⚠️ Enter a new PIN'; document.getElementById('cpNew').focus(); return; }
-  if (newVal.length < 4) { errEl.textContent = '⚠️ PIN must be at least 4 characters'; return; }
-  if (newVal !== confirmVal) { errEl.textContent = '❌ PINs do not match'; document.getElementById('cpConfirm').focus(); return; }
+  const shake = (el) => { el.classList.remove('shake-error'); void el.offsetWidth; el.classList.add('shake-error'); el.style.display = 'block'; };
+  
+  if (!currentVal) { currErrEl.textContent = '⚠️ Please enter your current PIN'; document.getElementById('cpCurrent').focus(); shake(currErrEl); return; }
+  if (!newVal) { errEl.textContent = '⚠️ Please enter a new PIN'; document.getElementById('cpNew').focus(); shake(errEl); return; }
+  if (newVal.length < 4) { errEl.textContent = '⚠️ PIN must be at least 4 characters'; shake(errEl); return; }
+  if (newVal !== confirmVal) { errEl.textContent = '❌ PINs do not match'; document.getElementById('cpConfirm').focus(); shake(errEl); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Verifying...';
@@ -1077,8 +1082,10 @@ async function saveProfile() {
   const btn = document.getElementById('modalSaveBtn');
 
   errEl.textContent = '';
-  if (classes.length === 0) { errEl.textContent = '⚠️ Select at least one class'; return; }
-  if (subjects.length === 0) { errEl.textContent = '⚠️ Select at least one subject'; return; }
+  const shake = (el) => { el.classList.remove('shake-error'); void el.offsetWidth; el.classList.add('shake-error'); };
+  
+  if (classes.length === 0) { errEl.textContent = '⚠️ Please select at least one class'; shake(errEl); return; }
+  if (subjects.length === 0) { errEl.textContent = '⚠️ Please select at least one subject'; shake(errEl); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Saving...';

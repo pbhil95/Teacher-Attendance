@@ -392,15 +392,20 @@ function setupEventListeners() {
     const err   = document.getElementById('err-login');
 
     err.classList.add('hidden');
+
+    // Client-side validation before hitting the API
+    if (!email)   return showError(err, '⚠️ Please enter your email address');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(err, '⚠️ Please enter a valid email address');
+    if (!pwd)     return showError(err, '⚠️ Please enter your password');
+
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Signing In…';
 
     const { error } = await appAuth.login(email, pwd);
     if (error) {
-      err.textContent = error.message;
-      err.classList.remove('hidden');
+      showError(err, '❌ ' + error.message);
       btn.disabled = false;
-      btn.textContent = 'Sign In';
+      btn.textContent = 'Sign In →';
     }
   });
 
@@ -414,17 +419,21 @@ function setupEventListeners() {
 
     err.classList.add('hidden');
     succ.classList.add('hidden');
+
+    // Validate email before sending
+    if (!email) return showError(err, '⚠️ Please enter your email address');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(err, '⚠️ Please enter a valid email address');
+
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Sending Link…';
 
     const { error } = await appAuth.resetPassword(email);
     if (error) {
-      err.textContent = error.message;
-      err.classList.remove('hidden');
+      showError(err, '❌ ' + error.message);
       btn.disabled = false;
       btn.textContent = 'Send Reset Link →';
     } else {
-      succ.textContent = 'Reset link sent! Check your email inbox (and spam folder).';
+      succ.textContent = '✅ Reset link sent! Check your email inbox (and spam folder).';
       succ.classList.remove('hidden');
       btn.disabled = false;
       btn.textContent = 'Send Reset Link →';
@@ -446,20 +455,24 @@ function setupEventListeners() {
     const err          = document.getElementById('err-register');
     err.classList.add('hidden');
 
-    if (!teacherName)        return showError(err, 'Please enter your full name');
-    if (!designation)        return showError(err, 'Please select a designation');
-    if (pwd !== pwdConfirm)  return showError(err, 'Passwords do not match');
-    if (classes.length  < 1) return showError(err, 'Select at least one class');
-    if (subjects.length < 1) return showError(err, 'Select at least one subject');
+    if (!teacherName)                                  return showError(err, '⚠️ Please enter your full name');
+    if (!designation)                                  return showError(err, '⚠️ Please select your designation');
+    if (!email)                                        return showError(err, '⚠️ Please enter your email address');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))    return showError(err, '⚠️ Please enter a valid email address');
+    if (!pwd)                                          return showError(err, '⚠️ Please enter a password');
+    if (pwd.length < 8)                               return showError(err, '⚠️ Password must be at least 8 characters');
+    if (pwd !== pwdConfirm)                           return showError(err, '❌ Passwords do not match — please re-enter');
+    if (classes.length  < 1)                          return showError(err, '⚠️ Please select at least one class you teach');
+    if (subjects.length < 1)                          return showError(err, '⚠️ Please select at least one subject you teach');
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-sm"></span> Creating Account…';
 
     const { error } = await appAuth.register(email, pwd, teacherName, designation, classes, subjects);
     if (error) {
-      showError(err, error.message);
+      showError(err, '❌ ' + error.message);
       btn.disabled = false;
-      btn.textContent = 'Create Account';
+      btn.textContent = 'Create Account →';
     }
   });
 
@@ -500,6 +513,12 @@ function setupEventListeners() {
 function showError(el, msg) {
   el.textContent = msg;
   el.classList.remove('hidden');
+  // Scroll into view so user can see the error
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Shake animation for visibility
+  el.classList.remove('shake-error');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('shake-error');
 }
 
 function toggleCounts(isTaken) {
@@ -578,8 +597,10 @@ async function handleForceReset(e) {
 
   err.classList.add('hidden');
 
-  if (newPwd.length < 8)   return showError(err, 'Password must be at least 8 characters');
-  if (newPwd !== confirm)  return showError(err, 'Passwords do not match');
+  if (!newPwd)             return showError(err, '⚠️ Please enter a new password');
+  if (newPwd.length < 8)   return showError(err, '⚠️ Password must be at least 8 characters long');
+  if (!confirm)            return showError(err, '⚠️ Please confirm your new password');
+  if (newPwd !== confirm)  return showError(err, '❌ Passwords do not match — please re-enter');
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
@@ -638,8 +659,10 @@ async function handleChangePwd(e) {
   err.classList.add('hidden');
   success.classList.add('hidden');
 
-  if (newPwd.length < 8)  return showError(err, 'Password must be at least 8 characters');
-  if (newPwd !== confirm)  return showError(err, 'Passwords do not match');
+  if (!newPwd)            return showError(err, '⚠️ Please enter a new password');
+  if (newPwd.length < 8)  return showError(err, '⚠️ Password must be at least 8 characters long');
+  if (!confirm)           return showError(err, '⚠️ Please confirm your new password');
+  if (newPwd !== confirm)  return showError(err, '❌ Passwords do not match — please re-enter');
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-sm"></span> Updating…';
@@ -697,10 +720,10 @@ async function handleEditProfile(e) {
   err.classList.add('hidden');
   success.classList.add('hidden');
 
-  if (!name)               return showError(err, 'Please enter your full name');
-  if (!designation)        return showError(err, 'Please select a designation');
-  if (classes.length  < 1) return showError(err, 'Select at least one class');
-  if (subjects.length < 1) return showError(err, 'Select at least one subject');
+  if (!name)               return showError(err, '⚠️ Please enter your full name');
+  if (!designation)        return showError(err, '⚠️ Please select your designation');
+  if (classes.length  < 1) return showError(err, '⚠️ Please select at least one class you teach');
+  if (subjects.length < 1) return showError(err, '⚠️ Please select at least one subject you teach');
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
@@ -729,22 +752,53 @@ async function handleEditProfile(e) {
 }
 
 // --- ATTENDANCE FORM ---
+// Inline error helper for the attendance form
+function showFormError(msg) {
+  let errEl = document.getElementById('form-submit-error');
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.id = 'form-submit-error';
+    errEl.className = 'alert alert-danger';
+    errEl.style.cssText = 'margin-bottom:12px;';
+    const submitWrap = document.querySelector('.submit-wrap');
+    if (submitWrap) submitWrap.parentNode.insertBefore(errEl, submitWrap);
+  }
+  errEl.textContent = msg;
+  errEl.classList.remove('hidden');
+  errEl.classList.remove('shake-error');
+  void errEl.offsetWidth;
+  errEl.classList.add('shake-error');
+  errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Also show toast for quick visibility
+  showToast(msg);
+}
+function clearFormError() {
+  const errEl = document.getElementById('form-submit-error');
+  if (errEl) errEl.classList.add('hidden');
+}
+
 async function handleAttendanceSubmit(e) {
   e.preventDefault();
+  clearFormError();
 
   const period  = document.querySelector('input[name="period"]:checked')?.value;
   const cls     = document.getElementById('form-class').value;
   const subject = document.getElementById('form-subject').value;
   const taken   = document.querySelector('input[name="taken"]:checked')?.value;
+  const reason  = document.getElementById('form-reason').value;
 
-  if (!period || !cls || !subject || !taken)
-    return showToast('⚠️ Please fill out all required fields.');
+  if (!period)  return showFormError('⚠️ Please select a Period before submitting');
+  if (!cls)     return showFormError('⚠️ Please select a Class before submitting');
+  if (!subject) return showFormError('⚠️ Please select a Subject before submitting');
+
+  if (taken === 'No' && !reason)
+    return showFormError('⚠️ Please select a Reason for not taking the class');
 
   if (taken === 'Yes') {
     const tot = getN('tot');
     const sum = getN('pre') + getN('abs') + getN('lea') + getN('od') + getN('tca') + getN('nr') + getN('sick');
-    if (!tot) return showToast('⚠️ Please enter Total Students');
-    if (sum !== tot) return showToast(`❌ Math error: Sum (${sum}) ≠ Total (${tot})`);
+    if (!tot) return showFormError('⚠️ Please enter the Total Students count');
+    if (sum !== tot) return showFormError(`❌ Math error: Sum of all counts (${sum}) must equal Total Students (${tot}). Difference: ${sum > tot ? '+' : ''}${sum - tot}`);
   }
 
   const btn = document.getElementById('btn-submit');
@@ -775,8 +829,9 @@ async function handleAttendanceSubmit(e) {
   btn.innerHTML = 'Submit Attendance &rarr;';
 
   if (error) {
-    showToast('❌ Error submitting: ' + error.message);
+    showFormError('❌ Submission failed: ' + error.message);
   } else {
+    clearFormError();
     const rows = [
       ['Teacher', payload.teacher],
       ['Period',  'Period ' + period],

@@ -410,6 +410,16 @@ h6 {
   }
 }
 
+@keyframes shake-error {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+.shake-error {
+  animation: shake-error 0.4s var(--ease) both;
+}
+
 /* ══════════════════════════════════════════════════════════
    APP HEADER
 ══════════════════════════════════════════════════════════ */
