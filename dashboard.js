@@ -246,7 +246,8 @@ function aggregateDaily(rows, teacherFilter) {
     od: r.od || 0, tca: r.tca || 0, nr: r.nr || 0, sick: r.sick || 0,
     mathOk: !isTaken(r) || rowSum(r) === (r.total || 0),
     time: new Date(r.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-    reason: r.reason || ''
+    reason: r.reason || '', remarks: r.remarks || '',
+    date: new Date(r.created_at).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric'})
   }));
 
   // Errors
@@ -648,7 +649,10 @@ function renderTodayTable(rows) {
     <th>Leave</th><th>OD</th><th>TCA</th><th>NR</th><th>Sick</th>
     <th>Math</th><th>Time</th></tr></thead><tbody>`;
   rows.forEach((r, i) => {
-    const tp = r.taken ? '<span class="pill pill-ok">Yes</span>' : '<span class="pill pill-warn">No</span>';
+    let tp = r.taken ? '<span class="pill pill-ok">Yes</span>' : '<span class="pill pill-warn">No</span>';
+    if (!r.taken && (r.reason || r.remarks)) {
+      tp += `<div style="margin-top:6px;"><button onclick="window.showReasonModal(\`${(r.reason||'').replace(/`/g,"'")}\`, \`${(r.remarks||'').replace(/`/g,"'")}\`, \`${r.date}\`, \`${r.period}\`)" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:2px 8px;border-radius:12px;font-size:10px;cursor:pointer;font-weight:700;" title="View Remarks" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">ℹ️ Reason</button></div>`;
+    }
     const mp = !r.taken ? '<span class="pill pill-gray">N/A</span>' : r.mathOk ? '<span class="pill pill-ok">✅</span>' : '<span class="pill pill-err">❌</span>';
     h += `<tr class="dr"><td>${i + 1}</td><td><b>${r.teacher}</b></td>
       <td style="text-align:center"><b>${r.period}</b></td>
@@ -1311,3 +1315,33 @@ async function exportDashboardExcel() {
   const safeTeacher = teacher ? '_' + teacher.replace(/\s+/g, '_') : '';
   XLSX.writeFile(wb, `JNV_Tarikhet_Attendance_${date}${safeTeacher}.xlsx`);
 }
+
+// ═══════════════════════════════════════════════════════════
+//  REMARKS POPUP MODAL
+// ═══════════════════════════════════════════════════════════
+window.showReasonModal = function(reason, remarks, date, period) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-backdrop'; // Matches dashboard.css modal backdrop
+  overlay.style.display = 'flex';
+  overlay.style.zIndex = '99999';
+  const rTxt = reason || 'Not Specified';
+  const remTxt = remarks || '<i>No additional remarks provided.</i>';
+  
+  overlay.innerHTML = `
+    <div class="modal-content" style="max-width:440px;text-align:center;padding:32px;">
+      <h3 style="margin-top:0;color:var(--text);margin-bottom:6px;font-size:1.3rem;">Reason for Absence</h3>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:20px;font-weight:600;">Class scheduled on ${date} (Period ${period})</p>
+      
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;margin-bottom:24px;text-align:left;">
+        <div style="font-size:0.65rem;text-transform:uppercase;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:6px;">Selected Reason</div>
+        <div style="font-weight:700;color:var(--blue);margin-bottom:16px;font-size:0.95rem;">${rTxt}</div>
+        
+        <div style="font-size:0.65rem;text-transform:uppercase;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:6px;">Teacher Remarks</div>
+        <div style="color:var(--text2);font-size:0.85rem;line-height:1.6;background:rgba(0,0,0,0.2);padding:12px;border-radius:var(--r-sm);border:1px solid var(--border);">${remTxt}</div>
+      </div>
+      
+      <button onclick="this.closest('.modal-backdrop').remove()" class="btn" style="width:100%;">Okay, Close</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+};

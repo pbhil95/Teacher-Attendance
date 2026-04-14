@@ -987,9 +987,12 @@ function renderMyTable(rows) {
     const date = dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
     const time = dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
     const isTaken = String(r.taken).toLowerCase() === 'yes';
-    const statusHtml = isTaken
+    let statusHtml = isTaken
       ? '<span style="background:var(--emerald-sub);color:var(--emerald-lt);border:1px solid var(--emerald-border);padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">✓ Taken</span>'
       : '<span style="background:var(--rose-sub);color:var(--rose-lt);border:1px solid var(--rose-border);padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">✗ Not Taken</span>';
+    if (!isTaken && (r.reason || r.remarks)) {
+      statusHtml += `<div style="margin-top:5px;"><button onclick="window.showReasonModal(\`${(r.reason||'').replace(/`/g,"'")}\`, \`${(r.remarks||'').replace(/`/g,"'")}\`, \`${date}\`, \`${r.period}\`)" style="background:var(--bg-raised);border:1px solid var(--bd2);color:var(--t2);padding:3px 10px;border-radius:var(--r-full);font-size:0.66rem;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:4px;transition:0.2s;" onmouseover="this.style.background='var(--indigo-sub)';this.style.borderColor='var(--indigo-border)';this.style.color='var(--indigo-lt)'" onmouseout="this.style.background='var(--bg-raised)';this.style.borderColor='var(--bd2)';this.style.color='var(--t2)'" title="View Remarks">ℹ️ Reason</button></div>`;
+    }
     const bg = i % 2 === 0 ? '' : 'background:var(--bg-raised);';
     h += `<tr style="${bg}border-bottom:1px solid var(--bd);">
       <td style="padding:10px 12px;color:var(--t3);">${i + 1}</td>
@@ -1051,3 +1054,32 @@ function exportMyExcel() {
   XLSX.writeFile(wb, fileName);
   showToast('✅ Excel exported successfully!');
 }
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL GLOBALS
+// ═══════════════════════════════════════════════════════════
+window.showReasonModal = function(reason, remarks, date, period) {
+  const overlay = document.createElement('div');
+  overlay.className = 'fullscreen-overlay';
+  overlay.style.zIndex = '99999';
+  const rTxt = reason || 'Not Specified';
+  const remTxt = remarks || '<i>No additional remarks provided.</i>';
+  
+  overlay.innerHTML = `
+    <div class="auth-card" style="max-width:440px;text-align:center;padding:32px;animation:fadeSlideIn 0.3s var(--spring) forwards;">
+      <h3 style="margin-top:0;font-family:var(--font-heading);color:var(--t1);margin-bottom:6px;font-size:1.3rem;">Reason for Absence</h3>
+      <p style="font-size:0.8rem;color:var(--t3);margin-bottom:20px;font-weight:600;">Class scheduled on ${date} (Period ${period})</p>
+      
+      <div style="background:var(--bg-raised);border:1px solid var(--bd2);border-radius:var(--r-md);padding:18px;margin-bottom:24px;text-align:left;">
+        <div style="font-size:0.65rem;text-transform:uppercase;font-weight:700;color:var(--t3);letter-spacing:1px;margin-bottom:6px;">Selected Reason</div>
+        <div style="font-weight:700;color:var(--indigo-lt);margin-bottom:16px;font-size:0.95rem;">${rTxt}</div>
+        
+        <div style="font-size:0.65rem;text-transform:uppercase;font-weight:700;color:var(--t3);letter-spacing:1px;margin-bottom:6px;">Teacher Remarks</div>
+        <div style="color:var(--t2);font-size:0.85rem;line-height:1.6;background:var(--input-bg);padding:12px;border-radius:var(--r-sm);border:1px solid var(--input-border);">${remTxt}</div>
+      </div>
+      
+      <button onclick="this.closest('.fullscreen-overlay').remove()" class="btn btn-primary" style="width:100%;">Okay, Close</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+};
