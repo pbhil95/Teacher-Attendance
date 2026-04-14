@@ -701,6 +701,16 @@ tbody tr:hover td {
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
+@media (min-width: 1000px) {
+  /* Reset the 1000px clamp inherited from style.css */
+  .app-header { padding: 0 28px; }
+}
+@media (min-width: 1440px) {
+  .app-header, .toolbar, .tabs {
+    padding-left: calc(50vw - 720px + 28px);
+    padding-right: calc(50vw - 720px + 28px);
+  }
+}
 @media (max-width: 900px) {
   .kpi-grid { grid-template-columns: repeat(3, 1fr); }
 }

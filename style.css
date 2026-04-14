@@ -1757,7 +1757,14 @@ h6 {
     max-width: 1000px;
     padding: 36px 32px 80px;
   }
+}
 
+@media (min-width: 1000px) {
+  .app-header {
+    padding-left: calc(50vw - 500px + 24px);
+    padding-right: calc(50vw - 500px + 24px);
+  }
+}
   #attendance-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
